@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # 1. Database Service (MySQL)
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysql-container
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "mydb"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # 2. Spring Boot Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: springboot-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqldb
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/mydb?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+
+  # 3. Next.js Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nextjs-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      # ชี้ไปยัง localhost เพราะเบราว์เซอร์ของผู้ใช้เป็นคนยิง API มาที่พอร์ต 8080
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+
+volumes:
+  mysql-data:
