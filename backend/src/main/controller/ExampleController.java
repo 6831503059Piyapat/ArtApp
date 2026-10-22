@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.example.backend.controller;
 
-import com.example.demo.entity.ExampleEntity;
-import com.example.demo.repository.UserRepository;
+import com.example.backend.entity.ExampleEntity;
+import com.example.backend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
