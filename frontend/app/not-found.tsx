@@ -9,7 +9,7 @@ export default function NotFound() {
         {/* Animated / Glowing 404 Text */} 
         <div className="relative">
           <h1 className="text-9xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse">
-            40404
+            404
           </h1>
           <div className="bg-indigo-600 text-xs px-2 py-1 rounded rotate-12 absolute top-10 left-1/2 -translate-x-1/2 shadow-lg">
             Page Not Found
