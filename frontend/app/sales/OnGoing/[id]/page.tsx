@@ -1,776 +1,388 @@
-
 "use client";
-
-import { useMemo, useState } from "react";
+import React, { useState } from 'react';
 import {
-  Store, UserRound, Package, Wallet, History, ArrowLeft,
-  Users, Plus, Minus, Trash2, Save, Undo2, Lock,
-  ReceiptText, X, Copy, Sun, Moon, Check,
-} from "lucide-react";
+  Store,
+  LayoutGrid,
+  User,
+  Plus,
+  Trash2,
+  Undo2,
+  ArrowLeft,
+  ShoppingBag,
+  History,
+  Lightbulb,
+  Receipt,
+  UserPlus,
+  Save,
+  X,
+  PlusCircle,
+  Minus
+} from 'lucide-react';
+import Navbar from '@/app/components/navbar';
 
-type Supplier = "host" | "kaimook" | "japan";
-
-type Product = {
-  id: number;
-  name: string;
-  supplier: Supplier;
-  stock: number;
-  sold: number;
-  price: number;
-};
-
-const initialProducts: Product[] = [
-  { id: 1, name: "Green Horned Frog", supplier: "host", stock: 0, sold: 10, price: 150 },
-  { id: 2, name: "Yellow Horned Frog", supplier: "host", stock: 1, sold: 9, price: 150 },
-  { id: 3, name: "Brown Horned Frog", supplier: "host", stock: 6, sold: 4, price: 150 },
-  { id: 4, name: "Japanese turtle (Big)", supplier: "kaimook", stock: 3, sold: 5, price: 250 },
-  { id: 5, name: "Japanese turtle (Small)", supplier: "kaimook", stock: 10, sold: 7, price: 100 },
-  { id: 6, name: "Turtle food 500g", supplier: "kaimook", stock: 40, sold: 22, price: 80 },
-  { id: 7, name: "Aquarium Moss Ball (Medium)", supplier: "japan", stock: 8, sold: 7, price: 60 },
-  { id: 8, name: "Mini Terrarium Starter Glass", supplier: "japan", stock: 3, sold: 3, price: 190 },
-];
-
-const suppliers: { id: Supplier; name: string; color: string }[] = [
-  { id: "host", name: "My Products (Host)", color: "bg-primary-500" },
-  { id: "kaimook", name: "P' Kaimook", color: "bg-pink-500" },
-  { id: "japan", name: "Nong' Japan", color: "bg-amber-500" },
-];
-
-const money = (value: number) =>
-  `฿${value.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-
-export default function OngoingPage() {
-  const [products, setProducts] = useState(initialProducts);
-  const [filter, setFilter] = useState<"all" | Supplier>("all");
-  const [gross, setGross] = useState(8490);
-  const [unitsSold, setUnitsSold] = useState(66);
-  const [lastAction, setLastAction] = useState<{
-    productId: number;
-    qty: number;
-    amount: number;
-    name: string;
-  } | null>(null);
-
-  const [dark, setDark] = useState(false);
-  const [showInvite, setShowInvite] = useState(false);
-  const [showAddSupplier, setShowAddSupplier] = useState(false);
-  const [newSupplier, setNewSupplier] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newQty, setNewQty] = useState("1");
-  const [newPrice, setNewPrice] = useState("1");
-  const [addTo, setAddTo] = useState<Supplier>("host");
-  const [message, setMessage] = useState("Sold 5x Turtle food 500g");
-  const [saved, setSaved] = useState(true);
-
-  const filteredProducts = useMemo(
-    () => filter === "all"
-      ? products
-      : products.filter((p) => p.supplier === filter),
-    [products, filter]
-  );
-
-  const updateProduct = (id: number, changes: Partial<Product>) => {
-    setProducts((current) =>
-      current.map((p) => p.id === id ? { ...p, ...changes } : p)
-    );
-    setSaved(false);
-  };
-
-  const changeStock = (id: number, amount: number) => {
-    const product = products.find((p) => p.id === id);
-    if (!product) return;
-    const next = product.stock + amount;
-    if (next < 0) return;
-    updateProduct(id, { stock: next });
-  };
-
-  const recordSale = (id: number, qty: number) => {
-    const product = products.find((p) => p.id === id);
-    if (!product || qty <= 0) return;
-
-    if (product.stock < qty) {
-      window.alert("Not enough inventory remaining for this item!");
-      return;
-    }
-
-    const amount = product.price * qty;
-
-    setProducts((current) => current.map((p) =>
-      p.id === id
-        ? { ...p, stock: p.stock - qty, sold: p.sold + qty }
-        : p
-    ));
-
-    setGross((current) => current + amount);
-    setUnitsSold((current) => current + qty);
-    setLastAction({ productId: id, qty, amount, name: product.name });
-    setMessage(`Sold ${qty}x ${product.name} (${money(amount)})`);
-    setSaved(false);
-  };
-
-  const undoSale = () => {
-    if (!lastAction) return;
-
-    const action = lastAction;
-
-    setProducts((current) => current.map((p) =>
-      p.id === action.productId
-        ? {
-            ...p,
-            stock: p.stock + action.qty,
-            sold: Math.max(0, p.sold - action.qty),
-          }
-        : p
-    ));
-
-    setGross((current) => current - action.amount);
-    setUnitsSold((current) => Math.max(0, current - action.qty));
-    setMessage(`Reverted ${action.qty}x ${action.name}`);
-    setLastAction(null);
-    setSaved(false);
-  };
-
-  const addProduct = (supplier: Supplier) => {
-    const qty = Number(newQty);
-    const price = Number(newPrice);
-
-    if (!newName.trim() || !Number.isInteger(qty) || qty < 1 ||
-        !Number.isFinite(price) || price < 0) {
-      window.alert("Please enter a product name, valid quantity, and price.");
-      return;
-    }
-
-    setProducts((current) => [
-      ...current,
-      {
-        id: Math.max(0, ...current.map((p) => p.id)) + 1,
-        name: newName.trim(),
-        supplier,
-        stock: qty,
-        sold: 0,
-        price,
-      },
-    ]);
-
-    setNewName("");
-    setNewQty("1");
-    setNewPrice("1");
-    setSaved(false);
-  };
-
-  const removeProduct = (id: number) => {
-    if (!window.confirm("Delete this product?")) return;
-    setProducts((current) => current.filter((p) => p.id !== id));
-    setSaved(false);
-  };
-
-  const applyChanges = () => {
-    // Demo only: connect this handler to your API to persist changes.
-    setSaved(true);
-    window.alert("Changes applied in this demo. Connect an API to save permanently.");
-  };
-
-  const discardChanges = () => {
-    if (!window.confirm("Discard all edits and restore the initial data?")) return;
-    setProducts(initialProducts);
-    setGross(8490);
-    setUnitsSold(66);
-    setLastAction(null);
-    setMessage("Changes discarded");
-    setSaved(true);
-  };
-
-  const copyInvite = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        "https://consigndesk.app/join/MFU-MON14-88X2"
-      );
-      window.alert("Invite link copied!");
-    } catch {
-      window.alert("Unable to copy. Please copy the link manually.");
-    }
-  };
+export default function SalesRunDetail() {
+  // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
+  const [activeNav, setActiveNav] = useState('Ongoing');
+  const [activeCatalog, setActiveCatalog] = useState('all');
 
   return (
-    <div className={`${dark ? "dark" : ""}`}>
-      <div className="min-h-screen bg-[#F8F8FC] pb-32 font-sans text-[#25213B] dark:bg-slate-950 dark:text-white">
-        {/* Navigation */}
-        <header className="sticky top-0 z-40 border-b border-[#EAE7F5] bg-white/95 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
-          <div className="mx-auto flex min-h-20 max-w-[1800px] items-center justify-between gap-4 px-4 py-3 lg:px-8">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-primary-500 via-pink-500 to-amber-400 text-white">
-                <Store size={22} />
-              </div>
-              <span className="text-xl font-extrabold tracking-tight sm:text-2xl">
-                ConsignDesk
-              </span>
+    <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
+      {/* 1. TOP NAVBAR */}
+      <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+       <Navbar />
+      </header>
 
-              <nav className="ml-4 hidden items-center gap-1 rounded-xl bg-primary-50 p-1 lg:flex">
-                {["Dashboard", "Sales Runs", "Ongoing", "Completed"].map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-                      item === "Ongoing"
-                        ? "bg-white text-primary-700 shadow-sm"
-                        : "text-[#716D85] hover:bg-white"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                aria-label="Toggle theme"
-                onClick={() => setDark(!dark)}
-                className="rounded-xl border border-primary-100 bg-primary-50 p-2.5 text-primary-600"
-              >
-                {dark ? <Sun size={20} /> : <Moon size={20} />}
+      {/* MAIN CONTAINER */}
+      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6 mt-5">
+        
+        {/* TOP HEADER SECTION CARD */}
+        <div className="bg-white rounded-2xl p-6 border border-purple-100/60 shadow-sm space-y-6">
+          {/* Title row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <button className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors mt-0.5">
+                <ArrowLeft className="w-4 h-4" />
               </button>
-              <div className="hidden text-right sm:block">
-                <p className="text-sm font-bold">Alex Chen</p>
-                <p className="text-xs text-[#716D85]">Host</p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-primary-500 to-pink-500 text-white">
-                <UserRound size={21} />
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-[1800px] px-4 py-6 lg:px-8">
-          {/* Run heading */}
-          <section className="mb-6 rounded-2xl border border-[#EAE7F5] bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <div className="flex flex-col justify-between gap-5 border-b border-[#EAE7F5] pb-5 lg:flex-row lg:items-center">
               <div>
-                <button
-                  type="button"
-                  onClick={() => window.history.back()}
-                  className="mb-3 flex items-center gap-2 text-sm text-[#716D85] hover:text-primary-600"
-                >
-                  <ArrowLeft size={18} /> Back
-                </button>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-xl font-extrabold sm:text-2xl">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-2xl font-black text-slate-900 tracking-tight">
                     MFU outside night market (MON 14)
                   </h1>
-                  <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">
-                    EDIT MODE ACTIVE
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    EDIT MODE
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowInvite(true)}
-                    className="flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-bold text-primary-700"
-                  >
-                    <Users size={16} /> 1 Assistant · + Invite
-                  </button>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  className="rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-bold text-white"
-                >
-                  Edit Mode
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.alert("Connect your API to end this run.")}
-                  className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-bold text-rose-600"
-                >
-                  <Lock size={16} /> End Run
-                </button>
+                <div className="flex items-center gap-2 text-xs text-purple-600 font-medium mt-1.5">
+                  <span className="bg-purple-50 px-2.5 py-1 rounded-full flex items-center gap-1 border border-purple-100">
+                    <User className="w-3 h-3" /> 1 Assistant
+                  </span>
+                  <button className="hover:underline font-semibold">+ Invite</button>
+                </div>
               </div>
             </div>
 
-            {/* KPI cards */}
-            <div className="grid grid-cols-1 gap-4 pt-5 sm:grid-cols-2 xl:grid-cols-4">
-              <Kpi title="Gross Intake" value={money(gross)} icon={<Wallet size={22} />} />
-              <Kpi title="Total Sold Units" value={String(unitsSold)} icon={<Package size={22} />} subtitle="/ 88 starting" />
-              <div className="rounded-xl border border-primary-100 bg-primary-50/70 p-4 sm:col-span-2">
-                <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#716D85]">
-                  <History size={18} /> Latest Action
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold">{message}</p>
-                  <button
-                    type="button"
-                    onClick={undoSale}
-                    disabled={!lastAction}
-                    className="flex items-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Undo2 size={16} /> Undo
-                  </button>
-                </div>
+            {/* Top Right Mode Toggle Buttons */}
+            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+              <button className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 rounded-lg">
+                <ShoppingBag className="w-3.5 h-3.5" /> Sales Mode
+              </button>
+              <button className="px-3.5 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg shadow-sm flex items-center gap-1.5">
+                <Receipt className="w-3.5 h-3.5" /> Edit Mode
+              </button>
+              <button className="px-3.5 py-1.5 text-xs font-semibold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-1.5 border border-rose-100">
+                <X className="w-3.5 h-3.5" /> End Run
+              </button>
+            </div>
+          </div>
+
+          {/* Key Stat Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Gross Intake */}
+            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">GROSS INTAKE</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">฿8,490.00</p>
+              </div>
+              <div className="p-2.5 bg-purple-100/60 text-purple-600 rounded-xl">
+                <Receipt className="w-5 h-5" />
               </div>
             </div>
-          </section>
 
-          {/* Sidebar and products */}
-          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-            <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:col-span-3">
-              <div className="rounded-2xl border border-[#EAE7F5] bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <p className="mb-3 px-2 text-xs font-bold uppercase tracking-wider text-[#716D85]">
-                  Catalog Index
-                </p>
-
-                <FilterButton
-                  active={filter === "all"}
-                  onClick={() => setFilter("all")}
-                  icon={<Package size={19} />}
-                  label="All Products"
-                  count={products.length}
-                />
-
-                {suppliers.map((supplier) => (
-                  <FilterButton
-                    key={supplier.id}
-                    active={filter === supplier.id}
-                    onClick={() => setFilter(supplier.id)}
-                    icon={<Store size={19} />}
-                    label={supplier.name}
-                    count={products.filter((p) => p.supplier === supplier.id).length}
-                  />
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => setShowAddSupplier(true)}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-primary-200 bg-primary-50 p-3 text-sm font-bold text-primary-700 hover:bg-primary-100"
-                >
-                  <Users size={18} /> Add Supplier
-                </button>
-
-                <div className="my-4 border-t border-[#EAE7F5]" />
-
-                <div className="flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-bold">
-                  <ReceiptText size={19} className="text-amber-500" />
-                  Stall Expenses
+            {/* Total Sold Units */}
+            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL SOLD UNITS</p>
+                <div className="flex items-baseline gap-1 mt-1">
+                  <span className="text-2xl font-black text-slate-900">66</span>
+                  <span className="text-xs text-slate-400 font-medium">/ 85 starting</span>
                 </div>
               </div>
-
-              <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">
-                <p className="mb-1 text-sm font-bold">💡 Quick Tip</p>
-                <p className="text-xs leading-5 text-[#716D85]">
-                  Choose a supplier to filter products. Edit quantities and prices,
-                  then apply changes to the run.
-                </p>
+              <div className="p-2.5 bg-amber-100/60 text-amber-600 rounded-xl">
+                <ShoppingBag className="w-5 h-5" />
               </div>
-            </aside>
+            </div>
 
-            <div className="flex min-w-0 flex-col gap-6 lg:col-span-9">
-              {suppliers
-                .filter((s) => filter === "all" || filter === s.id)
-                .map((supplier) => (
-                  <section key={supplier.id} className="min-w-0">
-                    <div className="mb-3 flex items-center justify-between rounded-2xl border border-[#EAE7F5] bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                      <div className="flex items-center gap-3">
-                        <span className={`h-3 w-3 rounded-full ${supplier.color}`} />
-                        <h2 className="font-extrabold">{supplier.name}</h2>
-                      </div>
-                      <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700">
-                        {products.filter((p) => p.supplier === supplier.id).length} Items
-                      </span>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-2xl border border-[#EAE7F5] bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                      <table className="w-full min-w-[760px] text-left text-sm">
-                        <thead className="bg-primary-50 text-xs uppercase tracking-wider">
-                          <tr>
-                            <th className="p-4">Product Name</th>
-                            <th className="p-4 text-center">Stock / Qty</th>
-                            <th className="p-4 text-right">Price (฿)</th>
-                            <th className="p-4 text-center">Sold</th>
-                            <th className="p-4 text-center">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#EAE7F5]">
-                          {products
-                            .filter((p) => p.supplier === supplier.id)
-                            .map((product) => (
-                              <tr key={product.id} className="hover:bg-primary-50/40">
-                                <td className="p-3">
-                                  <div className="flex items-center gap-2">
-                                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${supplier.color}`} />
-                                    <input
-                                      aria-label="Product name"
-                                      value={product.name}
-                                      onChange={(e) => updateProduct(product.id, { name: e.target.value })}
-                                      className="w-full min-w-40 rounded-lg border border-[#EAE7F5] bg-[#F8F8FC] px-3 py-2 font-bold outline-none focus:border-primary-500"
-                                    />
-                                  </div>
-                                </td>
-                                <td className="p-3">
-                                  <div className="flex items-center justify-center gap-2">
-                                    <button
-                                      type="button"
-                                      aria-label="Decrease stock"
-                                      onClick={() => changeStock(product.id, -1)}
-                                      className="rounded-md border border-primary-100 p-1.5 hover:bg-primary-50"
-                                    >
-                                      <Minus size={14} />
-                                    </button>
-                                    <input
-                                      aria-label="Stock quantity"
-                                      type="number"
-                                      min="0"
-                                      value={product.stock}
-                                      onChange={(e) => {
-                                        const n = Number(e.target.value);
-                                        if (Number.isInteger(n) && n >= 0) {
-                                          updateProduct(product.id, { stock: n });
-                                        }
-                                      }}
-                                      className="w-14 rounded-lg bg-primary-50 p-2 text-center font-extrabold text-primary-700 outline-none"
-                                    />
-                                    <button
-                                      type="button"
-                                      aria-label="Increase stock"
-                                      onClick={() => changeStock(product.id, 1)}
-                                      className="rounded-md border border-primary-100 p-1.5 hover:bg-primary-50"
-                                    >
-                                      <Plus size={14} />
-                                    </button>
-                                  </div>
-                                </td>
-                                <td className="p-3">
-                                  <div className="flex items-center justify-end gap-1">
-                                    <span className="font-bold text-amber-500">฿</span>
-                                    <input
-                                      aria-label="Product price"
-                                      type="number"
-                                      min="0"
-                                      value={product.price}
-                                      onChange={(e) => {
-                                        const n = Number(e.target.value);
-                                        if (Number.isFinite(n) && n >= 0) {
-                                          updateProduct(product.id, { price: n });
-                                        }
-                                      }}
-                                      className="w-24 rounded-lg border border-[#EAE7F5] bg-[#F8F8FC] px-2 py-2 text-right font-bold outline-none focus:border-primary-500"
-                                    />
-                                  </div>
-                                </td>
-                                <td className="p-3 text-center font-extrabold text-[#716D85]">
-                                  {product.sold}
-                                </td>
-                                <td className="p-3">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <button
-                                      type="button"
-                                      title="Record one sale"
-                                      onClick={() => recordSale(product.id, 1)}
-                                      className="rounded-lg bg-primary-100 px-2 py-2 text-xs font-bold text-primary-700 hover:bg-primary-200"
-                                    >
-                                      Sell 1
-                                    </button>
-                                    <button
-                                      type="button"
-                                      aria-label="Delete product"
-                                      title="Delete product"
-                                      onClick={() => removeProduct(product.id)}
-                                      className="rounded-lg p-2 text-[#9A96AA] hover:bg-rose-50 hover:text-rose-500"
-                                    >
-                                      <Trash2 size={17} />
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Add product */}
-                    <form
-                      className="mt-3 flex flex-col gap-3 rounded-2xl border border-primary-100 bg-primary-50/70 p-4 md:flex-row"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        addProduct(supplier.id);
-                      }}
-                    >
-                      <input
-                        required
-                        value={addTo === supplier.id ? newName : ""}
-                        onFocus={() => setAddTo(supplier.id)}
-                        onChange={(e) => {
-                          setAddTo(supplier.id);
-                          setNewName(e.target.value);
-                        }}
-                        placeholder="Item name"
-                        className="min-w-0 flex-1 rounded-xl border border-[#EAE7F5] bg-white px-4 py-3 text-sm outline-none focus:border-primary-500"
-                      />
-                      <input
-                        required
-                        type="number"
-                        min="1"
-                        value={addTo === supplier.id ? newQty : "1"}
-                        onFocus={() => setAddTo(supplier.id)}
-                        onChange={(e) => {
-                          setAddTo(supplier.id);
-                          setNewQty(e.target.value);
-                        }}
-                        aria-label="New product quantity"
-                        placeholder="Qty"
-                        className="w-full rounded-xl border border-[#EAE7F5] bg-white px-4 py-3 text-sm outline-none focus:border-primary-500 md:w-24"
-                      />
-                      <input
-                        required
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={addTo === supplier.id ? newPrice : "1"}
-                        onFocus={() => setAddTo(supplier.id)}
-                        onChange={(e) => {
-                          setAddTo(supplier.id);
-                          setNewPrice(e.target.value);
-                        }}
-                        aria-label="New product price"
-                        placeholder="Price ฿"
-                        className="w-full rounded-xl border border-[#EAE7F5] bg-white px-4 py-3 text-sm outline-none focus:border-primary-500 md:w-28"
-                      />
-                      <button
-                        type="submit"
-                        className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white hover:bg-primary-700"
-                      >
-                        <Plus size={17} /> Add Product
-                      </button>
-                    </form>
-                  </section>
-                ))}
-
-              <button
-                type="button"
-                onClick={() => setShowAddSupplier(true)}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-dashed border-primary-300 bg-white p-5 text-left hover:bg-primary-50"
-              >
-                <span>
-                  <span className="block font-bold">Add New Consignor / Supplier</span>
-                  <span className="mt-1 block text-xs text-[#716D85]">
-                    Add suppliers and configure their product catalogs.
-                  </span>
+            {/* Latest Action & Undo */}
+            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                  <History className="w-3 h-3 text-purple-500" /> LATEST ACTION
+                </p>
+                <p className="text-xs font-semibold text-slate-800 mt-1">
+                  Sold 5x Turtle food 500g (฿400)
+                </p>
+                <span className="inline-block mt-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
+                  24s ago
                 </span>
-                <Plus size={22} className="text-primary-600" />
+              </div>
+              <button className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1">
+                <Undo2 className="w-3.5 h-3.5" /> Undo
               </button>
             </div>
           </div>
-        </main>
+        </div>
 
-        {/* Fixed bottom action bar */}
-        <footer className="fixed bottom-0 z-40 w-full border-t border-primary-100 bg-white/95 px-4 py-3 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/95">
-          <div className="mx-auto flex max-w-[1800px] flex-col justify-between gap-3 sm:flex-row sm:items-center">
-            <div>
-              <p className="flex items-center gap-2 text-sm font-bold text-primary-700">
-                <span className={`h-2.5 w-2.5 rounded-full ${saved ? "bg-emerald-500" : "animate-pulse bg-primary-500"}`} />
-                {saved ? "All changes applied" : "Unsaved modifications"}
-              </p>
-              <p className="mt-1 hidden text-xs text-[#716D85] md:block">
-                Apply your edits when you're ready.
-              </p>
+        {/* CONTENT SECTION: SIDEBAR + MAIN TABLES */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          
+          {/* LEFT SIDEBAR / CATALOG INDEX */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">
+                CATALOG INDEX
+              </h3>
+              
+              <nav className="space-y-1">
+                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-purple-50 text-purple-700 font-semibold text-xs border border-purple-100">
+                  <div className="flex items-center gap-2.5">
+                    <LayoutGrid className="w-4 h-4 text-purple-600" />
+                    <span>All Products</span>
+                  </div>
+                  <span className="bg-purple-200/60 text-purple-800 px-2 py-0.5 rounded-full text-[10px] font-bold">8</span>
+                </button>
+
+                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <User className="w-4 h-4 text-slate-400" />
+                    <span>My Products (Host)</span>
+                  </div>
+                </button>
+
+                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <Store className="w-4 h-4 text-pink-400" />
+                    <span>P' Kaimook</span>
+                  </div>
+                </button>
+
+                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <Store className="w-4 h-4 text-amber-400" />
+                    <span>Nong' Japan</span>
+                  </div>
+                </button>
+              </nav>
+
+              <button className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+                <UserPlus className="w-3.5 h-3.5" /> + Add Supplier
+              </button>
+
+              <button className="w-full py-2.5 px-3 bg-rose-50/60 hover:bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs transition-colors flex items-center justify-between border border-rose-100">
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-rose-500" />
+                  <span>Booth Expenses</span>
+                </div>
+                <span>›</span>
+              </button>
             </div>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={discardChanges}
-                className="flex-1 rounded-xl border border-[#EAE7F5] px-5 py-3 text-sm font-bold hover:bg-[#F8F8FC] sm:flex-none"
-              >
-                Discard Changes
-              </button>
-              <button
-                type="button"
-                onClick={applyChanges}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white hover:bg-primary-700 sm:flex-none"
-              >
-                <Save size={17} /> Apply to Run
-              </button>
+
+            {/* Quick Tip Box */}
+            <div className="bg-amber-50/60 border border-amber-200/60 rounded-2xl p-4 flex gap-3">
+              <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1">
+                <p className="font-bold text-amber-900">Quick Tip</p>
+                <p className="text-amber-700/80 leading-relaxed">
+                  Click supplier tab to jump directly to items. Click action button to register immediate sales.
+                </p>
+              </div>
             </div>
           </div>
-        </footer>
 
-        {/* Invite assistant modal */}
-        {showInvite && (
-          <Modal title="Invite Run Assistants" onClose={() => setShowInvite(false)}>
-            <p className="text-sm text-[#716D85]">
-              Assistants can record sales and look up stock. Inventory editing
-              should be restricted by your backend permissions.
-            </p>
-            <label className="text-xs font-bold uppercase text-[#716D85]">
-              Shareable invite link
-            </label>
-            <div className="flex gap-2">
-              <input
-                readOnly
-                value="https://consigndesk.app/join/MFU-MON14-88X2"
-                className="min-w-0 flex-1 rounded-xl border border-[#EAE7F5] bg-[#F8F8FC] px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                onClick={copyInvite}
-                className="flex items-center gap-2 rounded-xl bg-primary-600 px-3 py-2 text-sm font-bold text-white"
-              >
-                <Copy size={16} /> Copy
+          {/* RIGHT PRODUCT LIST TABLES */}
+          <div className="lg:col-span-3 space-y-6">
+            
+            {/* 1. SECTION: MY PRODUCTS */}
+            <ProductGroupSection
+              title="My Products"
+              badgeText="Host"
+              badgeColor="bg-purple-100 text-purple-700"
+              itemCount={3}
+              dotColor="bg-purple-600"
+              items={[
+                { id: 1, name: 'Green Horned Frog', qty: 0, price: 150, sold: 10 },
+                { id: 2, name: 'Yellow Horned Frog', qty: 0, price: 150, sold: 9 },
+                { id: 3, name: 'Brown Horned Frog', qty: 0, price: 150, sold: 4 },
+              ]}
+              placeholderText="Item Name (e.g. Linen Coaster Set)"
+            />
+
+            {/* 2. SECTION: P' KAIMOOK */}
+            <ProductGroupSection
+              title="P' Kaimook"
+              badgeText="Supplier"
+              badgeColor="bg-pink-100 text-pink-700"
+              itemCount={3}
+              dotColor="bg-pink-500"
+              items={[
+                { id: 4, name: 'Japanese turtle (Big)', qty: 0, price: 250, sold: 5 },
+                { id: 5, name: 'Japanese turtle (Small)', qty: 0, price: 100, sold: 7 },
+                { id: 6, name: 'Turtle food 500g', qty: 0, price: 80, sold: 22 },
+              ]}
+              placeholderText="Item Name (e.g. Ceramic Vase)"
+            />
+
+            {/* 3. SECTION: NONG' JAPAN */}
+            <ProductGroupSection
+              title="Nong' Japan"
+              badgeText="Supplier"
+              badgeColor="bg-amber-100 text-amber-700"
+              itemCount={2}
+              dotColor="bg-amber-500"
+              items={[
+                { id: 7, name: 'Aquarium Moss Ball (Medium)', qty: 0, price: 60, sold: 7 },
+                { id: 8, name: 'Mini Terrarium Starter Glass', qty: 0, price: 190, sold: 3 },
+              ]}
+              placeholderText="Item Name (e.g. Postcard Set)"
+            />
+
+            {/* ADD NEW SUPPLIER BOTTOM CARD */}
+            <div className="bg-slate-50/80 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 text-purple-600 rounded-xl">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
+              </div>
+              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+                <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
-            <div className="rounded-xl bg-primary-50 p-4 text-center">
-              <p className="text-xs font-bold text-[#716D85]">Pairing code</p>
-              <p className="my-2 text-3xl font-extrabold tracking-widest text-primary-700">
-                884 921
-              </p>
-              <p className="text-xs text-[#716D85]">Demo code only</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowInvite(false)}
-              className="w-full rounded-xl bg-primary-600 p-3 font-bold text-white"
-            >
-              Done
-            </button>
-          </Modal>
-        )}
 
-        {/* Add supplier modal */}
-        {showAddSupplier && (
-          <Modal title="Add Supplier" onClose={() => setShowAddSupplier(false)}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!newSupplier.trim()) return;
-                window.alert(
-                  `Supplier "${newSupplier.trim()}" entered. Add a supplier ID and API integration to save it permanently.`
-                );
-                setNewSupplier("");
-                setShowAddSupplier(false);
-              }}
-            >
-              <label className="mb-2 block text-sm font-bold">Supplier name</label>
-              <input
-                required
-                autoFocus
-                value={newSupplier}
-                onChange={(e) => setNewSupplier(e.target.value)}
-                placeholder="Enter supplier name"
-                className="mb-4 w-full rounded-xl border border-[#EAE7F5] px-4 py-3 outline-none focus:border-primary-500"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-primary-600 p-3 font-bold text-white"
-              >
-                <Plus size={17} className="mr-1 inline" /> Add Supplier
-              </button>
-            </form>
-          </Modal>
-        )}
-      </div>
-    </div>
-  );
-}
+          </div>
+        </div>
+      </main>
 
-function Kpi({
-  title,
-  value,
-  icon,
-  subtitle,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  subtitle?: string;
-}) {
-  return (
-    <div className="flex flex-col justify-between rounded-xl border border-primary-100 bg-primary-50/70 p-4">
-      <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#716D85]">
-        {title}
-        <span className="text-primary-600">{icon}</span>
-      </div>
-      <div className="flex flex-wrap items-baseline gap-2">
-        <span className="text-2xl font-extrabold tracking-tight text-[#25213B]">
-          {value}
-        </span>
-        {subtitle && <span className="text-xs font-semibold text-[#716D85]">{subtitle}</span>}
-      </div>
-    </div>
-  );
-}
+      {/* FOOTER BAR FOR UNSAVED MODIFICATIONS */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-3 px-8 z-40 flex items-center justify-between shadow-lg">
+        <div className="flex items-center space-x-2 text-xs font-semibold text-purple-600">
+          <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+          <span>3 Unsaved Modifications</span>
+          <span className="text-slate-400 font-normal">
+            • Live run updates will apply instantly to register
+          </span>
+        </div>
 
-function FilterButton({
-  active,
-  onClick,
-  icon,
-  label,
-  count,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-  count?: number;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`mb-1 flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-3 text-left text-sm font-bold transition-colors ${
-        active
-          ? "border-primary-200 bg-primary-100 text-primary-700"
-          : "border-transparent text-[#716D85] hover:bg-primary-50"
-      }`}
-    >
-      <span className="flex min-w-0 items-center gap-2">
-        {icon}
-        <span className="truncate">{label}</span>
-      </span>
-      {count !== undefined && (
-        <span className="rounded-full bg-white px-2 py-0.5 text-xs">
-          {count}
-        </span>
-      )}
-    </button>
-  );
-}
-
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="w-full max-w-lg space-y-4 rounded-2xl bg-white p-6 text-slate-900 shadow-2xl"
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-extrabold">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close dialog"
-            className="rounded-lg p-2 text-[#716D85] hover:bg-slate-100"
-          >
-            <X size={20} />
+        <div className="flex items-center space-x-3">
+          <button className="px-4 py-2 rounded-xl text-xs font-bold text-rose-500 border border-rose-200 hover:bg-rose-50 transition-colors">
+            Discard Changes
+          </button>
+          <button className="px-5 py-2 rounded-xl text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors shadow-sm flex items-center gap-1.5">
+            <Save className="w-4 h-4" /> Apply to Run
           </button>
         </div>
-        {children}
+      </footer>
+    </div>
+  );
+}
+
+// COMPONENT: Product Group Section (ใช้สร้างตารางสินค้าแต่ละ Supplier)
+function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor, items, placeholderText }:any) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-3 p-5">
+      {/* Group Header */}
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center space-x-2.5">
+          <span className={`w-2.5 h-2.5 rounded-full ${dotColor}`}></span>
+          <h2 className="font-bold text-slate-900 text-base">{title}</h2>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}`}>
+            {badgeText}
+          </span>
+        </div>
+        <span className="px-2.5 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[11px] font-bold border border-purple-100">
+          {itemCount} items
+        </span>
       </div>
+
+      {/* Table Header */}
+      <div className="grid grid-cols-12 text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1">
+        <div className="col-span-5">PRODUCT NAME</div>
+        <div className="col-span-3 text-center">STOCK / QTY</div>
+        <div className="col-span-2 text-center">PRICE (฿)</div>
+        <div className="col-span-1 text-center">SOLD</div>
+        <div className="col-span-1 text-center">ACTION</div>
+      </div>
+
+      {/* Product Rows */}
+      <div className="space-y-2">
+        {items.map((item:any) => (
+          <div key={item.id} className="grid grid-cols-12 items-center px-3 py-2 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors text-xs font-medium">
+            <div className="col-span-5 flex items-center gap-2">
+              <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></span>
+              <input
+                type="text"
+                defaultValue={item.name}
+                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-800 w-full font-semibold focus:outline-purple-500 text-xs shadow-2xs"
+              />
+            </div>
+
+            {/* Qty Stepper */}
+            <div className="col-span-3 flex items-center justify-center gap-1">
+              <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
+                <Minus className="w-3 h-3" />
+              </button>
+              <span className="w-8 text-center font-bold text-purple-600">{item.qty}</span>
+              <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+
+            {/* Price */}
+            <div className="col-span-2 flex items-center justify-center">
+              <div className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1 w-20 shadow-2xs">
+                <span className="text-amber-500 font-bold">฿</span>
+                <input
+                  type="text"
+                  defaultValue={item.price}
+                  className="w-full bg-transparent font-bold text-slate-800 text-center focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Sold Count */}
+            <div className="col-span-1 text-center font-bold text-slate-700">
+              {item.sold}
+            </div>
+
+            {/* Delete Action */}
+            <div className="col-span-1 text-center">
+              <button className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 transition-colors">
+                <Trash2 className="w-4 h-4 mx-auto" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Item Form Row */}
+      <div className="grid grid-cols-12 gap-2 pt-2 items-center">
+        <div className="col-span-6">
+          <input
+            type="text"
+            placeholder={placeholderText}
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+          />
+        </div>
+        <div className="col-span-2">
+          <input
+            type="number"
+            placeholder="Qty"
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+          />
+        </div>
+        <div className="col-span-2">
+          <input
+            type="number"
+            placeholder="Price ฿"
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+          />
+        </div>
+        <div className="col-span-2">
+          <button className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1">
+            <PlusCircle className="w-3.5 h-3.5" /> Add Product
+          </button>
+        </div>
+    </div>
     </div>
   );
 }
