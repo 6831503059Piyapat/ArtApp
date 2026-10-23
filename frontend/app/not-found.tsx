@@ -1,4 +1,4 @@
-// app/not-found.tsx
+
 import Link from 'next/link';
 
 export default function NotFound() {
@@ -6,10 +6,10 @@ export default function NotFound() {
     <div className="min-h-screen bg-slate-900 text-white flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full text-center space-y-8">
         
-        {/* Animated / Glowing 404 Text */}
+        {/* Animated / Glowing 404 Text */} 
         <div className="relative">
           <h1 className="text-9xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse">
-            404
+            40404
           </h1>
           <div className="bg-indigo-600 text-xs px-2 py-1 rounded rotate-12 absolute top-10 left-1/2 -translate-x-1/2 shadow-lg">
             Page Not Found
