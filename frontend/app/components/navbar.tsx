@@ -1,4 +1,7 @@
-
+import Link from 'next/link';
+import { useState } from 'react'; 
+const poppins = 'font-sans';
+const creepster = 'font-[cursive]';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -10,13 +13,13 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`fixed w-full z-50 top-0 start-0 border-b border-[#ff6600]/50 bg-[#12001b]/80 backdrop-blur-md shadow-[0_0_15px_rgba(255,102,0,0.3)] ${poppins.className}`}>
+    <nav className={`fixed w-full z-50 top-0 start-0 border-b border-[#ff6600]/50 bg-[#12001b]/80 backdrop-blur-md shadow-[0_0_15px_rgba(255,102,0,0.3)] ${poppins}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse group">
           <span className="text-3xl">🎃</span>
-          <span className={`self-center text-3xl whitespace-nowrap text-[#ff6600] tracking-wider transition-all duration-300 group-hover:text-[#39ff14] group-hover:drop-shadow-[0_0_10px_#39ff14] ${creepster.className}`}>
+          <span className={`self-center text-3xl whitespace-nowrap text-[#ff6600] tracking-wider transition-all duration-300 group-hover:text-[#39ff14] group-hover:drop-shadow-[0_0_10px_#39ff14] ${creepster}`}>
             SpookyWeb
           </span>
         </Link>
@@ -24,7 +27,7 @@ export default function Navbar() {
         {/* Right Side Buttons (Desktop) */}
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <Link href="/login">
-            <button type="button" className={`text-black bg-[#ff6600] hover:bg-[#39ff14] hover:shadow-[0_0_15px_#39ff14] transition-all duration-300 font-medium rounded-lg text-lg px-5 py-2 text-center tracking-widest hover:scale-105 ${creepster.className}`}>
+            <button type="button" className={`text-black bg-[#ff6600] hover:bg-[#39ff14] hover:shadow-[0_0_15px_#39ff14] transition-all duration-300 font-medium rounded-lg text-lg px-5 py-2 text-center tracking-widest hover:scale-105 ${creepster}`}>
               LOGIN
             </button>
           </Link>
