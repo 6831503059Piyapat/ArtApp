@@ -24,6 +24,9 @@ import {
   Grid,
   Droplets,
   Package,
+  Wallet,
+  Pencil,
+  ChevronDown,
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
@@ -128,10 +131,39 @@ export default function SalesRunDetail() {
       category: 'japan'
     }
   ];
+  const expensesList = [
+    {
+      id: '01',
+      timestamp: '14/9/26 12:43:05',
+      detail: 'Weekend Market Stall Rent',
+      dotColor: 'bg-amber-400',
+      category: 'Booth Fee',
+      categoryBg: 'bg-orange-50 text-orange-600 border-orange-100',
+      loggedBy: 'Alex Chen',
+      role: '(Host)',
+      amount: '฿700.00'
+    },
+    {
+      id: '02',
+      timestamp: '14/9/26 15:10:20',
+      detail: 'Ice bucket, string bags & tape',
+      dotColor: 'bg-purple-600',
+      category: 'Stall expense',
+      categoryBg: 'bg-orange-50 text-orange-600 border-orange-100',
+      loggedBy: 'Alex Chen',
+      role: '(Host)',
+      amount: '฿150.00'
+    }
+  ];
   const [products, setProducts] = useState(initialProducts);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
-  const [isSaleMode, setIsSaleMode] = useState(true);
+  //State สำหรับ Toggle Sales Mode / Edit Mode
+  const [stepMode, setStepMode] = useState("sales");
+  // State สำหรับฟอร์ม Fast Log Shared Expense
+  const [expenseTitle, setExpenseTitle] = useState('Ice bag or plastic bags');
+  const [category, setCategory] = useState('Stall Supplies');
+  const [amount, setAmount] = useState('70');
 const handleSell = (id: string) => {
     setProducts((prev) =>
       prev.map((item) => {
@@ -193,15 +225,15 @@ const handleSell = (id: string) => {
                 <span
                   aria-hidden="true"
                   className={`absolute inset-y-1 w-[calc(50%-0.25rem)] rounded-lg bg-white shadow-sm transition-transform duration-300 ease-out ${
-                    isSaleMode ? "translate-x-0" : "translate-x-full"
+                    stepMode === "sales" ? "translate-x-0" : "translate-x-full"
                   }`}
                 />
                 <button
                   type="button"
-                  onClick={() => setIsSaleMode(true)}
-                  aria-pressed={isSaleMode}
+                  onClick={() => setStepMode("sales")}
+                  aria-pressed={stepMode === "sales"}
                   className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                    isSaleMode
+                    stepMode === "sales"
                       ? "text-purple-700"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
@@ -210,10 +242,10 @@ const handleSell = (id: string) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsSaleMode(false)}
-                  aria-pressed={!isSaleMode}
+                  onClick={() => setStepMode("edit")}
+                  aria-pressed={stepMode === "edit"}
                   className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                    !isSaleMode
+                    stepMode === "edit"
                       ? "text-purple-700"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
@@ -319,7 +351,7 @@ const handleSell = (id: string) => {
                 <UserPlus className="w-3.5 h-3.5" /> + Add Supplier
               </button>
 
-              <button className="w-full py-2.5 px-3 bg-rose-50/60 hover:bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs transition-colors flex items-center justify-between border border-rose-100">
+              <button onClick={()=>setStepMode("expense")} className="w-full py-2.5 px-3 bg-rose-50/60 hover:bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs transition-colors flex items-center justify-between border border-rose-100">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-rose-500" />
                   <span>Booth Expenses</span>
@@ -345,7 +377,7 @@ const handleSell = (id: string) => {
           <div className="lg:col-span-3 space-y-6">
             
             {/* 1. SECTION: MY PRODUCTS */}
-            {isSaleMode &&(
+            {stepMode === "edit" && (
                 <>
             
             <ProductGroupSection
@@ -392,7 +424,7 @@ const handleSell = (id: string) => {
             </>
 )}
                {/* Product cards for each supplier  Sales Mode*/}
-               { !isSaleMode && (
+               { stepMode === "sales" && (
     <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-4xl mx-auto space-y-4">
       
       {/* 1. HOST PRODUCTS SECTION */}
@@ -475,8 +507,177 @@ const handleSell = (id: string) => {
 
     </div>
                )}
+               {stepMode === "expense" && (
+                <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-5xl mx-auto space-y-5">
+      
+      {/* 1. HEADER CARD: Booth's Operating Expenses */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-orange-100/70 text-orange-500 flex items-center justify-center shrink-0">
+            <Wallet className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Booth’s Operating Expenses
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5 font-medium">
+              Track and split operational costs for this sales run
+            </p>
+          </div>
+        </div>
+
+        {/* Status Badge */}
+        <div className="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full border border-purple-100 flex items-center gap-2 text-xs font-semibold">
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Synchronized Ledger</span>
+        </div>
+      </div>
+
+      {/* 2. FAST LOG SHARED EXPENSE CARD */}
+      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-2xs space-y-4">
+        {/* Section Title */}
+        <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
+          <PlusCircle className="w-4 h-4 text-orange-500" />
+          <span>Fast Log Shared Expense</span>
+        </div>
+
+        {/* Input Form Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          
+          {/* Expense Title Input */}
+          <div className="md:col-span-5 space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              Expense Title
+            </label>
+            <div className="relative flex items-center">
+              <Pencil className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+              <input
+                type="text"
+                value={expenseTitle}
+                onChange={(e) => setExpenseTitle(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-purple-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Category Dropdown */}
+          <div className="md:col-span-3 space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              Category
+            </label>
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 appearance-none focus:bg-white focus:outline-purple-500 transition-colors pr-8 cursor-pointer"
+              >
+                <option value="Stall Supplies">Stall Supplies</option>
+                <option value="Booth Fee">Booth Fee</option>
+                <option value="Travel">Travel</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Amount (฿) Input */}
+          <div className="md:col-span-2 space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              Amount (฿)
+            </label>
+            <div className="relative flex items-center">
+              <span className="text-xs font-semibold text-slate-400 absolute left-3.5">
+                ฿
+              </span>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-slate-800 text-right focus:bg-white focus:outline-purple-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Record Button */}
+          <div className="md:col-span-2">
+            <button className="w-full py-2.5 bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-slate-900 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1">
+              <Plus className="w-4 h-4 stroke-[3]" /> Record
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 3. RECORDED EXPENSES CARD */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+        {/* Card Header */}
+        <div className="p-5 flex items-center justify-between border-b border-slate-100">
+          <div className="flex items-center space-x-2 text-slate-900 font-bold text-base">
+            <Receipt className="w-5 h-5 text-orange-500" />
+            <span>Recorded Expenses</span>
+          </div>
+          <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium">
+            Active Read-Only Ledger
+          </span>
+        </div>
+
+        {/* Table Content */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th className="py-3 px-5 w-12">#</th>
+                <th className="py-3 px-4">Timestamp</th>
+                <th className="py-3 px-4">Expense Detail</th>
+                <th className="py-3 px-4 text-center">Category</th>
+                <th className="py-3 px-4 text-center">Logged By</th>
+                <th className="py-3 px-5 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+              {expensesList.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="py-4 px-5 font-bold text-slate-900">{item.id}</td>
+                  <td className="py-4 px-4 text-slate-400 text-[11px]">{item.timestamp}</td>
+                  <td className="py-4 px-4">
+                    <div className="flex items-center space-x-2">
+                      <span className={`w-2 h-2 rounded-full ${item.dotColor}`}></span>
+                      <span className="font-bold text-slate-800">{item.detail}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border ${item.categoryBg}`}>
+                      {item.category}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    <span className="font-semibold text-slate-700">{item.loggedBy} </span>
+                    <span className="text-orange-500 font-bold text-[11px]">{item.role}</span>
+                  </td>
+                  <td className="py-4 px-5 text-right font-black text-slate-900 text-sm">
+                    {item.amount}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer / Summary */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span className="text-slate-400 font-medium">
+            Showing 2 settled market expenses
+          </span>
+          <div className="flex items-center space-x-1.5">
+            <span className="text-slate-400 font-medium">Subtotal Logged:</span>
+            <span className="font-black text-orange-500 text-sm">฿850.00</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+               )}
             {/* ADD NEW SUPPLIER BOTTOM CARD */}
-            {isSaleMode &&(
+            {stepMode === "edit" &&(
             <div className="bg-slate-50/80 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-100 text-purple-600 rounded-xl">
