@@ -16,15 +16,136 @@ import {
   Save,
   X,
   PlusCircle,
+  Leaf,
+  Sun,
+  Mountain,
+  Rabbit,
+  Fish,
+  Grid,
+  Droplets,
+  Package,
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
+  const initialProducts = [
+    // My Products / Host Items
+    {
+      id: '1',
+      name: 'Green Horned Frog',
+      start: 10,
+      stock: 0,
+      price: 150,
+      sold: 10,
+      icon: Leaf,
+      iconBg: 'bg-purple-100/70 text-purple-600',
+      category: 'host'
+    },
+    {
+      id: '2',
+      name: 'Yellow Horned Frog',
+      start: 10,
+      stock: 1,
+      price: 150,
+      sold: 9,
+      icon: Sun,
+      iconBg: 'bg-amber-100/70 text-amber-500',
+      category: 'host'
+    },
+    {
+      id: '3',
+      name: 'Brown Horned Frog',
+      start: 10,
+      stock: 6,
+      price: 150,
+      sold: 4,
+      icon: Mountain,
+      iconBg: 'bg-purple-100/70 text-purple-600',
+      category: 'host'
+    },
+    // P' Kaimook
+    {
+      id: '4',
+      name: 'Japanese turtle (Big)',
+      start: 8,
+      stock: 3,
+      price: 250,
+      sold: 5,
+      icon: Rabbit,
+      iconBg: 'bg-pink-100/70 text-pink-500',
+      supplier: "P' Kaimook",
+      category: 'kaimook'
+    },
+    {
+      id: '5',
+      name: 'Japanese turtle (Small)',
+      start: 17,
+      stock: 10,
+      price: 100,
+      sold: 7,
+      icon: Fish,
+      iconBg: 'bg-pink-100/70 text-pink-500',
+      supplier: "P' Kaimook",
+      category: 'kaimook'
+    },
+    {
+      id: '6',
+      name: 'Turtle food 500g',
+      start: 62,
+      stock: 40,
+      price: 80,
+      sold: 22,
+      icon: Grid,
+      iconBg: 'bg-amber-100/70 text-amber-500',
+      supplier: "P' Kaimook",
+      category: 'kaimook'
+    },
+    // Nong' Japan
+    {
+      id: '7',
+      name: 'Aquarium Moss Ball (Medium)',
+      start: 15,
+      stock: 8,
+      price: 60,
+      sold: 7,
+      icon: Package,
+      iconBg: 'bg-purple-100/70 text-purple-600',
+      supplier: "Nong' Japan",
+      category: 'japan'
+    },
+    {
+      id: '8',
+      name: 'Mini Terrarium Starter Glass',
+      start: 6,
+      stock: 3,
+      price: 190,
+      sold: 3,
+      icon: Droplets,
+      iconBg: 'bg-purple-100/70 text-purple-600',
+      supplier: "Nong' Japan",
+      category: 'japan'
+    }
+  ];
+  const [products, setProducts] = useState(initialProducts);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
-
+  const [isSaleMode, setIsSaleMode] = useState(true);
+const handleSell = (id: string) => {
+    setProducts((prev) =>
+      prev.map((item) => {
+        if (item.id === id && item.stock > 0) {
+          return {
+            ...item,
+            stock: item.stock - 1,
+            sold: item.sold + 1
+          };
+        }
+        return item;
+      })
+    );
+  };
   return (
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
       {/* 1. TOP NAVBAR */}
@@ -63,15 +184,45 @@ export default function SalesRunDetail() {
             </div>
 
             {/* Top Right Mode Toggle Buttons */}
-            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
-              <button className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 rounded-lg">
-                <ShoppingBag className="w-3.5 h-3.5" /> Sales Mode
-              </button>
-              <button className="px-3.5 py-1.5 text-xs font-semibold text-white bg-purple-600 rounded-lg shadow-sm flex items-center gap-1.5">
-                <Receipt className="w-3.5 h-3.5" /> Edit Mode
-              </button>
-              <button className="px-3.5 py-1.5 text-xs font-semibold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-1.5 border border-rose-100">
-                <X className="w-3.5 h-3.5" /> End Run
+            <div className="flex items-center gap-2">
+              <div
+                className="relative flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 shadow-inner"
+                role="group"
+                aria-label="Run mode"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-y-1 w-[calc(50%-0.25rem)] rounded-lg bg-white shadow-sm transition-transform duration-300 ease-out ${
+                    isSaleMode ? "translate-x-0" : "translate-x-full"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsSaleMode(true)}
+                  aria-pressed={isSaleMode}
+                  className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                    isSaleMode
+                      ? "text-purple-700"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <ShoppingBag className="h-3.5 w-3.5" /> Sales Mode
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSaleMode(false)}
+                  aria-pressed={!isSaleMode}
+                  className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                    !isSaleMode
+                      ? "text-purple-700"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Receipt className="h-3.5 w-3.5" /> Edit Mode
+                </button>
+              </div>
+              <button type="button" className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
+                <X className="h-3.5 w-3.5" /> End Run
               </button>
             </div>
           </div>
@@ -190,10 +341,15 @@ export default function SalesRunDetail() {
           </div>
 
           {/* RIGHT PRODUCT LIST TABLES */}
+          {/* Product cards for each supplier  Edit Mode*/}
           <div className="lg:col-span-3 space-y-6">
             
             {/* 1. SECTION: MY PRODUCTS */}
+            {isSaleMode &&(
+                <>
+            
             <ProductGroupSection
+              
               title="My Products"
               badgeText="Host"
               badgeColor="bg-purple-100 text-purple-700"
@@ -207,7 +363,6 @@ export default function SalesRunDetail() {
               placeholderText="Item Name (e.g. Linen Coaster Set)"
             />
 
-            {/* 2. SECTION: P' KAIMOOK */}
             <ProductGroupSection
               title="P' Kaimook"
               badgeText="Supplier"
@@ -222,7 +377,6 @@ export default function SalesRunDetail() {
               placeholderText="Item Name (e.g. Ceramic Vase)"
             />
 
-            {/* 3. SECTION: NONG' JAPAN */}
             <ProductGroupSection
               title="Nong' Japan"
               badgeText="Supplier"
@@ -235,8 +389,94 @@ export default function SalesRunDetail() {
               ]}
               placeholderText="Item Name (e.g. Postcard Set)"
             />
+            </>
+)}
+               {/* Product cards for each supplier  Sales Mode*/}
+               { !isSaleMode && (
+    <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-4xl mx-auto space-y-4">
+      
+      {/* 1. HOST PRODUCTS SECTION */}
+       <div className="pt-2 space-y-3">
+        {/* Supplier Header Badge */}
+        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
+                My Products
+            </h2>
+            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+              Host
+            </span>
+          </div>
+          <span className="bg-pink-50 text-pink-500 border border-pink-100 px-3 py-0.5 rounded-full text-xs font-bold">
+            3 items
+          </span>
+        </div>
 
+        {/* Product Cards */}
+        {products
+          .filter((item) => item.category === 'host')
+          .map((item) => (
+            <ProductCard key={item.id} item={item} onSell={handleSell} />
+          ))}
+      </div>
+
+      {/* 2. SUPPLIER SECTION: P' KAIMOOK */}
+      <div className="pt-2 space-y-3">
+        {/* Supplier Header Badge */}
+        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
+              P' Kaimook
+            </h2>
+            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+              Supplier
+            </span>
+          </div>
+          <span className="bg-pink-50 text-pink-500 border border-pink-100 px-3 py-0.5 rounded-full text-xs font-bold">
+            3 items
+          </span>
+        </div>
+
+        {/* Product Cards */}
+        {products
+          .filter((item) => item.category === 'kaimook')
+          .map((item) => (
+            <ProductCard key={item.id} item={item} onSell={handleSell} />
+          ))}
+      </div>
+
+      {/* 3. SUPPLIER SECTION: NONG' JAPAN */}
+      <div className="pt-2 space-y-3">
+        {/* Supplier Header Badge */}
+        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
+              Nong' Japan
+            </h2>
+            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+              Supplier
+            </span>
+          </div>
+          <span className="bg-amber-50 text-amber-600 border border-amber-100 px-3 py-0.5 rounded-full text-xs font-bold">
+            3 items
+          </span>
+        </div>
+
+        {/* Product Cards */}
+        {products
+          .filter((item) => item.category === 'japan')
+          .map((item) => (
+            <ProductCard key={item.id} item={item} onSell={handleSell} />
+          ))}
+      </div>
+
+    </div>
+               )}
             {/* ADD NEW SUPPLIER BOTTOM CARD */}
+            {isSaleMode &&(
             <div className="bg-slate-50/80 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-100 text-purple-600 rounded-xl">
@@ -248,8 +488,10 @@ export default function SalesRunDetail() {
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
-
+            )}
           </div>
+       
+            
         </div>
       </main>
 
@@ -383,6 +625,59 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
           </button>
         </div>
     </div>
+    </div>
+  );
+}
+function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void }) {
+  const IconComponent = item.icon;
+  const isOutOfStock = item.stock === 0;
+
+  return (
+    <div className="bg-white rounded-2xl p-4 border border-slate-100/80 shadow-2xs hover:shadow-md transition-shadow flex items-center justify-between">
+      {/* Left Column: Icon + Name + Stock Info */}
+      <div className="flex items-center space-x-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.iconBg}`}>
+          <IconComponent className="w-6 h-6" />
+        </div>
+
+        <div className="space-y-0.5">
+          <h3 className="font-bold text-slate-900 text-sm tracking-tight">
+            {item.name}
+          </h3>
+          <div className="flex items-center space-x-1 text-xs text-slate-400 font-medium">
+            <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
+            <span>•</span>
+            <span className={isOutOfStock ? 'text-purple-600 font-semibold' : 'text-purple-600 font-semibold'}>
+              {isOutOfStock ? '0 remaining' : `${item.stock} in stock`}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column: Price + Sold Count + Sell Button */}
+      <div className="flex items-center space-x-5">
+        <div className="text-right">
+          <div className="text-base font-black text-slate-900 flex items-center justify-end leading-none">
+            <span className="text-sm font-extrabold mr-0.5">฿</span>
+            {item.price}
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium mt-1">
+            Sold: <span className="font-bold text-slate-700">{item.sold}</span>
+          </p>
+        </div>
+
+        <button
+          onClick={() => onSell(item.id)}
+          disabled={isOutOfStock}
+          className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all active:scale-95 flex items-center gap-1 ${
+            isOutOfStock
+              ? 'bg-purple-600 opacity-90 cursor-not-allowed'
+              : 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800'
+          }`}
+        >
+          Sell - 1
+        </button>
+      </div>
     </div>
   );
 }
