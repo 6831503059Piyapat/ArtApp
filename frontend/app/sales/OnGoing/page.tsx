@@ -10,8 +10,26 @@ import {
   ChevronRight,
   Sparkles
 } from 'lucide-react';
+import Footer from "@/app/components/footer";
 import Link from 'next/link';
 import Navbar from '@/app/components/navbar';
+type SalesRun = {
+  id: number;
+  title: string;
+  status: boolean;
+  elapsedText: string;
+  durationMax:string;
+  durationCurrent: string;
+  remainingText: string;
+  progressPercent: number;
+  grossSales: number;
+  netSales: number;
+  itemsCleared: number;
+  itemsCleardMax: number;
+  soldPercentage: number;
+  boothStaffMax: number;
+  boothStaffList: string[];
+};
 export default function ConsignDeskDashboard() {
   const [activeTab, setActiveTab] = useState('Ongoing');
   const [filter, setFilter] = useState('All Ongoing');
@@ -21,65 +39,105 @@ export default function ConsignDeskDashboard() {
     {
       id: 1,
       title: 'MFU Outside Night Market (Mon 14)',
-      status: 'LIVE RUN ACTIVE',
+      status: false,
       elapsedText: 'Duration: 1d 4h elapsed',
       remainingText: '5d 20h remaining of 7d max',
       progressPercent: 20, // (1.16/7)
-      grossSales: '฿8,490.00',
-      netSales: 'Net ฿8,420',
-      itemsCleared: '66 / 103',
-      soldPercentage: '64% sold out',
-      boothStaffCount: '2 / 6',
-      boothStaffList: '@may_craft, @...',
+      durationMax: '7d',
+      durationCurrent: '1d 4h',
+      grossSales: 8490.00,
+      netSales: 8420.00,
+      itemsCleared: 66,
+      itemsCleardMax: 103,
+      soldPercentage: 64,
+      boothStaffCount: 2,
+      boothStaffMax: 6,
+      boothStaffList: ['@may_craft', '@...'],
     },
     {
       id: 2,
       title: 'Nimman Artisan Weekend Pop-up',
-      status: 'LIVE RUN ACTIVE',
+      status: true,
       elapsedText: 'Elapsed: 4d 18h',
       remainingText: '2d 6h remaining of 7d max',
       progressPercent: 68,
-      grossSales: '฿4,350.00',
-      netSales: 'Net ฿4,190',
-      itemsCleared: '38 / 70',
-      soldPercentage: '54% sold out',
-      boothStaffCount: '1 / 6',
-      boothStaffList: '@ploy_w',
+      durationMax: '7d',
+      durationCurrent: '4d 18h',
+      grossSales: 4350.00,
+      netSales: 4190.00,
+      itemsCleared: 38,
+      itemsCleardMax: 70  ,
+      soldPercentage: 54,
+      boothStaffCount: 1,
+      boothStaffMax: 6,
+      boothStaffList: ['@ploy_w'],
     },
-    {
+     {
       id: 3,
       title: 'Chiang Mai Craft Fair (One Nimman)',
-      status: 'LIVE RUN ACTIVE',
+      status: true,
       elapsedText: 'Elapsed: 5h 20m',
       remainingText: '6d 18h remaining of 7d max',
       progressPercent: 8,
-      grossSales: '฿2,080.00',
-      netSales: 'Net ฿2,010',
-      itemsCleared: '14 / 45',
-      soldPercentage: '31% sold out',
-      boothStaffCount: '1 / 6',
-      boothStaffList: '@art_k',
+      durationMax: '7d',
+      durationCurrent: '5h 20m',
+      grossSales: 2080.00,
+      netSales: 2010.00,
+      itemsCleared: 14,
+      itemsCleardMax: 45,
+      soldPercentage: 31,
+      boothStaffCount: 1,
+      boothStaffMax: 6,
+      boothStaffList: ['@art_kajoifaoiwfhiahfo'],
     },
+    {
+      id: 4,
+      title: 'Chiang Mai Craft Fair (One Nimman)',
+      status: true,
+      elapsedText: 'Elapsed: 5h 20m',
+      remainingText: '6d 18h remaining of 7d max',
+      progressPercent: 8,
+      durationMax: '7d',
+      durationCurrent: '5h 20m',
+      grossSales: 2080.00,
+      netSales: 2010.00,
+      itemsCleared: 14,
+      itemsCleardMax: 45,
+      soldPercentage: 31,
+      boothStaffCount: 1,
+      boothStaffMax: 6,
+      boothStaffList: ['@art_k',"daw",'@art_k',"daw",'@art_k',"daw"],
+    },
+    {
+      id: 5,
+      title: 'Chiang Mai Craft Fair (One Nimman)',
+      status: true,
+      elapsedText: 'Elapsed: 5h 20m',
+      remainingText: '6d 18h remaining of 7d max',
+      progressPercent: 8,
+      durationMax: '7d',
+      durationCurrent: '5h 20m',
+      grossSales: 2080.00,
+      netSales: 2010.00,
+      itemsCleared: 14,
+      itemsCleardMax: 45,
+      soldPercentage: 31,
+      boothStaffCount: 1,
+      boothStaffMax: 6,
+      boothStaffList: ['@art_k',"daw",'@art_k',"daw",'@art_k',"daw"],
+    },
+    
   ];
 
   return (
-    <div className="min-h-screen bg-[#f7f8fc] text-[#1c1d36] font-sans pb-12 antialiased selection:bg-purple-100 selection:text-purple-700">
-      <Navbar />
-      {/* 1. Header Navigation Bar */}
+    <div className="min-h-screen bg-[#f7f8fc] text-[#1c1d36] font-sans antialiased selection:bg-purple-100 selection:text-purple-700 ">
       
+      {/* 1. Header Navigation Bar */}
+      <Navbar />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 pt-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 pt-6 space-y-6 mt-15 mb-10">
         
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-          <span className="hover:text-slate-600 cursor-pointer">Home</span>
-          <span>/</span>
-          <span className="hover:text-slate-600 cursor-pointer">Sales Runs</span>
-          <span>/</span>
-          <span className="text-[#6c5ce7] font-semibold">Ongoing Runs</span>
-        </div>
-
         {/* Page Title & Status Badges */}
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-extrabold tracking-tight text-[#161233]">
@@ -89,12 +147,21 @@ export default function ConsignDeskDashboard() {
           <div className="flex items-center gap-2 text-xs font-semibold">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#efebff] text-[#6c5ce7] border border-[#e1d9ff]">
               <span className="w-2 h-2 rounded-full bg-[#6c5ce7]"></span>
-              Active Runs: 3 / 5 Max Capacity
+              Active Runs: {salesRuns.length} / 5 Max Capacity
             </span>
-            
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#e8f8f0] text-[#10b981] border border-[#d1f4e0]">
-              2 Slots Available
-            </span>
+            {salesRuns.length < 5 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e8f8f0] text-[#10b981] border border-[#d1f4e0]">
+                <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
+                {5 - salesRuns.length} Slots Available
+              </span>
+            )}
+            {salesRuns.length >= 5 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-200/50 text-red-500 border border-red-300/50">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Slots Not Available
+              </span>
+            )}
+          
           </div>
         </div>
 
@@ -146,9 +213,9 @@ export default function ConsignDeskDashboard() {
                   
                   {/* Status Badge */}
                   <div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e8f8f0] text-[11px] font-bold tracking-wider text-[#10b981]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
-                      {run.status}
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${run.status ? 'bg-[#e8f8f0]  text-[#10b981]' : 'bg-[#ffebee] text-red-500'} text-[11px] font-bold tracking-wider`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${run.status ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></span>
+                      {run.status ? 'LIVE RUN ACTIVE' : 'RUN INACTIVE'}
                     </span>
                   </div>
 
@@ -181,10 +248,10 @@ export default function ConsignDeskDashboard() {
                       Gross Sales
                     </p>
                     <p className="text-lg font-extrabold text-[#11122a] leading-snug">
-                      {run.grossSales}
+                      ฿{run.grossSales}
                     </p>
                     <p className="text-[11px] font-medium text-slate-500">
-                      {run.netSales}
+                     Net ฿{run.netSales}
                     </p>
                   </div>
 
@@ -196,10 +263,10 @@ export default function ConsignDeskDashboard() {
                       Items Cleared
                     </p>
                     <p className="text-lg font-extrabold text-[#11122a] leading-snug">
-                      {run.itemsCleared}
+                      {run.itemsCleared} / {run.itemsCleardMax}
                     </p>
                     <p className="text-[11px] font-semibold text-[#10b981]">
-                      {run.soldPercentage}
+                      {run.soldPercentage} % sold out
                     </p>
                   </div>
 
@@ -211,23 +278,27 @@ export default function ConsignDeskDashboard() {
                       Booth Staff
                     </p>
                     <p className="text-lg font-extrabold text-[#11122a] leading-snug">
-                      {run.boothStaffCount}
+                      {run.boothStaffList.length} / {run.boothStaffMax}
                     </p>
                     <p className="text-[11px] font-medium text-slate-400">
-                      {run.boothStaffList}
+                      
+                      {run.boothStaffList.length < run.boothStaffMax
+                        ? `Available Slots: ${run.boothStaffMax - run.boothStaffList.length}`
+                        : 'No Available Slots'}
+
                     </p>
                   </div>
                 </div>
 
                 {/* Right Action Buttons */}
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-[200px] justify-center">
-                  <Link href="/sales/OnGoing/1" className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 group">
+                  <Link href={`/sales/OnGoing/${run.id}`} className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 group">
                     <span>Enter Sales Terminal</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                                   </Link>
-                  <button className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
+                  </Link>
+                  <Link href={`/ViewUser/${run.id}`} className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
                     Live Sales Activity
-                  </button>
+                  </Link>
                 </div>
 
               </div>
@@ -236,6 +307,7 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* 3. Bottom Dashed Card (Available Run Slots) */}
+        {salesRuns.length < 5 && (
         <div className="border-2 border-dashed border-[#d8d0ff] bg-[#f9f8ff]/60 rounded-3xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           
           <div className="flex items-center gap-4">
@@ -245,29 +317,31 @@ export default function ConsignDeskDashboard() {
             </div>
             
             {/* Slot Details */}
-            <div>
+            
+              <div>
               <h3 className="text-sm font-bold text-[#1a1836]">
-                Available Run Slots (Slots 4 & 5 of 5)
+               {5- salesRuns.length} Left Available Run Slots 
               </h3>
               <p className="text-xs font-medium text-slate-500 mt-0.5">
-                You can launch up to 2 more concurrent booths before reaching your 5–run plan limit.
+                You can launch up to {5 - salesRuns.length} more concurrent booths before reaching your 5–run plan limit.
               </p>
             </div>
+            
+            
           </div>
 
           {/* Launch Button */}
-          <button className="w-full md:w-auto bg-white hover:bg-purple-50 text-[#6c5ce7] text-xs font-bold py-2.5 px-5 rounded-xl border border-[#c4b5fd] shadow-sm transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0">
+          <Link href="/SaleRun" className="w-full md:w-auto bg-white hover:bg-purple-50 text-[#6c5ce7] text-xs font-bold py-2.5 px-5 rounded-xl border border-[#c4b5fd] shadow-sm transition-all duration-200 flex items-center justify-center gap-1.5 shrink-0">
             <Plus className="w-4 h-4" />
             <span>Launch Next Run</span>
-          </button>
+          </Link>
         </div>
+        )}
 
       </main>
 
       {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-12 text-xs font-medium text-slate-400">
-        © 2025 ConsignDesk POS • Artisanal Market System
-      </footer>
+        <Footer/>
 
     </div>
   );
