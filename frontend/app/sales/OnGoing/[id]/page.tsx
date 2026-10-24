@@ -41,7 +41,7 @@ import {
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
-
+import Footer from "@/app/components/footer";
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
   const initialProducts = [

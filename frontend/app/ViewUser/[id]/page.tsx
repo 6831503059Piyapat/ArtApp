@@ -1,3 +1,8 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import Footer from "@/app/components/footer";
 import {
   Activity,
   Bug,
@@ -11,7 +16,6 @@ import {
   User,
   Zap,
 } from "lucide-react";
-
 const viewerUrl = "https://consigndesk.app/ActBoard/2026";
 
 const suppliers = [
@@ -78,31 +82,19 @@ export default function ConsignDesk() {
     <div className="flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#111747]">
       <nav className="flex h-14 shrink-0 items-center justify-between border-b border-[#eeeafc] bg-white px-5">
         <div className="flex min-w-0 items-center gap-4 md:gap-8">
-          <a href="#" className="flex shrink-0 items-center gap-2 text-[17px] font-extrabold tracking-tight">
+          <Link href="#" className="flex shrink-0 items-center gap-2 text-[17px] font-extrabold tracking-tight">
             <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff91b8] to-[#7957ff] text-white shadow-sm">
               <Store className="h-3.5 w-3.5" />
             </span>
             ConsignDesk
-          </a>
-          <div className="hidden items-center gap-1 rounded-xl border border-[#eeeafd] bg-[#f7f5ff] p-1 text-[11px] font-medium text-[#6f7387] sm:flex">
-            <a href="#" className="rounded-lg px-3 py-1.5 hover:text-[#7957ff]">Dashboard</a>
-            <a href="#" className="rounded-lg px-3 py-1.5 hover:text-[#7957ff]">Sales Runs</a>
-            <a href="#" aria-current="page" className="flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-[#7957ff] shadow-sm">
-              Ongoing
-              <span className="flex items-center gap-1 rounded-full bg-[#fff0f4] px-1.5 py-0.5 text-[9px] text-[#ed72a8]">
+            <span className="flex items-center gap-1 rounded-full bg-[#fff0f4] px-1.5 py-0.5 text-[9px] text-[#ed72a8]">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff7c9e]" />
                 Live
               </span>
-            </a>
-            <a href="#" className="rounded-lg px-3 py-1.5 hover:text-[#7957ff]">Completed</a>
-          </div>
+          </Link>
+          
         </div>
-        <div className="flex shrink-0 items-center gap-2 text-[11px] font-bold">
-          <span className="hidden sm:inline">Alex Chen</span>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ed72bd] to-[#7957ff] text-white shadow-sm">
-            <User className="h-3.5 w-3.5" />
-          </span>
-        </div>
+       
       </nav>
 
       <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-4 px-5 py-3">
@@ -298,9 +290,7 @@ export default function ConsignDesk() {
         </div>
       </main>
 
-      <footer className="mt-2 shrink-0 border-t border-[#eeeafd] bg-white px-5 py-4 text-[9px] font-medium text-[#858ba0]">
-        © 2025 ConsignDesk POS • Artisanal Market System
-      </footer>
+      <Footer/>
     </div>
   );
 }

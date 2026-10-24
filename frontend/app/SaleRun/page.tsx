@@ -1,7 +1,7 @@
 "use client";
-
+import Navbar from '@/app/components/navbar';
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent ,Suspense} from "react";
 import {
   CalendarDays,
   Check,
@@ -151,34 +151,12 @@ export default function CreateSalesRun() {
 
   return (
     <div className="min-h-screen bg-[#f7f8fc] pb-20 font-sans text-[#111747]">
-      <header className="sticky top-0 z-30 h-[42px] border-b border-[#e9ebf3] bg-white">
-        <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between px-[18px]">
-          <div className="flex min-w-0 items-center gap-3">
-            <Link href="/" className="flex shrink-0 items-center gap-1.5 text-[13px] font-extrabold tracking-tight">
-              <span className="flex h-[19px] w-[19px] items-center justify-center rounded-md bg-gradient-to-br from-[#ed72bd] via-[#a264f5] to-[#ffb84d] text-white">
-                <Store className="h-3 w-3" />
-              </span>
-              ConsignDesk
-            </Link>
-            <nav aria-label="Main navigation" className="hidden items-center gap-0.5 rounded-lg border border-[#eeeafd] bg-[#f7f5ff] p-0.5 sm:flex">
-              <Link href="/dashboard" className="rounded-md px-2.5 py-1 text-[8px] text-[#72778b] hover:bg-white">Dashboard</Link>
-              <Link href="/SaleRun/1" aria-current="page" className="rounded-md px-2.5 py-1 text-[8px] text-[#72778b] hover:bg-white">Sales Runs</Link>
-              <Link href="/sales/OnGoing" className="flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-[8px] font-semibold text-[#7957ff] shadow-sm">
-                <span className="h-1 w-1 rounded-full bg-[#7957ff]" />
-                Ongoing
-              </Link>
-              <Link href="/sales/completed" className="rounded-md px-2.5 py-1 text-[8px] text-[#72778b] hover:bg-white">Completed</Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-1.5 text-[8px] font-semibold">
-            Alex Chen
-            <span className="flex h-[21px] w-[21px] items-center justify-center rounded-full bg-gradient-to-br from-[#ed72bd] to-[#7957ff] text-white">
-              <UserRound className="h-3 w-3" />
-            </span>
-          </div>
-        </div>
-      </header>
-
+      
+      
+      <Suspense fallback={<div>Loading...</div>}>
+       <Navbar />
+      </Suspense>
+      
       <main className="mx-auto max-w-[1280px] px-[18px] pt-5">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
