@@ -2,9 +2,15 @@
 import React, { Suspense, useState } from 'react';
 import {
   Store,
+  ShieldAlert,
+  ChevronDown,
+  Calculator,
+  Edit3,
   LayoutGrid,
   User,
   Plus,
+  AlertTriangle,
+  Lock,
   Trash2,
   Undo2,
   ArrowLeft,
@@ -26,7 +32,12 @@ import {
   Package,
   Wallet,
   Pencil,
-  ChevronDown,
+  Copy,
+  QrCode,
+  Shield,
+  ShieldCheck,
+  RotateCcw,
+  Check,
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
@@ -164,6 +175,33 @@ export default function SalesRunDetail() {
   const [expenseTitle, setExpenseTitle] = useState('Ice bag or plastic bags');
   const [category, setCategory] = useState('Stall Supplies');
   const [amount, setAmount] = useState('70');
+  //INVITE MODAL
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  // End Sales Run Modal
+  const [isEndRunOpen, setIsEndRunOpen] = useState(false);
+
+  const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
+  const joinPin = '88X2-901';
+  // Toggle Switches State
+  const [activeTab, setActiveTab] = useState<'global' | 'may' | 'tanawat'>('global');
+  const [isPermissionEnabled, setIsPermissionEnabled] = useState(false);
+  const [permissions, setPermissions] = useState({
+    registerSales: true,
+    issueDiscounts: false,
+    voidTransaction: true,
+    viewInventory: true,
+    restockQuantities: true,
+    addNewProducts: false
+  });
+  const togglePermission = (key: keyof typeof permissions) => {
+    setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 const handleSell = (id: string) => {
     setProducts((prev) =>
       prev.map((item) => {
@@ -178,6 +216,7 @@ const handleSell = (id: string) => {
       })
     );
   };
+
   return (
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
       {/* 1. TOP NAVBAR */}
@@ -212,7 +251,7 @@ const handleSell = (id: string) => {
                   <span className="bg-purple-50 px-2.5 py-1 rounded-full flex items-center gap-1 border border-purple-100">
                     <User className="w-3 h-3" /> 1 Assistant
                   </span>
-                  <button className="hover:underline font-semibold">+ Invite</button>
+                  <button  onClick={() => setIsOpen(true)} className="hover:underline font-semibold">+ Invite</button>
                 </div>
               </div>
             </div>
@@ -255,7 +294,10 @@ const handleSell = (id: string) => {
                   <Receipt className="h-3.5 w-3.5" /> Edit Mode
                 </button>
               </div>
-              <button type="button" className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
+              <button 
+                type="button" 
+                onClick={() => setIsEndRunOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
                 <X className="h-3.5 w-3.5" /> End Run
               </button>
             </div>
@@ -687,7 +729,7 @@ const handleSell = (id: string) => {
                 </div>
                 <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
               </div>
-              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+              <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
@@ -717,9 +759,210 @@ const handleSell = (id: string) => {
           </button>
         </div>
       </footer>
+
+      {isOpen && (
+        <SupplierInviteModal
+          onClose={() => setIsOpen(false)}
+          copied={copied}
+          onCopy={handleCopy}
+          inviteUrl={inviteUrl}
+          joinPin={joinPin}
+          onOpenPermissions={() => {
+            setIsOpen(false);
+            setIsPermissionEnabled(true);
+          }}
+        />
+      )}
+      {isPermissionEnabled && (
+       < AssistantPermissionsModal
+       onClose={() => setIsPermissionEnabled(false)} />
+      )}
+      {isEndRunOpen && (
+        <EndSalesRunModal
+          onClose={() => setIsEndRunOpen(false)}
+        />
+      )}
+    </div>
+  );
+
+
+
+}
+type PermissionProps = {
+  registerSales: boolean;
+  issueDiscounts: boolean;
+  voidTransaction: boolean;
+  viewInventory: boolean;
+  restockQuantities: boolean;
+  addNewProducts: boolean;
+};
+type ActivePermissionTab = 'global' | 'may' | 'tanawat';
+type PermissionModalProps = {
+  onClose: () => void;
+  activity: ActivePermissionTab;
+  permission: PermissionProps;
+  activitySet: React.Dispatch<React.SetStateAction<ActivePermissionTab>>;
+  togglePermission: (key: keyof PermissionProps) => void;
+  resetPermissions: () => void;
+};
+type SupplierInviteModalProps = {
+  onClose: () => void;
+  copied: boolean;
+  onCopy: () => void;
+  inviteUrl: string;
+  joinPin: string;
+  onOpenPermissions: () => void;
+};
+// MODAL COMPONENT: Supplier Invite Modal
+function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions }: SupplierInviteModalProps) {
+  return (
+    <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+      
+      {/* MODAL CARD */}
+      <div onClick={(e) => e.stopPropagation()}  className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100/80 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-purple-500 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <UserPlus className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-snug">
+                Invite Run Assistants
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
+                Invited Assistants need permission from you to make actions
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onClose()}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-6 space-y-6">
+          
+          {/* Top Section: Link/PIN (Left) + QR Code (Right) */}
+          <div className="grid grid-cols-12 gap-4 items-stretch">
+            
+            {/* Left Inputs (8 cols) */}
+            <div className="col-span-7 space-y-4 flex flex-col justify-between">
+              
+              {/* RUN INVITE LINK */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  RUN INVITE LINK
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <div className="bg-purple-50/60 border border-purple-100/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 truncate w-full">
+                    {inviteUrl}
+                  </div>
+                  <button
+                    onClick={() => onCopy()}
+                    className="bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-slate-900 font-bold text-xs px-3 py-2 rounded-xl transition-colors shadow-xs flex items-center gap-1 shrink-0"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* RUN JOIN CODE / PIN */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  RUN JOIN CODE / PIN
+                </label>
+                <div className="bg-purple-50/80 border border-purple-100/80 rounded-xl px-3 py-2.5 text-center text-purple-600 font-black text-base tracking-wider">
+                  {joinPin}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right QR Box (5 cols) */}
+            <div className="col-span-5 bg-slate-50/60 border border-slate-100 rounded-2xl p-3 flex flex-col items-center justify-center text-center space-y-2">
+              <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
+                {/* Simulated QR Code Graphic */}
+                <div className="w-16 h-16 bg-white relative flex items-center justify-center">
+                  <QrCode className="w-full h-full text-slate-900" />
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-slate-400">
+                Fast Booth Scan
+              </span>
+            </div>
+
+          </div>
+
+          {/* ASSISTANTS JOINED (2) SECTION */}
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              ASSISTANTS JOINED (2)
+            </label>
+
+            <div className="space-y-2">
+              {/* Assistant 1: @may_craft (Active) */}
+              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
+                    MC
+                  </div>
+                  <span className="text-xs font-bold text-slate-800">
+                    @may_craft
+                  </span>
+                </div>
+                <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Active
+                </span>
+              </div>
+
+              {/* Assistant 2: granawan.b (Offline) */}
+              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center uppercase">
+                    TB
+                  </div>
+                  <span className="text-xs font-semibold text-slate-600">
+                    granawan.b
+                  </span>
+                </div>
+                <span className="bg-slate-100 text-slate-500 border border-slate-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Offline
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
+          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-purple-600 border border-purple-200/80 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-purple-600" />
+            <span>Assistant Permissions</span>
+          </button>
+          
+          <button
+            onClick={() => onClose()}
+            className="px-5 py-2 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+          >
+            Done
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }
+
 
 // COMPONENT: Product Group Section (ใช้สร้างตารางสินค้าแต่ละ Supplier)
 function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor, items, placeholderText }:any) {
@@ -880,6 +1123,402 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
         >
           Sell - 1
         </button>
+      </div>
+    </div>
+  );
+}
+type AssistantPermissionsModalProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSave?: (permissions: Record<string, boolean>) => void;
+};
+function AssistantPermissionsModal({
+  isOpen = true,
+  onClose = () => {},
+  onSave = () => {}
+}: AssistantPermissionsModalProps) {
+  // State สำหรับเก็บสถานะสวิตช์ทั้ง 5 รายการ (ค่าเริ่มต้นปิดทั้งหมด 0/5 ตามรูป)
+  const [permissions, setPermissions] = useState({
+    sellProducts: false,
+    editProducts: false,
+    recordExpenses: false,
+    viewSalesLog: false,
+    managePermissions: false
+  });
+
+  // State สำหรับ Dropdown เลือก Assistant
+  const [selectedAssistant, setSelectedAssistant] = useState('@ploy_w');
+
+  // ฟังก์ชันสลับการเปิด/ปิดสวิตช์ Toggle
+  const togglePermission = (key: keyof typeof permissions) => {
+    setPermissions((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  // คำนวณจำนวนรายการที่เปิดใช้งาน
+  const enabledCount = Object.values(permissions).filter(Boolean).length;
+
+  // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
+  if (!isOpen) return null;
+
+  return (
+    // BACKDROP (ฉากหลังมืดโปร่งแสง + เบลอด้วย backdrop-blur-sm)
+    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+      
+      {/* MODAL CONTAINER */}
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg max-h-[calc(100vh-1rem)] sm:max-h-[90vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-start justify-between gap-3 border-b border-slate-100 shrink-0">
+          <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                Assistant Permissions
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-1 leading-relaxed max-w-xs">
+                Default permissions for new assistants: All disabled (toggle on individually to grant access).
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
+          
+          {/* SELECT ASSISTANT SECTION */}
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span>SELECT ASSISTANT</span>
+              <span className="text-slate-400 font-semibold lowercase">3 joined</span>
+            </div>
+
+            {/* Custom Dropdown Box */}
+            <div className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-purple-50/70 transition-colors">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-500 text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
+                  P
+                </div>
+                <div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="font-bold text-slate-900 text-sm">
+                      {selectedAssistant}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-xs font-semibold">
+                    <span className="text-amber-500">
+                      Restricted (Viewer only)
+                    </span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-slate-400 font-medium">
+                      All permissions off by default
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            </div>
+          </div>
+
+          {/* PERMISSIONS SECTION */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                PERMISSIONS
+              </span>
+              <span className="text-[11px] sm:text-xs font-bold text-amber-500">
+                All permissions off by default ({enabledCount}/5 enabled)
+              </span>
+            </div>
+
+            {/* LIST OF PERMISSION TOGGLES */}
+            <div className="space-y-2.5">
+              
+              {/* Item 1: Sell Products / Cashier Mode */}
+              <PermissionToggleRow
+                icon={<Calculator className="w-5 h-5 text-purple-600" />}
+                title="Sell Products / Cashier Mode"
+                description="Sell products and register sales transactions in Sales Mode"
+                enabled={permissions.sellProducts}
+                onToggle={() => togglePermission('sellProducts')}
+              />
+
+              {/* Item 2: Add / Edit / Delete Products */}
+              <PermissionToggleRow
+                icon={<Edit3 className="w-5 h-5 text-purple-600" />}
+                title="Add / Edit / Delete Products"
+                description="Manage catalog items, quantities, and pricing"
+                enabled={permissions.editProducts}
+                onToggle={() => togglePermission('editProducts')}
+              />
+
+              {/* Item 3: Record Booth Expenses */}
+              <PermissionToggleRow
+                icon={<Receipt className="w-5 h-5 text-purple-600" />}
+                title="Record Booth Expenses"
+                description="Record booth expenses and operational costs"
+                enabled={permissions.recordExpenses}
+                onToggle={() => togglePermission('recordExpenses')}
+              />
+
+              {/* Item 4: View Sales Log & Gross Stats */}
+              <PermissionToggleRow
+                icon={<History className="w-5 h-5 text-purple-600" />}
+                title="View Sales Log & Gross Stats"
+                description="Access transaction history, undo sales, and total stats"
+                enabled={permissions.viewSalesLog}
+                onToggle={() => togglePermission('viewSalesLog')}
+              />
+
+              {/* Item 5: Manage & Grant Permissions */}
+              <PermissionToggleRow
+                icon={<Shield className="w-5 h-5 text-purple-600" />}
+                title="Manage & Grant Permissions"
+                badgeText="RESTRICTED"
+                description="Assign roles and grant assistant permissions"
+                enabled={permissions.managePermissions}
+                onToggle={() => togglePermission('managePermissions')}
+              />
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={() => onSave(permissions)}
+            className="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+          >
+            <Check className="w-4 h-4 stroke-[3]" />
+            <span>Save Permissions</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// COMPONENT ย่อยสำหรับสวิตช์แต่ละแถว
+type PermissionToggleRowProps = {
+  icon: React.ReactNode;
+  title: string;
+  badgeText?: string;
+  description: string;
+  enabled: boolean;
+  onToggle: () => void;
+};
+
+function PermissionToggleRow({
+  icon,
+  title,
+  badgeText,
+  description,
+  enabled,
+  onToggle
+}: PermissionToggleRowProps) {
+  return (
+    <div
+      onClick={onToggle}
+      className="p-3.5 rounded-2xl border border-slate-100/90 bg-white hover:bg-slate-50/60 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-2xs"
+    >
+      <div className="flex items-start space-x-3.5 pr-2">
+        <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 mt-0.5">
+          {icon}
+        </div>
+        <div className="space-y-0.5">
+          <div className="flex items-center space-x-2">
+            <h3 className="font-bold text-slate-900 text-xs tracking-tight">
+              {title}
+            </h3>
+            {badgeText && (
+              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-purple-100 text-purple-600 uppercase tracking-wider">
+                {badgeText}
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium leading-normal">
+            {description}
+          </p>
+        </div>
+      </div>
+
+      {/* TOGGLE SWITCH */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+        className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none ${
+          enabled ? 'bg-purple-600' : 'bg-slate-200'
+        }`}
+      >
+        <div
+          className={`w-5 h-5 bg-white rounded-full shadow-xs transform transition-transform duration-200 ease-in-out ${
+            enabled ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    </div>
+  );
+}
+type EndSalesRunModalProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onConfirmEndRun?: () => void;
+};
+function EndSalesRunModal({
+  isOpen = true,
+  onClose = () => {},
+  onConfirmEndRun = () => {}
+}: EndSalesRunModalProps) {
+  // State สำหรับ Checkbox การยืนยัน Step 2
+  const [isConfirmed, setIsConfirmed] = useState(true);
+
+  // State สำหรับ Text Input ยืนยันคำว่า "END RUN"
+  const [confirmText, setConfirmText] = useState('END RUN');
+
+  // ตรวจสอบเงื่อนไขว่าสามารถกดปุ่ม Confirm & End Run ได้หรือไม่
+  const isReadyToSubmit = isConfirmed && confirmText.trim().toUpperCase() === 'END RUN';
+
+  // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
+  if (!isOpen) return null;
+
+  return (
+    // BACKDROP (ฉากหลังมืดโปร่งแสง + เบลอด้วย backdrop-blur-sm)
+    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+      
+      {/* MODAL CONTAINER */}
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-6 pb-5 flex items-start justify-between border-b border-slate-100">
+          <div className="flex items-start space-x-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                End Active Sales Run
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
+                Two-step verification required to permanently close session
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-6 space-y-5">
+          
+          {/* STEP 1: SESSION LOCKDOWN WARNINGS BOX */}
+          <div className="bg-rose-50/60 border border-rose-200/60 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center space-x-2 text-rose-600 font-bold text-xs">
+              <Lock className="w-4 h-4 shrink-0" />
+              <span>Step 1: Session Lockdown Warnings</span>
+            </div>
+
+            <ul className="text-[11px] text-slate-500 font-medium space-y-1 pl-6 list-disc marker:text-slate-400 leading-relaxed">
+              <li>Disconnects active assistants (Ploy W. and others).</li>
+              <li>Locks all product inventories and disables instant sales logging.</li>
+              <li>Calculates final supplier payouts and locks telemetry tallies.</li>
+            </ul>
+          </div>
+
+          {/* STEP 2: VERIFICATION & RECONCILIATION */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-slate-800">
+              Step 2: Verification & Reconciliation
+            </h3>
+
+            {/* CONFIRMATION CHECKBOX BOX */}
+            <label
+              onClick={() => setIsConfirmed(!isConfirmed)}
+              className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-purple-50/70 transition-colors select-none"
+            >
+              <div
+                className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
+                  isConfirmed ? 'bg-purple-600 text-white' : 'border border-slate-300 bg-white'
+                }`}
+              >
+                {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+              <span className="text-xs font-bold text-slate-800">
+                I confirm that the sales session has ended.
+              </span>
+            </label>
+
+            {/* INPUT CONFIRMATION TEXT */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700 block">
+                Type <span className="font-bold text-rose-500">END RUN</span> below to confirm:
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="END RUN"
+                className="w-full bg-slate-50/60 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-rose-500 uppercase transition-all placeholder:text-slate-300"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={() => {
+              if (isReadyToSubmit) onConfirmEndRun();
+            }}
+            disabled={!isReadyToSubmit}
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all flex items-center gap-1.5 ${
+              isReadyToSubmit
+                ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 cursor-pointer'
+                : 'bg-rose-300 cursor-not-allowed opacity-70'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Confirm & End Run</span>
+          </button>
+        </div>
+
       </div>
     </div>
   );
