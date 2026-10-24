@@ -2,6 +2,7 @@
 import React, { Suspense, useState } from 'react';
 import {
   Store,
+  ChevronDown,
   LayoutGrid,
   User,
   Plus,
@@ -26,7 +27,12 @@ import {
   Package,
   Wallet,
   Pencil,
-  ChevronDown,
+  Copy,
+  QrCode,
+  Shield,
+  ShieldCheck,
+  RotateCcw,
+  Check,
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
@@ -164,6 +170,31 @@ export default function SalesRunDetail() {
   const [expenseTitle, setExpenseTitle] = useState('Ice bag or plastic bags');
   const [category, setCategory] = useState('Stall Supplies');
   const [amount, setAmount] = useState('70');
+  //INVITE MODAL
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
+  const joinPin = '88X2-901';
+  // Toggle Switches State
+  const [activeTab, setActiveTab] = useState<'global' | 'may' | 'tanawat'>('global');
+  const [isPermissionEnabled, setIsPermissionEnabled] = useState(false);
+  const [permissions, setPermissions] = useState({
+    registerSales: true,
+    issueDiscounts: false,
+    voidTransaction: true,
+    viewInventory: true,
+    restockQuantities: true,
+    addNewProducts: false
+  });
+  const togglePermission = (key: keyof typeof permissions) => {
+    setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 const handleSell = (id: string) => {
     setProducts((prev) =>
       prev.map((item) => {
@@ -178,6 +209,7 @@ const handleSell = (id: string) => {
       })
     );
   };
+
   return (
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
       {/* 1. TOP NAVBAR */}
@@ -349,7 +381,7 @@ const handleSell = (id: string) => {
                 </button>
               </nav>
 
-              <button className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+              <button onClick={() => setIsOpen(true)} className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
                 <UserPlus className="w-3.5 h-3.5" /> + Add Supplier
               </button>
 
@@ -687,7 +719,7 @@ const handleSell = (id: string) => {
                 </div>
                 <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
               </div>
-              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+              <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
@@ -717,6 +749,480 @@ const handleSell = (id: string) => {
           </button>
         </div>
       </footer>
+
+      {isOpen && (
+        <SupplierInviteModal
+          onClose={() => setIsOpen(false)}
+          copied={copied}
+          onCopy={handleCopy}
+          inviteUrl={inviteUrl}
+          joinPin={joinPin}
+          onOpenPermissions={() => {
+            setIsOpen(false);
+            setIsPermissionEnabled(true);
+          }}
+        />
+      )}
+      {isPermissionEnabled && (
+        <PermissionModal
+          onClose={() => setIsPermissionEnabled(false)}
+          activity={activeTab}
+          permission={permissions}
+          activitySet={setActiveTab}
+          togglePermission={togglePermission}
+          resetPermissions={() => setPermissions({
+            registerSales: true,
+            issueDiscounts: false,
+            voidTransaction: true,
+            viewInventory: true,
+            restockQuantities: true,
+            addNewProducts: false
+          })}
+        />
+      )}
+    </div>
+  );
+
+
+
+}
+type PermissionProps = {
+  registerSales: boolean;
+  issueDiscounts: boolean;
+  voidTransaction: boolean;
+  viewInventory: boolean;
+  restockQuantities: boolean;
+  addNewProducts: boolean;
+};
+type ActivePermissionTab = 'global' | 'may' | 'tanawat';
+type PermissionModalProps = {
+  onClose: () => void;
+  activity: ActivePermissionTab;
+  permission: PermissionProps;
+  activitySet: React.Dispatch<React.SetStateAction<ActivePermissionTab>>;
+  togglePermission: (key: keyof PermissionProps) => void;
+  resetPermissions: () => void;
+};
+type SupplierInviteModalProps = {
+  onClose: () => void;
+  copied: boolean;
+  onCopy: () => void;
+  inviteUrl: string;
+  joinPin: string;
+  onOpenPermissions: () => void;
+};
+// MODAL COMPONENT: Supplier Invite Modal
+function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions }: SupplierInviteModalProps) {
+  return (
+    <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+      
+      {/* MODAL CARD */}
+      <div onClick={(e) => e.stopPropagation()}  className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100/80 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-purple-500 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <UserPlus className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-snug">
+                Invite Run Assistants
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
+                Invited Assistants need permission from you to make actions
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onClose()}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-6 space-y-6">
+          
+          {/* Top Section: Link/PIN (Left) + QR Code (Right) */}
+          <div className="grid grid-cols-12 gap-4 items-stretch">
+            
+            {/* Left Inputs (8 cols) */}
+            <div className="col-span-7 space-y-4 flex flex-col justify-between">
+              
+              {/* RUN INVITE LINK */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  RUN INVITE LINK
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <div className="bg-purple-50/60 border border-purple-100/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 truncate w-full">
+                    {inviteUrl}
+                  </div>
+                  <button
+                    onClick={() => onCopy()}
+                    className="bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-slate-900 font-bold text-xs px-3 py-2 rounded-xl transition-colors shadow-xs flex items-center gap-1 shrink-0"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* RUN JOIN CODE / PIN */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  RUN JOIN CODE / PIN
+                </label>
+                <div className="bg-purple-50/80 border border-purple-100/80 rounded-xl px-3 py-2.5 text-center text-purple-600 font-black text-base tracking-wider">
+                  {joinPin}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right QR Box (5 cols) */}
+            <div className="col-span-5 bg-slate-50/60 border border-slate-100 rounded-2xl p-3 flex flex-col items-center justify-center text-center space-y-2">
+              <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
+                {/* Simulated QR Code Graphic */}
+                <div className="w-16 h-16 bg-white relative flex items-center justify-center">
+                  <QrCode className="w-full h-full text-slate-900" />
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-slate-400">
+                Fast Booth Scan
+              </span>
+            </div>
+
+          </div>
+
+          {/* ASSISTANTS JOINED (2) SECTION */}
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              ASSISTANTS JOINED (2)
+            </label>
+
+            <div className="space-y-2">
+              {/* Assistant 1: @may_craft (Active) */}
+              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
+                    MC
+                  </div>
+                  <span className="text-xs font-bold text-slate-800">
+                    @may_craft
+                  </span>
+                </div>
+                <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Active
+                </span>
+              </div>
+
+              {/* Assistant 2: granawan.b (Offline) */}
+              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center uppercase">
+                    TB
+                  </div>
+                  <span className="text-xs font-semibold text-slate-600">
+                    granawan.b
+                  </span>
+                </div>
+                <span className="bg-slate-100 text-slate-500 border border-slate-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Offline
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
+          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-purple-600 border border-purple-200/80 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-purple-600" />
+            <span>Assistant Permissions</span>
+          </button>
+          
+          <button
+            onClick={() => onClose()}
+            className="px-5 py-2 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+          >
+            Done
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+//Permission Modal Component
+function PermissionModal({ onClose, activitySet, activity, permission, togglePermission, resetPermissions }: PermissionModalProps) {
+  return(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+      
+      {/* MODAL CARD */}
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100 shrink-0">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                  Assistant Permissions & Roles
+                </h2>
+                <span className="bg-purple-100 text-purple-700 font-bold text-[10px] px-2 py-0.5 rounded-full">
+                  RUN #14
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
+                Configure what invited assistants can view, record, and execute at this sales terminal.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2. TAB SELECTION & APPLYING SUB-TEXT */}
+        <div className="px-6 pt-4 pb-2 border-b border-slate-100/60 bg-slate-50/40 shrink-0 space-y-2">
+          <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
+            {/* Tab 1: Global Role */}
+            <button
+              onClick={() => activitySet('global')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+                activity === 'global'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              <span>Global Role (All Assistants)</span>
+              <span className={`text-[9px] px-1.5 py-0.2 rounded-md font-extrabold ${
+                activity === 'global' ? 'bg-indigo-500 text-white' : 'bg-slate-200 text-slate-600'
+              }`}>
+                Default
+              </span>
+            </button>
+
+            {/* Tab 2: @may_craft */}
+            <button
+              onClick={() => activitySet('may')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 ${
+                activity === 'may'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>@may_craft</span>
+            </button>
+
+            {/* Tab 3: @tanawat.b */}
+            <button
+              onClick={() => activitySet('tanawat')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 ${
+                activity === 'tanawat'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span>@tanawat.b</span>
+            </button>
+          </div>
+
+          <p className="text-[11px] text-slate-400 font-medium pl-0.5">
+            Applying to <strong className="text-slate-700 font-semibold">all booth assistants</strong>
+          </p>
+        </div>
+
+        {/* 3. MODAL BODY (SCROLLABLE PERMISSION LIST) */}
+        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          
+          {/* SECTION A: SALES & TERMINAL OPERATIONS */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
+                  A. SALES & TERMINAL OPERATIONS
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400">
+                Checkout Flow & Cashier Controls
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {/* Item 1 */}
+              <PermissionRow
+                title="Register Instant Sales (Checkout)"
+                badgeText="Recommended"
+                badgeColor="bg-emerald-50 text-emerald-600 border-emerald-100"
+                description="Allows assistant to tap products, scan QR items, and log instant cash or PromptPay purchases."
+                enabled={permission.registerSales}
+                onToggle={() => togglePermission('registerSales')}
+              />
+
+              {/* Item 2 */}
+              <PermissionRow
+                title="Issue Discounts & Custom Price"
+                badgeText="Host Only Default"
+                badgeColor="bg-amber-50 text-amber-600 border-amber-100"
+                description="Allow assistant to grant manual discounts up to 20% or round price for bundle promotions."
+                enabled={permission.issueDiscounts}
+                onToggle={() => togglePermission('issueDiscounts')}
+              />
+
+              {/* Item 3 */}
+              <PermissionRow
+                title="Void / Undo Last Transaction"
+                badgeText="5-Minute Window"
+                badgeColor="bg-purple-50 text-purple-600 border-purple-100"
+                description="Allow undoing accidental taps or refunded orders within 5 minutes without calling the Host."
+                enabled={permission.voidTransaction}
+                onToggle={() => togglePermission('voidTransaction')}
+              />
+            </div>
+          </div>
+
+          {/* SECTION B: INVENTORY & STOCK CONTROLS */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-pink-500"></span>
+                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
+                  B. INVENTORY & STOCK CONTROLS
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400">
+                Booth Stash & Quantities
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {/* Item 1 */}
+              <PermissionRow
+                title="View Live Inventory Quantities"
+                badgeText="Recommended"
+                badgeColor="bg-emerald-50 text-emerald-600 border-emerald-100"
+                description="Show exact remaining stock badges on catalog cards and under-counter replenishment bins."
+                enabled={permission.viewInventory}
+                onToggle={() => togglePermission('viewInventory')}
+              />
+
+              {/* Item 2 */}
+              <PermissionRow
+                title="Restock / Quick Edit Quantities"
+                badgeText="Assistant Friendly"
+                badgeColor="bg-purple-50 text-purple-600 border-purple-100"
+                description="Grant ability to increment stock when new supply arrives from vehicle or consignor drops off."
+                enabled={permission.restockQuantities}
+                onToggle={() => togglePermission('restockQuantities')}
+              />
+
+              {/* Item 3 */}
+              <PermissionRow
+                title="Add New Products or Edit Prices"
+                badgeText="Protected"
+                badgeColor="bg-rose-50 text-rose-600 border-rose-100"
+                description="Create brand-new SKU cards, modify barcode mapping, or change baseline item prices."
+                enabled={permission.addNewProducts}
+                onToggle={() => togglePermission('addNewProducts')}
+              />
+            </div>
+          </div>
+
+          {/* SECTION C: FINANCIALS & SETTLEMENTS */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
+                  C. FINANCIALS & SETTLEMENTS
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400">
+                Revenue, Splits & Expenses
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* 4. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between shrink-0">
+          <button
+            onClick={resetPermissions}
+            className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset to Default Staff Role</span>
+          </button>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onClose}
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Check className="w-4 h-4 stroke-[3]" />
+              <span>Save Permissions</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+type PermissionRowProps = {
+  title: string;
+  badgeText: string;
+  badgeColor: string;
+  description: string;
+  enabled: boolean;
+  onToggle: () => void;
+};
+
+function PermissionRow({ title, badgeText, badgeColor, description, enabled, onToggle }: PermissionRowProps) {
+  return (
+    <div className="bg-slate-50/70 border border-slate-100 rounded-2xl p-3.5 flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="text-xs font-bold text-slate-800">{title}</h3>
+          <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${badgeColor}`}>{badgeText}</span>
+        </div>
+        <p className="text-[10px] text-slate-400 leading-relaxed mt-1">{description}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        aria-label={`${enabled ? 'Disable' : 'Enable'} ${title}`}
+        onClick={onToggle}
+        className={`relative shrink-0 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-1 ${enabled ? 'bg-indigo-600' : 'bg-slate-300'}`}
+      >
+        <span className={`absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+      </button>
     </div>
   );
 }
