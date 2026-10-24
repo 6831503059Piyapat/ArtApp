@@ -2,10 +2,15 @@
 import React, { Suspense, useState } from 'react';
 import {
   Store,
+  ShieldAlert,
   ChevronDown,
+  Calculator,
+  Edit3,
   LayoutGrid,
   User,
   Plus,
+  AlertTriangle,
+  Lock,
   Trash2,
   Undo2,
   ArrowLeft,
@@ -173,6 +178,8 @@ export default function SalesRunDetail() {
   //INVITE MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  // End Sales Run Modal
+  const [isEndRunOpen, setIsEndRunOpen] = useState(false);
 
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
   const joinPin = '88X2-901';
@@ -244,7 +251,7 @@ const handleSell = (id: string) => {
                   <span className="bg-purple-50 px-2.5 py-1 rounded-full flex items-center gap-1 border border-purple-100">
                     <User className="w-3 h-3" /> 1 Assistant
                   </span>
-                  <button className="hover:underline font-semibold">+ Invite</button>
+                  <button  onClick={() => setIsOpen(true)} className="hover:underline font-semibold">+ Invite</button>
                 </div>
               </div>
             </div>
@@ -287,7 +294,10 @@ const handleSell = (id: string) => {
                   <Receipt className="h-3.5 w-3.5" /> Edit Mode
                 </button>
               </div>
-              <button type="button" className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
+              <button 
+                type="button" 
+                onClick={() => setIsEndRunOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
                 <X className="h-3.5 w-3.5" /> End Run
               </button>
             </div>
@@ -381,7 +391,7 @@ const handleSell = (id: string) => {
                 </button>
               </nav>
 
-              <button onClick={() => setIsOpen(true)} className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+              <button className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
                 <UserPlus className="w-3.5 h-3.5" /> + Add Supplier
               </button>
 
@@ -764,20 +774,12 @@ const handleSell = (id: string) => {
         />
       )}
       {isPermissionEnabled && (
-        <PermissionModal
-          onClose={() => setIsPermissionEnabled(false)}
-          activity={activeTab}
-          permission={permissions}
-          activitySet={setActiveTab}
-          togglePermission={togglePermission}
-          resetPermissions={() => setPermissions({
-            registerSales: true,
-            issueDiscounts: false,
-            voidTransaction: true,
-            viewInventory: true,
-            restockQuantities: true,
-            addNewProducts: false
-          })}
+       < AssistantPermissionsModal
+       onClose={() => setIsPermissionEnabled(false)} />
+      )}
+      {isEndRunOpen && (
+        <EndSalesRunModal
+          onClose={() => setIsEndRunOpen(false)}
         />
       )}
     </div>
@@ -960,272 +962,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
     </div>
   );
 }
-//Permission Modal Component
-function PermissionModal({ onClose, activitySet, activity, permission, togglePermission, resetPermissions }: PermissionModalProps) {
-  return(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
-      
-      {/* MODAL CARD */}
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
-        
-        {/* 1. MODAL HEADER */}
-        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100 shrink-0">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                  Assistant Permissions & Roles
-                </h2>
-                <span className="bg-purple-100 text-purple-700 font-bold text-[10px] px-2 py-0.5 rounded-full">
-                  RUN #14
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
-                Configure what invited assistants can view, record, and execute at this sales terminal.
-              </p>
-            </div>
-          </div>
 
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* 2. TAB SELECTION & APPLYING SUB-TEXT */}
-        <div className="px-6 pt-4 pb-2 border-b border-slate-100/60 bg-slate-50/40 shrink-0 space-y-2">
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-            {/* Tab 1: Global Role */}
-            <button
-              onClick={() => activitySet('global')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
-                activity === 'global'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              <span>Global Role (All Assistants)</span>
-              <span className={`text-[9px] px-1.5 py-0.2 rounded-md font-extrabold ${
-                activity === 'global' ? 'bg-indigo-500 text-white' : 'bg-slate-200 text-slate-600'
-              }`}>
-                Default
-              </span>
-            </button>
-
-            {/* Tab 2: @may_craft */}
-            <button
-              onClick={() => activitySet('may')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 ${
-                activity === 'may'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>@may_craft</span>
-            </button>
-
-            {/* Tab 3: @tanawat.b */}
-            <button
-              onClick={() => activitySet('tanawat')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 ${
-                activity === 'tanawat'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              <span>@tanawat.b</span>
-            </button>
-          </div>
-
-          <p className="text-[11px] text-slate-400 font-medium pl-0.5">
-            Applying to <strong className="text-slate-700 font-semibold">all booth assistants</strong>
-          </p>
-        </div>
-
-        {/* 3. MODAL BODY (SCROLLABLE PERMISSION LIST) */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
-          
-          {/* SECTION A: SALES & TERMINAL OPERATIONS */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
-                  A. SALES & TERMINAL OPERATIONS
-                </span>
-              </div>
-              <span className="text-[10px] font-semibold text-slate-400">
-                Checkout Flow & Cashier Controls
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              {/* Item 1 */}
-              <PermissionRow
-                title="Register Instant Sales (Checkout)"
-                badgeText="Recommended"
-                badgeColor="bg-emerald-50 text-emerald-600 border-emerald-100"
-                description="Allows assistant to tap products, scan QR items, and log instant cash or PromptPay purchases."
-                enabled={permission.registerSales}
-                onToggle={() => togglePermission('registerSales')}
-              />
-
-              {/* Item 2 */}
-              <PermissionRow
-                title="Issue Discounts & Custom Price"
-                badgeText="Host Only Default"
-                badgeColor="bg-amber-50 text-amber-600 border-amber-100"
-                description="Allow assistant to grant manual discounts up to 20% or round price for bundle promotions."
-                enabled={permission.issueDiscounts}
-                onToggle={() => togglePermission('issueDiscounts')}
-              />
-
-              {/* Item 3 */}
-              <PermissionRow
-                title="Void / Undo Last Transaction"
-                badgeText="5-Minute Window"
-                badgeColor="bg-purple-50 text-purple-600 border-purple-100"
-                description="Allow undoing accidental taps or refunded orders within 5 minutes without calling the Host."
-                enabled={permission.voidTransaction}
-                onToggle={() => togglePermission('voidTransaction')}
-              />
-            </div>
-          </div>
-
-          {/* SECTION B: INVENTORY & STOCK CONTROLS */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
-                  B. INVENTORY & STOCK CONTROLS
-                </span>
-              </div>
-              <span className="text-[10px] font-semibold text-slate-400">
-                Booth Stash & Quantities
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              {/* Item 1 */}
-              <PermissionRow
-                title="View Live Inventory Quantities"
-                badgeText="Recommended"
-                badgeColor="bg-emerald-50 text-emerald-600 border-emerald-100"
-                description="Show exact remaining stock badges on catalog cards and under-counter replenishment bins."
-                enabled={permission.viewInventory}
-                onToggle={() => togglePermission('viewInventory')}
-              />
-
-              {/* Item 2 */}
-              <PermissionRow
-                title="Restock / Quick Edit Quantities"
-                badgeText="Assistant Friendly"
-                badgeColor="bg-purple-50 text-purple-600 border-purple-100"
-                description="Grant ability to increment stock when new supply arrives from vehicle or consignor drops off."
-                enabled={permission.restockQuantities}
-                onToggle={() => togglePermission('restockQuantities')}
-              />
-
-              {/* Item 3 */}
-              <PermissionRow
-                title="Add New Products or Edit Prices"
-                badgeText="Protected"
-                badgeColor="bg-rose-50 text-rose-600 border-rose-100"
-                description="Create brand-new SKU cards, modify barcode mapping, or change baseline item prices."
-                enabled={permission.addNewProducts}
-                onToggle={() => togglePermission('addNewProducts')}
-              />
-            </div>
-          </div>
-
-          {/* SECTION C: FINANCIALS & SETTLEMENTS */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                <span className="font-bold text-slate-800 tracking-wider uppercase text-[11px]">
-                  C. FINANCIALS & SETTLEMENTS
-                </span>
-              </div>
-              <span className="text-[10px] font-semibold text-slate-400">
-                Revenue, Splits & Expenses
-              </span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* 4. MODAL FOOTER */}
-        <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between shrink-0">
-          <button
-            onClick={resetPermissions}
-            className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset to Default Staff Role</span>
-          </button>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onClose}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
-            >
-              <Check className="w-4 h-4 stroke-[3]" />
-              <span>Save Permissions</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  )
-}
-type PermissionRowProps = {
-  title: string;
-  badgeText: string;
-  badgeColor: string;
-  description: string;
-  enabled: boolean;
-  onToggle: () => void;
-};
-
-function PermissionRow({ title, badgeText, badgeColor, description, enabled, onToggle }: PermissionRowProps) {
-  return (
-    <div className="bg-slate-50/70 border border-slate-100 rounded-2xl p-3.5 flex items-center justify-between gap-4">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="text-xs font-bold text-slate-800">{title}</h3>
-          <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${badgeColor}`}>{badgeText}</span>
-        </div>
-        <p className="text-[10px] text-slate-400 leading-relaxed mt-1">{description}</p>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={enabled}
-        aria-label={`${enabled ? 'Disable' : 'Enable'} ${title}`}
-        onClick={onToggle}
-        className={`relative shrink-0 w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-1 ${enabled ? 'bg-indigo-600' : 'bg-slate-300'}`}
-      >
-        <span className={`absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
-      </button>
-    </div>
-  );
-}
 
 // COMPONENT: Product Group Section (ใช้สร้างตารางสินค้าแต่ละ Supplier)
 function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor, items, placeholderText }:any) {
@@ -1386,6 +1123,402 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
         >
           Sell - 1
         </button>
+      </div>
+    </div>
+  );
+}
+type AssistantPermissionsModalProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSave?: (permissions: Record<string, boolean>) => void;
+};
+function AssistantPermissionsModal({
+  isOpen = true,
+  onClose = () => {},
+  onSave = () => {}
+}: AssistantPermissionsModalProps) {
+  // State สำหรับเก็บสถานะสวิตช์ทั้ง 5 รายการ (ค่าเริ่มต้นปิดทั้งหมด 0/5 ตามรูป)
+  const [permissions, setPermissions] = useState({
+    sellProducts: false,
+    editProducts: false,
+    recordExpenses: false,
+    viewSalesLog: false,
+    managePermissions: false
+  });
+
+  // State สำหรับ Dropdown เลือก Assistant
+  const [selectedAssistant, setSelectedAssistant] = useState('@ploy_w');
+
+  // ฟังก์ชันสลับการเปิด/ปิดสวิตช์ Toggle
+  const togglePermission = (key: keyof typeof permissions) => {
+    setPermissions((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  // คำนวณจำนวนรายการที่เปิดใช้งาน
+  const enabledCount = Object.values(permissions).filter(Boolean).length;
+
+  // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
+  if (!isOpen) return null;
+
+  return (
+    // BACKDROP (ฉากหลังมืดโปร่งแสง + เบลอด้วย backdrop-blur-sm)
+    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+      
+      {/* MODAL CONTAINER */}
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg max-h-[calc(100vh-1rem)] sm:max-h-[90vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-start justify-between gap-3 border-b border-slate-100 shrink-0">
+          <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                Assistant Permissions
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-1 leading-relaxed max-w-xs">
+                Default permissions for new assistants: All disabled (toggle on individually to grant access).
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
+          
+          {/* SELECT ASSISTANT SECTION */}
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span>SELECT ASSISTANT</span>
+              <span className="text-slate-400 font-semibold lowercase">3 joined</span>
+            </div>
+
+            {/* Custom Dropdown Box */}
+            <div className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-purple-50/70 transition-colors">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-500 text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
+                  P
+                </div>
+                <div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="font-bold text-slate-900 text-sm">
+                      {selectedAssistant}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-xs font-semibold">
+                    <span className="text-amber-500">
+                      Restricted (Viewer only)
+                    </span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-slate-400 font-medium">
+                      All permissions off by default
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            </div>
+          </div>
+
+          {/* PERMISSIONS SECTION */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                PERMISSIONS
+              </span>
+              <span className="text-[11px] sm:text-xs font-bold text-amber-500">
+                All permissions off by default ({enabledCount}/5 enabled)
+              </span>
+            </div>
+
+            {/* LIST OF PERMISSION TOGGLES */}
+            <div className="space-y-2.5">
+              
+              {/* Item 1: Sell Products / Cashier Mode */}
+              <PermissionToggleRow
+                icon={<Calculator className="w-5 h-5 text-purple-600" />}
+                title="Sell Products / Cashier Mode"
+                description="Sell products and register sales transactions in Sales Mode"
+                enabled={permissions.sellProducts}
+                onToggle={() => togglePermission('sellProducts')}
+              />
+
+              {/* Item 2: Add / Edit / Delete Products */}
+              <PermissionToggleRow
+                icon={<Edit3 className="w-5 h-5 text-purple-600" />}
+                title="Add / Edit / Delete Products"
+                description="Manage catalog items, quantities, and pricing"
+                enabled={permissions.editProducts}
+                onToggle={() => togglePermission('editProducts')}
+              />
+
+              {/* Item 3: Record Booth Expenses */}
+              <PermissionToggleRow
+                icon={<Receipt className="w-5 h-5 text-purple-600" />}
+                title="Record Booth Expenses"
+                description="Record booth expenses and operational costs"
+                enabled={permissions.recordExpenses}
+                onToggle={() => togglePermission('recordExpenses')}
+              />
+
+              {/* Item 4: View Sales Log & Gross Stats */}
+              <PermissionToggleRow
+                icon={<History className="w-5 h-5 text-purple-600" />}
+                title="View Sales Log & Gross Stats"
+                description="Access transaction history, undo sales, and total stats"
+                enabled={permissions.viewSalesLog}
+                onToggle={() => togglePermission('viewSalesLog')}
+              />
+
+              {/* Item 5: Manage & Grant Permissions */}
+              <PermissionToggleRow
+                icon={<Shield className="w-5 h-5 text-purple-600" />}
+                title="Manage & Grant Permissions"
+                badgeText="RESTRICTED"
+                description="Assign roles and grant assistant permissions"
+                enabled={permissions.managePermissions}
+                onToggle={() => togglePermission('managePermissions')}
+              />
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={() => onSave(permissions)}
+            className="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+          >
+            <Check className="w-4 h-4 stroke-[3]" />
+            <span>Save Permissions</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// COMPONENT ย่อยสำหรับสวิตช์แต่ละแถว
+type PermissionToggleRowProps = {
+  icon: React.ReactNode;
+  title: string;
+  badgeText?: string;
+  description: string;
+  enabled: boolean;
+  onToggle: () => void;
+};
+
+function PermissionToggleRow({
+  icon,
+  title,
+  badgeText,
+  description,
+  enabled,
+  onToggle
+}: PermissionToggleRowProps) {
+  return (
+    <div
+      onClick={onToggle}
+      className="p-3.5 rounded-2xl border border-slate-100/90 bg-white hover:bg-slate-50/60 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-2xs"
+    >
+      <div className="flex items-start space-x-3.5 pr-2">
+        <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 mt-0.5">
+          {icon}
+        </div>
+        <div className="space-y-0.5">
+          <div className="flex items-center space-x-2">
+            <h3 className="font-bold text-slate-900 text-xs tracking-tight">
+              {title}
+            </h3>
+            {badgeText && (
+              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-purple-100 text-purple-600 uppercase tracking-wider">
+                {badgeText}
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium leading-normal">
+            {description}
+          </p>
+        </div>
+      </div>
+
+      {/* TOGGLE SWITCH */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+        className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none ${
+          enabled ? 'bg-purple-600' : 'bg-slate-200'
+        }`}
+      >
+        <div
+          className={`w-5 h-5 bg-white rounded-full shadow-xs transform transition-transform duration-200 ease-in-out ${
+            enabled ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    </div>
+  );
+}
+type EndSalesRunModalProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onConfirmEndRun?: () => void;
+};
+function EndSalesRunModal({
+  isOpen = true,
+  onClose = () => {},
+  onConfirmEndRun = () => {}
+}: EndSalesRunModalProps) {
+  // State สำหรับ Checkbox การยืนยัน Step 2
+  const [isConfirmed, setIsConfirmed] = useState(true);
+
+  // State สำหรับ Text Input ยืนยันคำว่า "END RUN"
+  const [confirmText, setConfirmText] = useState('END RUN');
+
+  // ตรวจสอบเงื่อนไขว่าสามารถกดปุ่ม Confirm & End Run ได้หรือไม่
+  const isReadyToSubmit = isConfirmed && confirmText.trim().toUpperCase() === 'END RUN';
+
+  // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
+  if (!isOpen) return null;
+
+  return (
+    // BACKDROP (ฉากหลังมืดโปร่งแสง + เบลอด้วย backdrop-blur-sm)
+    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+      
+      {/* MODAL CONTAINER */}
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        
+        {/* 1. MODAL HEADER */}
+        <div className="p-6 pb-5 flex items-start justify-between border-b border-slate-100">
+          <div className="flex items-start space-x-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                End Active Sales Run
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
+                Two-step verification required to permanently close session
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 2. MODAL BODY */}
+        <div className="p-6 space-y-5">
+          
+          {/* STEP 1: SESSION LOCKDOWN WARNINGS BOX */}
+          <div className="bg-rose-50/60 border border-rose-200/60 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center space-x-2 text-rose-600 font-bold text-xs">
+              <Lock className="w-4 h-4 shrink-0" />
+              <span>Step 1: Session Lockdown Warnings</span>
+            </div>
+
+            <ul className="text-[11px] text-slate-500 font-medium space-y-1 pl-6 list-disc marker:text-slate-400 leading-relaxed">
+              <li>Disconnects active assistants (Ploy W. and others).</li>
+              <li>Locks all product inventories and disables instant sales logging.</li>
+              <li>Calculates final supplier payouts and locks telemetry tallies.</li>
+            </ul>
+          </div>
+
+          {/* STEP 2: VERIFICATION & RECONCILIATION */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-slate-800">
+              Step 2: Verification & Reconciliation
+            </h3>
+
+            {/* CONFIRMATION CHECKBOX BOX */}
+            <label
+              onClick={() => setIsConfirmed(!isConfirmed)}
+              className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-purple-50/70 transition-colors select-none"
+            >
+              <div
+                className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
+                  isConfirmed ? 'bg-purple-600 text-white' : 'border border-slate-300 bg-white'
+                }`}
+              >
+                {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+              <span className="text-xs font-bold text-slate-800">
+                I confirm that the sales session has ended.
+              </span>
+            </label>
+
+            {/* INPUT CONFIRMATION TEXT */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700 block">
+                Type <span className="font-bold text-rose-500">END RUN</span> below to confirm:
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="END RUN"
+                className="w-full bg-slate-50/60 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-rose-500 uppercase transition-all placeholder:text-slate-300"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER */}
+        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={() => {
+              if (isReadyToSubmit) onConfirmEndRun();
+            }}
+            disabled={!isReadyToSubmit}
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all flex items-center gap-1.5 ${
+              isReadyToSubmit
+                ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 cursor-pointer'
+                : 'bg-rose-300 cursor-not-allowed opacity-70'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Confirm & End Run</span>
+          </button>
+        </div>
+
       </div>
     </div>
   );
