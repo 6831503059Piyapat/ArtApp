@@ -210,7 +210,7 @@ export default function CompletedRunsPage() {
                           <span className="text-[10px] text-primary font-extrabold">{run.net}</span>
                         </div>
                       </div>
-                      <Link href="#" className="inline-flex items-center gap-1 px-[10px] py-1 rounded-xl bg-gradient-to-r from-primary to-[#6842FF] hover:from-[#6A47F2] hover:to-[#5730EA] text-white text-[8px] font-bold transition-all shadow-sm shadow-primary/30 ml-auto md:ml-0 whitespace-nowrap">
+                      <Link href={`/sales/completed/${run.id}`} className="inline-flex items-center gap-1 px-[10px] py-1 rounded-xl bg-gradient-to-r from-primary to-[#6842FF] hover:from-[#6A47F2] hover:to-[#5730EA] text-white text-[8px] font-bold transition-all shadow-sm shadow-primary/30 ml-auto md:ml-0 whitespace-nowrap">
                         <span>View Run Breakdown</span>
                         <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
                       </Link>

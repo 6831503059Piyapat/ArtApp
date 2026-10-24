@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import {
   Store,
   LayoutGrid,
@@ -182,7 +182,9 @@ const handleSell = (id: string) => {
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
       {/* 1. TOP NAVBAR */}
       <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <Suspense fallback={<div>Loading...</div>}>
        <Navbar />
+       </Suspense>
       </header>
 
       {/* MAIN CONTAINER */}

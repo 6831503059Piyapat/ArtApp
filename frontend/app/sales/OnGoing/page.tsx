@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Sparkles
 } from 'lucide-react';
+import Link from 'next/link';
 import Navbar from '@/app/components/navbar';
 export default function ConsignDeskDashboard() {
   const [activeTab, setActiveTab] = useState('Ongoing');
@@ -220,10 +221,10 @@ export default function ConsignDeskDashboard() {
 
                 {/* Right Action Buttons */}
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-[200px] justify-center">
-                  <button className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 group">
+                  <Link href="/sales/OnGoing/1" className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 group">
                     <span>Enter Sales Terminal</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </button>
+                                   </Link>
                   <button className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
                     Live Sales Activity
                   </button>

@@ -1,7 +1,20 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
+  const pathname = usePathname();
 
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+
+  const linkClass = (href: string) =>
+    `px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
+      isActive(href)
+        ? 'bg-white text-primary font-semibold shadow-sm'
+        : 'text-creatory-gray hover:bg-white hover:text-creatory-navy'
+    }`;
 
   return (
    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-creatory-border shadow-[0_2px_12px_rgba(11,15,79,0.04)]">
@@ -16,10 +29,10 @@ export default function Navbar() {
               </span>
             </Link>
             <nav className="hidden md:flex items-center gap-0.5 rounded-xl border border-primary/10 bg-creatory-lavender/70 p-0.5">
-              <Link href="#" className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-creatory-gray hover:bg-white hover:text-creatory-navy transition-colors">Dashboard</Link>
+              <Link href="#" className={linkClass('/dashboard')} aria-current={isActive('/dashboard') ? 'page' : undefined}>Dashboard</Link>
               <Link href="#" className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-creatory-gray hover:bg-white hover:text-creatory-navy transition-colors">Sales Runs</Link>
-              <Link href="#" className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-creatory-gray hover:bg-white hover:text-creatory-navy transition-colors">Ongoing</Link>
-              <Link href="#" aria-current="page" className="px-3 py-1.5 text-[10px] transition-colors bg-white text-primary font-semibold rounded-lg shadow-sm">Completed</Link>
+              <Link href="/sales/OnGoing" className={linkClass('/sales/OnGoing')} aria-current={isActive('/sales/OnGoing') ? 'page' : undefined}>Ongoing</Link>
+              <Link href="/sales/completed" className={linkClass('/sales/completed')} aria-current={isActive('/sales/completed') ? 'page' : undefined}>Completed</Link>
             </nav>
           </div>
           <div className="flex items-center gap-1.5">
