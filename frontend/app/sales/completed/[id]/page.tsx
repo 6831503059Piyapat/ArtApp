@@ -1,36 +1,17 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { 
   ArrowLeft, FileSpreadsheet, FileText, Share2, 
   Wallet, Receipt, DollarSign, Users, List, 
   History, User, Check, CheckCircle2
 } from 'lucide-react';
-
+import Navbar from '@/app/components/navbar';
 export default function ConsignDeskDashboard() {
   return (
     <div className="min-h-screen bg-[#f8f9fc] font-sans text-gray-800 pb-10">
       {/* Navigation Bar */}
-      <nav className="bg-white border-b border-gray-100 flex items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="bg-purple-500 p-1.5 rounded-lg">
-              <span className="text-white font-bold text-sm">CD</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">ConsignDesk</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <button className="px-3 py-1.5 text-gray-500 hover:bg-gray-50 rounded-md">Dashboard</button>
-            <button className="px-3 py-1.5 text-gray-500 hover:bg-gray-50 rounded-md">Sales Runs</button>
-            <button className="px-3 py-1.5 text-blue-600 bg-blue-50 rounded-md font-medium">Ongoing</button>
-            <button className="px-3 py-1.5 text-gray-500 hover:bg-gray-50 rounded-md">Completed</button>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">Alex Chen</span>
-          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white">
-            <User size={16} />
-          </div>
-        </div>
-      </nav>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Navbar />
+      </Suspense>
 
       {/* Main Content */}
       <main className="max-w-[1400px] mx-auto px-6 mt-6">
