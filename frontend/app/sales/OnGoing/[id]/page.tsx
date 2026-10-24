@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import {
   Store,
   LayoutGrid,
@@ -182,7 +182,9 @@ const handleSell = (id: string) => {
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
       {/* 1. TOP NAVBAR */}
       <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <Suspense fallback={<div>Loading...</div>}>
        <Navbar />
+       </Suspense>
       </header>
 
       {/* MAIN CONTAINER */}
@@ -335,14 +337,14 @@ const handleSell = (id: string) => {
                 <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
                   <div className="flex items-center gap-2.5">
                     <Store className="w-4 h-4 text-pink-400" />
-                    <span>P' Kaimook</span>
+                    <span>P Kaimook</span>
                   </div>
                 </button>
 
                 <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
                   <div className="flex items-center gap-2.5">
                     <Store className="w-4 h-4 text-amber-400" />
-                    <span>Nong' Japan</span>
+                    <span>Nong Japan</span>
                   </div>
                 </button>
               </nav>
@@ -460,7 +462,7 @@ const handleSell = (id: string) => {
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
             <h2 className="font-bold text-slate-900 text-sm tracking-tight">
-              P' Kaimook
+              P Kaimook
             </h2>
             <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
               Supplier
@@ -486,7 +488,7 @@ const handleSell = (id: string) => {
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
             <h2 className="font-bold text-slate-900 text-sm tracking-tight">
-              Nong' Japan
+              Nong Japan
             </h2>
             <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
               Supplier
