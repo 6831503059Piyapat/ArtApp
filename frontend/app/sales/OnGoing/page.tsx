@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Store, 
   User, 
@@ -13,15 +13,16 @@ import {
 import Footer from "@/app/components/footer";
 import Link from 'next/link';
 import Navbar from '@/app/components/navbar';
+import { matchesSalesRun } from '../../features/OnGoing/utils/search';
+import { getRunTiming } from '../../features/OnGoing/utils/time';
+
 type SalesRun = {
   id: number;
+  isOwner: boolean;
   title: string;
   status: boolean;
-  elapsedText: string;
-  durationMax:string;
-  durationCurrent: string;
-  remainingText: string;
-  progressPercent: number;
+  boothtimecreate: string;
+  boothtimeEnd: string;
   grossSales: number;
   netSales: number;
   itemsCleared: number;
@@ -30,104 +31,90 @@ type SalesRun = {
   boothStaffMax: number;
   boothStaffList: string[];
 };
+
 export default function ConsignDeskDashboard() {
   const [activeTab, setActiveTab] = useState('Ongoing');
   const [filter, setFilter] = useState('All Ongoing');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    const updateNow = () => setNow(Date.now());
+    const initialTimer = window.setTimeout(updateNow, 0);
+    const timer = window.setInterval(updateNow, 60_000);
+
+    return () => {
+      window.clearTimeout(initialTimer);
+      window.clearInterval(timer);
+    };
+  }, []);
 
   // ข้อมูลจำลองของการขาย (Sales Runs Data)
-  const salesRuns = [
+  const salesRuns: SalesRun[] = [
     {
       id: 1,
-      title: 'MFU Outside Night Market (Mon 14)',
+      isOwner: true,
+      title: 'งานที่จัดขึ้นที่เชียงใหม่',
       status: false,
-      elapsedText: 'Duration: 1d 4h elapsed',
-      remainingText: '5d 20h remaining of 7d max',
-      progressPercent: 20, // (1.16/7)
-      durationMax: '7d',
-      durationCurrent: '1d 4h',
+      boothtimecreate: '2026-10-24T04:00:00Z',
+      boothtimeEnd: '2026-10-31T04:00:00Z',
       grossSales: 8490.00,
       netSales: 8420.00,
       itemsCleared: 66,
       itemsCleardMax: 103,
       soldPercentage: 64,
-      boothStaffCount: 2,
       boothStaffMax: 6,
       boothStaffList: ['@may_craft', '@...'],
     },
     {
       id: 2,
+      isOwner: true,
       title: 'Nimman Artisan Weekend Pop-up',
       status: true,
-      elapsedText: 'Elapsed: 4d 18h',
-      remainingText: '2d 6h remaining of 7d max',
-      progressPercent: 68,
-      durationMax: '7d',
-      durationCurrent: '4d 18h',
+      boothtimecreate: '2026-10-20T10:00:00Z',
+      boothtimeEnd: '2026-10-27T10:00:00Z',
       grossSales: 4350.00,
       netSales: 4190.00,
       itemsCleared: 38,
       itemsCleardMax: 70  ,
       soldPercentage: 54,
-      boothStaffCount: 1,
       boothStaffMax: 6,
       boothStaffList: ['@ploy_w'],
     },
      {
       id: 3,
+      isOwner: true,
       title: 'Chiang Mai Craft Fair (One Nimman)',
-      status: true,
-      elapsedText: 'Elapsed: 5h 20m',
-      remainingText: '6d 18h remaining of 7d max',
-      progressPercent: 8,
-      durationMax: '7d',
-      durationCurrent: '5h 20m',
+      status: false,
+      boothtimecreate: '2026-10-25T03:00:00Z',
+      boothtimeEnd: '2026-11-01T03:00:00Z',
       grossSales: 2080.00,
       netSales: 2010.00,
       itemsCleared: 14,
       itemsCleardMax: 45,
       soldPercentage: 31,
-      boothStaffCount: 1,
       boothStaffMax: 6,
       boothStaffList: ['@art_kajoifaoiwfhiahfo'],
     },
     {
       id: 4,
+      isOwner: false,
       title: 'Chiang Mai Craft Fair (One Nimman)',
       status: true,
-      elapsedText: 'Elapsed: 5h 20m',
-      remainingText: '6d 18h remaining of 7d max',
-      progressPercent: 8,
-      durationMax: '7d',
-      durationCurrent: '5h 20m',
+      boothtimecreate: '2026-10-25T03:00:00Z',
+      boothtimeEnd: '2026-11-01T03:00:00Z',
       grossSales: 2080.00,
       netSales: 2010.00,
       itemsCleared: 14,
       itemsCleardMax: 45,
       soldPercentage: 31,
-      boothStaffCount: 1,
-      boothStaffMax: 6,
-      boothStaffList: ['@art_k',"daw",'@art_k',"daw",'@art_k',"daw"],
-    },
-    {
-      id: 5,
-      title: 'Chiang Mai Craft Fair (One Nimman)',
-      status: true,
-      elapsedText: 'Elapsed: 5h 20m',
-      remainingText: '6d 18h remaining of 7d max',
-      progressPercent: 8,
-      durationMax: '7d',
-      durationCurrent: '5h 20m',
-      grossSales: 2080.00,
-      netSales: 2010.00,
-      itemsCleared: 14,
-      itemsCleardMax: 45,
-      soldPercentage: 31,
-      boothStaffCount: 1,
       boothStaffMax: 6,
       boothStaffList: ['@art_k',"daw",'@art_k',"daw",'@art_k',"daw"],
     },
     
+    
   ];
+  const filteredSalesRuns = salesRuns.filter((run) => matchesSalesRun(run, searchQuery, filter));
 
   return (
     <div className="min-h-screen bg-[#f7f8fc] text-[#1c1d36] font-sans antialiased selection:bg-purple-100 selection:text-purple-700 ">
@@ -170,12 +157,27 @@ export default function ConsignDeskDashboard() {
           
           {/* Search Input */}
           <div className="relative w-full md:w-96">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <label htmlFor="sales-run-search" className="sr-only">
+              Search ongoing sales runs
+            </label>
+            <Search aria-hidden="true" className="pointer-events-none w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
-              type="text"
-              placeholder="Search ongoing runs by name, location, or assistant..."
-              className="w-full bg-[#f6f7fb] text-xs font-medium text-slate-700 pl-10 pr-4 py-2.5 rounded-xl border border-transparent focus:border-purple-300 focus:bg-white focus:outline-none transition-all placeholder-slate-400"
+              id="sales-run-search"
+              type="search"
+              list="sales-run-options"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              autoComplete="off"
+              placeholder="Search by name, location, or assistant..."
+              className="w-full bg-[#f6f7fb] text-xs font-medium text-slate-700 pl-10 pr-4 py-2.5 rounded-xl border border-transparent focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all placeholder:text-slate-500"
             />
+            <datalist id="sales-run-options">
+              {salesRuns.map((run) => (
+                <option key={run.id} value={run.title}>
+                  {run.boothStaffList.join(', ')}
+                </option>
+              ))}
+            </datalist>
           </div>
 
           {/* Filter Tabs */}
@@ -183,6 +185,8 @@ export default function ConsignDeskDashboard() {
             {['All Ongoing', 'Host Owned', 'Assistant In'].map((item) => (
               <button
                 key={item}
+                type="button"
+                aria-pressed={filter === item}
                 onClick={() => setFilter(item)}
                 className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg transition-all ${
                   filter === item
@@ -197,9 +201,31 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* 2. Cards List (Sales Runs) */}
-        <div className="space-y-4">
-          {salesRuns.map((run) => (
-            <div
+        <div id="sales-run-list" className="space-y-4" aria-live="polite">
+          {filteredSalesRuns.length === 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+              <p className="text-sm font-bold text-slate-800">No matching sales runs</p>
+              <p className="mt-1 text-xs text-slate-500">Try another search or filter.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFilter('All Ongoing');
+                }}
+                className="mt-4 rounded-xl bg-[#6c5ce7] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#5b4bc4] focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2"
+              >
+                Show all runs
+              </button>
+            </div>
+          )}
+          {filteredSalesRuns.map((run) => {
+            const timing = getRunTiming(
+              run.boothtimecreate,
+              run.boothtimeEnd,
+              now ?? Date.parse(run.boothtimecreate),
+            );
+
+            return <div
               key={run.id}
               className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100 relative overflow-hidden transition-all hover:shadow-md"
             >
@@ -227,14 +253,14 @@ export default function ConsignDeskDashboard() {
                   {/* Progress Line and Time Details */}
                   <div className="space-y-1.5 max-w-xl">
                     <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-800">{run.elapsedText}</span>
-                      <span className="text-[#6c5ce7]">{run.remainingText}</span>
+                      <span className="text-slate-800"> Elapsed: {timing.elapsed}</span>
+                      <span className="text-[#6c5ce7]">{timing.remaining}</span>
                     </div>
                     {/* Progress Bar Container */}
                     <div className="w-full bg-[#eef0f6] h-2 rounded-full overflow-hidden">
                       <div
                         className="bg-gradient-to-r from-[#7c3aed] to-[#ec4899] h-full rounded-full transition-all duration-500"
-                        style={{ width: `${run.progressPercent}%` }}
+                        style={{ width: `${timing.progress}%` }}
                       ></div>
                     </div>
                   </div>
@@ -248,10 +274,10 @@ export default function ConsignDeskDashboard() {
                       Gross Sales
                     </p>
                     <p className="text-lg font-extrabold text-[#11122a] leading-snug">
-                      ฿{run.grossSales}
+                      ฿{run.grossSales.toLocaleString('en-US')}
                     </p>
                     <p className="text-[11px] font-medium text-slate-500">
-                     Net ฿{run.netSales}
+                     Net ฿{run.netSales.toLocaleString('en-US')}
                     </p>
                   </div>
 
@@ -296,14 +322,15 @@ export default function ConsignDeskDashboard() {
                     <span>Enter Sales Terminal</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                  <Link href={`/ViewUser/${run.id}`} className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
+                  <Link href={`/ViewUser/${run.id}`} target="_blank" className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
                     Live Sales Activity
                   </Link>
                 </div>
 
               </div>
-            </div>
-          ))}
+            </div>;
+            
+          })}
         </div>
 
         {/* 3. Bottom Dashed Card (Available Run Slots) */}
