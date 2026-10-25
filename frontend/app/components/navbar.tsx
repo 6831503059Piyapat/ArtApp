@@ -31,7 +31,7 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-0.5 rounded-xl border border-primary/10 bg-creatory-lavender/70 p-0.5">
               <Link href="#" className={linkClass('/dashboard')} aria-current={isActive('/dashboard') ? 'page' : undefined}>Dashboard</Link>
               <Link href="/SaleRun" className={linkClass('/SaleRun')} aria-current={isActive('/SaleRun') ? 'page' : undefined}>Sales Runs</Link>
-              <Link href="/sales/OnGoing" className={linkClass('/sales/OnGoing')} aria-current={isActive('/sales/OnGoing') ? 'page' : undefined}>Ongoing</Link>
+              <Link href="/sales/OnGoing" scroll={true} className={linkClass('/sales/OnGoing')} aria-current={isActive('/sales/OnGoing') ? 'page' : undefined}>Ongoing</Link>
               <Link href="/sales/completed" className={linkClass('/sales/completed')} aria-current={isActive('/sales/completed') ? 'page' : undefined}>Completed</Link>
             </nav>
           </div>

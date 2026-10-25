@@ -44,44 +44,21 @@ type Expense = {
 
 const initialSections: SupplierSection[] = [
   {
-    id: "host",
+    id: "host-8466468345",
     name: "My Products",
     role: "Host's inventory",
     accent: "purple",
     placeholder: "Item Name (e.g. Linen Coaster Set)",
     products: [
-      { id: 1, name: "Handmade Indigo Tote Bag", quantity: 12, price: 350, owner: "Me" },
-      { id: 2, name: "Embroidered Canvas Keychain", quantity: 25, price: 90, owner: "Me" },
-      { id: 3, name: "Natural Beeswax Candle (Jasmine)", quantity: 10, price: 220, owner: "Me" },
+      
     ],
   },
-  {
-    id: "kaimook",
-    name: "P' Kaimook",
-    role: "Supplier",
-    accent: "pink",
-    placeholder: "Item Name (e.g. Ceramic Vase)",
-    products: [
-      { id: 4, name: "Glazed Matcha Bowl (Speckled Stone)", quantity: 6, price: 480, owner: "P' Kaimook" },
-      { id: 5, name: "Mini Espresso Ceramic Tumbler", quantity: 8, price: 260, owner: "P' Kaimook" },
-    ],
-  },
-  {
-    id: "japan",
-    name: "Nong' Japan",
-    role: "Supplier",
-    accent: "orange",
-    placeholder: "Item Name (e.g. Postcard Set)",
-    products: [
-      {  id: 6, name: "A4 'Chiang Rai Sunset' Risograph Print", quantity: 15, price: 180, owner: "Nong' Japan" },
-      { id: 7, name: "Holographic Vinyl Sticker Pack (4pcs)", quantity: 30, price: 80, owner: "Nong' Japan" },
-    ],
-  },
+  
 ];
 
 const initialExpenses: Expense[] = [
-  { id: 1, name: "Weekend Market Stall Rent", category: "Booth Fee", amount: 700 },
-  { id: 2, name: "Ice bucket, string bags & packaging tape", category: "Stall Supplies", amount: 150 },
+  // { id: 1, name: "Weekend Market Stall Rent", category: "Booth Fee", amount: 700 },
+  // { id: 2, name: "Ice bucket, string bags & packaging tape", category: "Stall Supplies", amount: 150 },
 ];
 
 const accentStyles = {
@@ -102,18 +79,26 @@ const accentStyles = {
   },
 };
 
-const inputClass =
-  "min-w-0 rounded-lg border border-[#e7e9f1] bg-white px-2 py-1.5 text-[8px] text-[#111747] outline-none transition focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10 placeholder:text-[#8b90a2]";
+const inputClass ="min-w-0 rounded-lg border  bg-white px-2 py-1.5 text-[8px] text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
+const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
 export default function CreateSalesRun() {
-  const [sections, setSections] = useState(initialSections);
-  const [expenses, setExpenses] = useState(initialExpenses);
+  const [sections, setSections] = useState<SupplierSection[]>(initialSections);
+  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   // State for run name and Form for send to backend
-  const [runName, setRunName] = useState<string>("MFU Outside Night Market (MON14)");
+  const [runName, setRunName] = useState<string>("");
   const [runDate, setRunDate] = useState<string>("");
   const [runLocation, setRunLocation] = useState<string>("");
   const [ownerProducts, setOwnerProducts] = useState<Product[]>();
+  //State for manage blank and error form
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [runNameError, setRunNameError] = useState<boolean>(false);
+  const [runDateError, setRunDateError] = useState<boolean>(false);
+  const [runLocationError, setRunLocationError] = useState<boolean>(false);
 
+  //
   const [newSupplierName, setNewSupplierName] = useState("");
   const [supplierFormOpen, setSupplierFormOpen] = useState(false);
   const [newExpense, setNewExpense] = useState({ name: "", category: "Booth Fee", amount: "" });
@@ -125,16 +110,38 @@ export default function CreateSalesRun() {
 
   //Not real Function for send to backend, just for test
   async function hamdleSubmit(){
-    const Response = await fetch("http://localhost:3000/api/salesRun",{
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        runName: runName,
-        runDate: runDate,
-        runLocation: runLocation,
-        ownerProduct: ownerProducts
-      })
-    })
+    // const Response = await fetch("http://localhost:3000/api/salesRun",{
+    //   method: "POST",
+    //   headers: {"Content-Type": "application/json"},
+    //   body: JSON.stringify({
+    //     runName: runName,
+    //     runDate: runDate,
+    //     runLocation: runLocation,
+    //     ownerProduct: ownerProducts
+    //   })
+    // })
+    if(!runName || !runDate || !runLocation ){
+      if(!runName) setRunNameError(true);
+      if (runName) setRunNameError(false);
+      if(!runDate) setRunDateError(true);
+      if (runDate) setRunDateError(false);
+      if(!runLocation) setRunLocationError(true);
+      if (runLocation) setRunLocationError(false);
+      setError("Please fill in all required fields");
+      return;
+    }
+    setRunNameError(false);
+    setRunDateError(false);
+    setRunLocationError(false);
+    setLaunched(true);
+    //Data to send to API backend
+    //Setions is the data supplier and Owner Products for send to backend 
+    console.log(sections);
+    //Expenses is the data for send to backend
+    console.log(expenses);
+    console.log("Run Name:", runName);
+    console.log("Run Date:", runDate);
+    console.log("Run Location:", runLocation);
   }
 
   const addSupplier = () => {
@@ -212,7 +219,7 @@ export default function CreateSalesRun() {
                       onChange={(event) => setNewSupplierName(event.target.value)}
                       aria-label="New supplier name"
                       placeholder="Supplier name"
-                      className={`${inputClass} flex-1`}
+                      className={`${inputClass} ${inputClass2} flex-1`}
                     />
                     <button type="submit" aria-label="Add supplier" className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg bg-[#7957ff] text-white hover:bg-[#6642ed]">
                       <Plus className="h-3 w-3" />
@@ -252,23 +259,23 @@ export default function CreateSalesRun() {
                   <label className="block text-[7px] font-bold">
                     Run Name <span className="text-[#f15a24]">*</span>
                     <span className="relative mt-1 block">
-                      <Store className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#7957ff]" />
-                      <input required defaultValue="MFU Outside Night Market (MON14)" placeholder="Enter run name Ex: MFU Outside Night Market (MON14)" onChange={(e) => setRunName(e.target.value)} className={`${inputClass} w-full pl-6 font-semibold`} />
+                      <Store className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runNameError ? 'text-[#f15a24]':' text-[#7957ff]'}`} />
+                      <input required placeholder="Enter run name Ex: MFU Outside Night Market (MON14)" onChange={(e) => setRunName(e.target.value)} className={`${inputClass} ${runNameError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6 font-semibold`} />
                     </span>
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                     <label className="block text-[7px] font-bold">
                       Run Date / Period
                       <span className="relative mt-1 block">
-                        <CalendarDays className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#858ba0]" />
-                        <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} w-full pl-6`} />
+                        <CalendarDays className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runDateError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
+                        <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} ${runDateError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                     <label className="block text-[7px] font-bold">
                       Booth Location
                       <span className="relative mt-1 block">
-                        <MapPin className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#858ba0]" />
-                        <input placeholder="Mae Fah Luang University" onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} w-full pl-6`} />
+                        <MapPin className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runLocationError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
+                        <input placeholder="Mae Fah Luang University" onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} ${runLocationError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                   </div>
@@ -328,17 +335,20 @@ export default function CreateSalesRun() {
                         </td>
                       </tr>
                     ))}
+                    {expenses.length === 0 && (
+                      <tr><td colSpan={4} className="px-2 py-3 text-center text-[8px] text-[#858ba0]">No expenses added yet</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>
               <form onSubmit={addExpense} className="m-2.5 flex flex-wrap gap-1.5 rounded-lg border border-[#f0e7e4] bg-white p-1.5">
-                <input required value={newExpense.name} onChange={(event) => setNewExpense({ ...newExpense, name: event.target.value })} placeholder="Expense description (e.g. Folding Table Rental)" className={`${inputClass} flex-[2_1_130px]`} />
-                <select value={newExpense.category} onChange={(event) => setNewExpense({ ...newExpense, category: event.target.value })} className={`${inputClass} flex-[1_1_75px]`}>
+                <input required value={newExpense.name} onChange={(event) => setNewExpense({ ...newExpense, name: event.target.value })} placeholder="Expense description (e.g. Folding Table Rental)" className={`${inputClass} ${inputClass2} flex-[2_1_130px]`} />
+                <select value={newExpense.category} onChange={(event) => setNewExpense({ ...newExpense, category: event.target.value })} className={`${inputClass} ${inputClass2} flex-[1_1_75px]`}>
                   <option>Booth Fee</option>
                   <option>Stall Supplies</option>
                   <option>Travel</option>
                 </select>
-                <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder="Amount ฿" className={`${inputClass} flex-[1_1_55px]`} />
+                <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder="Amount ฿" className={`${inputClass} ${inputClass2} flex-[1_1_55px]`} />
                 <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-2.5 py-1.5 text-[8px] font-semibold text-white transition hover:bg-[#df4e1c]">
                   <Plus className="h-2.5 w-2.5" /> Add Expense
                 </button>
@@ -360,7 +370,7 @@ export default function CreateSalesRun() {
           </div>
           <div className="flex shrink-0 gap-1.5">
             <button type="button" className="rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-[8px] font-semibold text-[#e34d55] hover:bg-[#ffebeb]">Cancel</button>
-            <button type="button" onClick={() => setLaunched(true)} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-1.5 text-[8px] font-bold text-[#111747] shadow-sm hover:brightness-105">
+            <button type="button" onClick={() => hamdleSubmit()} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-1.5 text-[8px] font-bold text-[#111747] shadow-sm hover:brightness-105">
               <Rocket className="h-2.5 w-2.5" /> {launched ? "Launched" : "Launch Run"}
             </button>
           </div>
@@ -448,9 +458,9 @@ function ProductSection({
         </table>
       </div>
       <form onSubmit={addProduct} className="m-2.5 flex flex-wrap gap-1.5 rounded-lg border border-[#eff0f5] bg-[#fafbfe] p-1.5">
-        <input required value={name} onChange={(event) => setName(event.target.value)} placeholder={section.placeholder} className={`${inputClass} flex-[2_1_120px]`} />
-        <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder="Qty" className={`${inputClass} flex-[1_1_42px]`} />
-        <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Price ฿" className={`${inputClass} flex-[1_1_52px]`} />
+        <input required value={name} onChange={(event) => setName(event.target.value)} placeholder={section.placeholder} className={`${inputClass} ${inputClass2} flex-[2_1_120px]`} />
+        <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder="Qty" className={`${inputClass} ${inputClass2} flex-[1_1_42px]`} />
+        <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Price ฿" className={`${inputClass} ${inputClass2} flex-[1_1_52px]`} />
         <input hidden value={section.id} onChange={(e)=>setOwnerP(e.target.value)}/>
         <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-2.5 py-1.5 text-[7px] font-semibold text-white transition hover:bg-[#6642ed]">
           <Plus className="h-2.5 w-2.5" /> Add Product
