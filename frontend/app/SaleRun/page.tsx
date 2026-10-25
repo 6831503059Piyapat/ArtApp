@@ -23,6 +23,7 @@ type Product = {
   name: string;
   quantity: number;
   price: number;
+  owner :string;
 };
 
 type SupplierSection = {
@@ -49,9 +50,9 @@ const initialSections: SupplierSection[] = [
     accent: "purple",
     placeholder: "Item Name (e.g. Linen Coaster Set)",
     products: [
-      { id: 1, name: "Handmade Indigo Tote Bag", quantity: 12, price: 350 },
-      { id: 2, name: "Embroidered Canvas Keychain", quantity: 25, price: 90 },
-      { id: 3, name: "Natural Beeswax Candle (Jasmine)", quantity: 10, price: 220 },
+      { id: 1, name: "Handmade Indigo Tote Bag", quantity: 12, price: 350, owner: "Me" },
+      { id: 2, name: "Embroidered Canvas Keychain", quantity: 25, price: 90, owner: "Me" },
+      { id: 3, name: "Natural Beeswax Candle (Jasmine)", quantity: 10, price: 220, owner: "Me" },
     ],
   },
   {
@@ -61,8 +62,8 @@ const initialSections: SupplierSection[] = [
     accent: "pink",
     placeholder: "Item Name (e.g. Ceramic Vase)",
     products: [
-      { id: 4, name: "Glazed Matcha Bowl (Speckled Stone)", quantity: 6, price: 480 },
-      { id: 5, name: "Mini Espresso Ceramic Tumbler", quantity: 8, price: 260 },
+      { id: 4, name: "Glazed Matcha Bowl (Speckled Stone)", quantity: 6, price: 480, owner: "P' Kaimook" },
+      { id: 5, name: "Mini Espresso Ceramic Tumbler", quantity: 8, price: 260, owner: "P' Kaimook" },
     ],
   },
   {
@@ -72,8 +73,8 @@ const initialSections: SupplierSection[] = [
     accent: "orange",
     placeholder: "Item Name (e.g. Postcard Set)",
     products: [
-      { id: 6, name: "A4 'Chiang Rai Sunset' Risograph Print", quantity: 15, price: 180 },
-      { id: 7, name: "Holographic Vinyl Sticker Pack (4pcs)", quantity: 30, price: 80 },
+      {  id: 6, name: "A4 'Chiang Rai Sunset' Risograph Print", quantity: 15, price: 180, owner: "Nong' Japan" },
+      { id: 7, name: "Holographic Vinyl Sticker Pack (4pcs)", quantity: 30, price: 80, owner: "Nong' Japan" },
     ],
   },
 ];
@@ -107,6 +108,12 @@ const inputClass =
 export default function CreateSalesRun() {
   const [sections, setSections] = useState(initialSections);
   const [expenses, setExpenses] = useState(initialExpenses);
+  // State for run name and Form for send to backend
+  const [runName, setRunName] = useState<string>("MFU Outside Night Market (MON14)");
+  const [runDate, setRunDate] = useState<string>("");
+  const [runLocation, setRunLocation] = useState<string>("");
+  const [ownerProducts, setOwnerProducts] = useState<Product[]>();
+
   const [newSupplierName, setNewSupplierName] = useState("");
   const [supplierFormOpen, setSupplierFormOpen] = useState(false);
   const [newExpense, setNewExpense] = useState({ name: "", category: "Booth Fee", amount: "" });
@@ -115,6 +122,20 @@ export default function CreateSalesRun() {
   const updateSection = (sectionId: string, update: (section: SupplierSection) => SupplierSection) => {
     setSections((current) => current.map((section) => section.id === sectionId ? update(section) : section));
   };
+
+  //Not real Function for send to backend, just for test
+  async function hamdleSubmit(){
+    const Response = await fetch("http://localhost:3000/api/salesRun",{
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        runName: runName,
+        runDate: runDate,
+        runLocation: runLocation,
+        ownerProduct: ownerProducts
+      })
+    })
+  }
 
   const addSupplier = () => {
     const name = newSupplierName.trim();
@@ -158,21 +179,9 @@ export default function CreateSalesRun() {
       </Suspense>
       
       <main className="mx-auto max-w-[1280px] px-[18px] pt-5">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-[14px] w-[4px] rounded-full bg-gradient-to-b from-[#7957ff] to-[#ffb84d]" />
-              <h1 className="text-[16px] font-extrabold tracking-tight">Create Sales Run</h1>
-              <span className="rounded-full border border-[#e4d9ff] bg-[#f2edff] px-1.5 py-0.5 text-[7px] font-semibold text-[#7957ff]">Step-by-Step</span>
-            </div>
-            <p className="mt-0.5 text-[8px] text-[#858ba0]">Organize host products, consigned supplier stock, and booth overhead before launch.</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-1 text-[7px] text-[#858ba0]">
-            Auto-save active <span className="h-1 w-1 rounded-full bg-[#20c997]" />
-          </div>
-        </div>
+        
 
-        <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[147px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[147px_minmax(0,1fr)] mt-15 " >
           <aside className="space-y-2 sm:sticky sm:top-[54px]">
             <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
               <h2 className="mb-1 px-1 text-[7px] font-bold uppercase tracking-wide text-[#858ba0]">Sections &amp; Inventory</h2>
@@ -244,7 +253,7 @@ export default function CreateSalesRun() {
                     Run Name <span className="text-[#f15a24]">*</span>
                     <span className="relative mt-1 block">
                       <Store className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#7957ff]" />
-                      <input required defaultValue="MFU Outside Night Market (MON14)" className={`${inputClass} w-full pl-6 font-semibold`} />
+                      <input required defaultValue="MFU Outside Night Market (MON14)" placeholder="Enter run name Ex: MFU Outside Night Market (MON14)" onChange={(e) => setRunName(e.target.value)} className={`${inputClass} w-full pl-6 font-semibold`} />
                     </span>
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -252,14 +261,14 @@ export default function CreateSalesRun() {
                       Run Date / Period
                       <span className="relative mt-1 block">
                         <CalendarDays className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#858ba0]" />
-                        <input defaultValue="14/10/2026" className={`${inputClass} w-full pl-6`} />
+                        <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} w-full pl-6`} />
                       </span>
                     </label>
                     <label className="block text-[7px] font-bold">
                       Booth Location
                       <span className="relative mt-1 block">
                         <MapPin className="absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-[#858ba0]" />
-                        <input defaultValue="Mae Fah Luang University" className={`${inputClass} w-full pl-6`} />
+                        <input placeholder="Mae Fah Luang University" onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} w-full pl-6`} />
                       </span>
                     </label>
                   </div>
@@ -380,13 +389,13 @@ function ProductSection({
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const accent = accentStyles[section.accent];
-
+  const [ownerP,setOwnerP] = useState<string>("");
   const addProduct = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parsedQuantity = Number(quantity);
     const parsedPrice = Number(price);
     if (!name.trim() || !Number.isFinite(parsedQuantity) || parsedQuantity <= 0 || !Number.isFinite(parsedPrice) || parsedPrice < 0) return;
-    onAdd({ name: name.trim(), quantity: parsedQuantity, price: parsedPrice });
+    onAdd({ name: name.trim(), quantity: parsedQuantity, price: parsedPrice, owner: ownerP });
     setName("");
     setQuantity("");
     setPrice("");
@@ -442,6 +451,7 @@ function ProductSection({
         <input required value={name} onChange={(event) => setName(event.target.value)} placeholder={section.placeholder} className={`${inputClass} flex-[2_1_120px]`} />
         <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder="Qty" className={`${inputClass} flex-[1_1_42px]`} />
         <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Price ฿" className={`${inputClass} flex-[1_1_52px]`} />
+        <input hidden value={section.id} onChange={(e)=>setOwnerP(e.target.value)}/>
         <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-2.5 py-1.5 text-[7px] font-semibold text-white transition hover:bg-[#6642ed]">
           <Plus className="h-2.5 w-2.5" /> Add Product
         </button>
