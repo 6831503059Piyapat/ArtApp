@@ -1,4 +1,5 @@
-import React, { Suspense } from 'react';
+"use client";
+import React, { Suspense , useState} from 'react';
 import { 
   ArrowLeft, FileSpreadsheet, FileText, Share2, 
   Wallet, Receipt, DollarSign, Users, List, 
@@ -6,6 +7,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 export default function ConsignDeskDashboard() {
+  const [activeTab, setActiveTab] = useState('payouts');
   return (
     <div className="min-h-screen bg-[#f8f9fc] font-sans text-gray-800 pb-10">
       {/* Navigation Bar */}
@@ -148,134 +150,183 @@ export default function ConsignDeskDashboard() {
 
         {/* Tabs */}
         <div className="flex items-center gap-6 border-b border-gray-200 mb-6 px-2">
-          <button className="flex items-center gap-2 pb-3 text-gray-500 hover:text-gray-800 font-medium text-sm">
+          <button onClick={() => setActiveTab('sales')}
+            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+              activeTab === 'sales' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
             <List size={16} /> Sales Log
             <span className="bg-purple-100 text-purple-700 text-xs px-1.5 py-0.5 rounded-md">88</span>
           </button>
-          <button className="flex items-center gap-2 pb-3 text-gray-500 hover:text-gray-800 font-medium text-sm">
-            <Receipt size={16} className="text-orange-500" /> Expenses Log
+          
+          <button onClick={() => setActiveTab('expenses')}
+            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+              activeTab === 'expenses' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Receipt size={16} className={activeTab === 'expenses' ? '' : 'text-orange-500'} /> Expenses Log
             <span className="bg-gray-100 text-gray-600 text-xs px-1.5 py-0.5 rounded-md">1</span>
           </button>
-          <button className="flex items-center gap-2 pb-3 text-gray-500 hover:text-gray-800 font-medium text-sm">
-            <History size={16} className="text-pink-500" /> Changes Made (Audit Trail)
+
+          <button onClick={() => setActiveTab('changes')}
+            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+              activeTab === 'changes' ? 'text-pink-500 border-b-2 border-pink-500' : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <History size={16} className={activeTab === 'changes' ? '' : 'text-pink-500'} /> Changes Made (Audit Trail)
             <span className="bg-gray-100 text-gray-600 text-xs px-1.5 py-0.5 rounded-md">4</span>
           </button>
-          <button className="flex items-center gap-2 pb-3 text-purple-600 border-b-2 border-purple-600 font-medium text-sm">
+
+          <button onClick={() => setActiveTab('payouts')}
+            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+              activeTab === 'payouts' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
             <Users size={16} /> Supplier Payout Summaries
             <span className="bg-purple-100 text-purple-700 text-xs px-1.5 py-0.5 rounded-md">3</span>
           </button>
         </div>
 
         {/* Payout Detail Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        {/* 3. ส่วนเนื้อหาที่จะเปลี่ยนไปตาม Tab ที่กด */}
+        <div className="tab-content-area">
           
-          {/* Card 1 - Host */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-6 flex-grow">
-              <div className="flex justify-between items-start mb-4">
-                <span className="bg-purple-50 text-purple-600 text-xs font-semibold px-2 py-1 rounded-md">Booth Owner</span>
-                <span className="text-xs text-gray-400 font-medium">54.0% of stall</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-800">Alex Chen (Host)</h3>
-              <p className="text-sm text-gray-400 mb-6">Exotics & Plant Culture Line</p>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Gross Sales</span>
-                  <span className="font-semibold text-slate-800 font-mono">฿4,570.00</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Shared expense</span>
-                  <span className="font-semibold text-orange-500 font-mono">-฿23.34</span>
-                </div>
-                <div className="pt-3 border-t border-gray-100 flex justify-between">
-                  <span className="font-semibold text-slate-800">Net Payout:</span>
-                  <span className="font-bold text-purple-600 font-mono">฿4,546.66</span>
-                </div>
-              </div>
+          {/* ถ้าเลือก Tab Sales */}
+          {activeTab === 'sales' && (
+            <div className="bg-white p-10 text-center rounded-2xl border border-gray-100 shadow-sm text-gray-500">
+              <List size={32} className="mx-auto mb-3 text-gray-300" />
+              <p>หน้า Sales Log (เตรียมใส่ตารางยอดขายที่นี่)</p>
             </div>
-            <div className="p-4 bg-purple-50/50 border-t border-gray-50 flex justify-center items-center">
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-700 bg-purple-100/50 px-4 py-2 rounded-lg w-full justify-center">
-                <div className="w-4 h-4 bg-purple-500 rounded-sm flex items-center justify-center">
-                  <Check size={12} className="text-white" />
-                </div>
-                Host Withdrawn & Reconciled
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Card 2 - Partner 1 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-6 flex-grow">
-              <div className="flex justify-between items-start mb-4">
-                <span className="bg-pink-50 text-pink-600 text-xs font-semibold px-2 py-1 rounded-md">Consignor Partner</span>
-                <span className="text-xs text-gray-400 font-medium">28.8% of stall</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-800">P&apos; Kaimook</h3>
-              <p className="text-sm text-gray-400 mb-6">Aquatic & Terrarium Feed</p>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Gross Sales</span>
-                  <span className="font-semibold text-slate-800 font-mono">฿2,450.00</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Shared expense</span>
-                  <span className="font-semibold text-orange-500 font-mono">-฿23.33</span>
-                </div>
-                <div className="pt-3 border-t border-gray-100 flex justify-between">
-                  <span className="font-semibold text-slate-800">Net Payout:</span>
-                  <span className="font-bold text-purple-600 font-mono">฿2,426.67</span>
-                </div>
-              </div>
+          {/* ถ้าเลือก Tab Expenses */}
+          {activeTab === 'expenses' && (
+            <div className="bg-white p-10 text-center rounded-2xl border border-gray-100 shadow-sm text-gray-500">
+              <Receipt size={32} className="mx-auto mb-3 text-gray-300" />
+              <p>หน้า Expenses Log (เตรียมใส่รายการค่าใช้จ่ายที่นี่)</p>
             </div>
-            <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
-                <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
-                Supplier&apos;s payout settled
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Card 3 - Partner 2 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-6 flex-grow">
-              <div className="flex justify-between items-start mb-4">
-                <span className="bg-orange-50 text-orange-600 text-xs font-semibold px-2 py-1 rounded-md">Consignor Partner</span>
-                <span className="text-xs text-gray-400 font-medium">17.2% of stall</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-800">Nong&apos; Japan</h3>
-              <p className="text-sm text-gray-400 mb-6">Glassware & Moss Crafts</p>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Gross Sales</span>
-                  <span className="font-semibold text-slate-800 font-mono">฿1,470.00</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Shared expense</span>
-                  <span className="font-semibold text-orange-500 font-mono">-฿23.33</span>
-                </div>
-                <div className="pt-3 border-t border-gray-100 flex justify-between">
-                  <span className="font-semibold text-slate-800">Net Payout:</span>
-                  <span className="font-bold text-purple-600 font-mono">฿1,446.67</span>
-                </div>
-              </div>
+          {/* ถ้าเลือก Tab Audit */}
+          {activeTab === 'audit' && (
+            <div className="bg-white p-10 text-center rounded-2xl border border-gray-100 shadow-sm text-gray-500">
+              <History size={32} className="mx-auto mb-3 text-gray-300" />
+              <p>หน้า Audit Trail (เตรียมใส่ประวัติการแก้ไขข้อมูลที่นี่)</p>
             </div>
-            <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
-                <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
-                Supplier&apos;s payout settled
-              </div>
-            </div>
-          </div>
+          )}
 
+          {/* ถ้าเลือก Tab Payouts (โค้ดการ์ด 3 ใบของหนูอยู่ตรงนี้ทั้งหมด) */}
+          {activeTab === 'payouts' && (
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              {/* Card 1 - Host */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-6 flex-grow">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="bg-purple-50 text-purple-600 text-xs font-semibold px-2 py-1 rounded-md">Booth Owner</span>
+                    <span className="text-xs text-gray-400 font-medium">54.0% of stall</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800">Alex Chen (Host)</h3>
+                  <p className="text-sm text-gray-400 mb-6">Exotics & Plant Culture Line</p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="font-semibold text-slate-800 font-mono">฿4,570.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Shared expense</span>
+                      <span className="font-semibold text-orange-500 font-mono">-฿23.34</span>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100 flex justify-between">
+                      <span className="font-semibold text-slate-800">Net Payout:</span>
+                      <span className="font-bold text-purple-600 font-mono">฿4,546.66</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 bg-purple-50/50 border-t border-gray-50 flex justify-center items-center">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700 bg-purple-100/50 px-4 py-2 rounded-lg w-full justify-center">
+                    <div className="w-4 h-4 bg-purple-500 rounded-sm flex items-center justify-center">
+                      <Check size={12} className="text-white" />
+                    </div>
+                    Host Withdrawn & Reconciled
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2 - Partner 1 */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-6 flex-grow">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="bg-pink-50 text-pink-600 text-xs font-semibold px-2 py-1 rounded-md">Consignor Partner</span>
+                    <span className="text-xs text-gray-400 font-medium">28.8% of stall</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800">P&apos; Kaimook</h3>
+                  <p className="text-sm text-gray-400 mb-6">Aquatic & Terrarium Feed</p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="font-semibold text-slate-800 font-mono">฿2,450.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Shared expense</span>
+                      <span className="font-semibold text-orange-500 font-mono">-฿23.33</span>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100 flex justify-between">
+                      <span className="font-semibold text-slate-800">Net Payout:</span>
+                      <span className="font-bold text-purple-600 font-mono">฿2,426.67</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
+                  <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
+                    <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
+                    Supplier&apos;s payout settled
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 - Partner 2 */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-6 flex-grow">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="bg-orange-50 text-orange-600 text-xs font-semibold px-2 py-1 rounded-md">Consignor Partner</span>
+                    <span className="text-xs text-gray-400 font-medium">17.2% of stall</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800">Nong&apos; Japan</h3>
+                  <p className="text-sm text-gray-400 mb-6">Glassware & Moss Crafts</p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="font-semibold text-slate-800 font-mono">฿1,470.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Shared expense</span>
+                      <span className="font-semibold text-orange-500 font-mono">-฿23.33</span>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100 flex justify-between">
+                      <span className="font-semibold text-slate-800">Net Payout:</span>
+                      <span className="font-bold text-purple-600 font-mono">฿1,446.67</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
+                  <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
+                    <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
+                    Supplier&apos;s payout settled
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
         </div>
 
       </main>
 
       {/* Footer */}
-      <footer className="text-center text-xs text-gray-400 pb-4">
+      <footer className="text-center text-xs text-gray-400 pb-4 mt-8">
         © 2025 ConsignDesk POS • Artisanal Market System
       </footer>
 
