@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import Footer from "@/app/components/footer";
 import {
   Activity,
@@ -13,10 +12,53 @@ import {
   Share2,
   Star,
   Store,
-  User,
   Zap,
 } from "lucide-react";
+
+import { useEffect, useState } from "react";
+
 const viewerUrl = "https://consigndesk.app/ActBoard/2026";
+
+const BoothSyncTime = () => {
+  const [time, setTime] = useState("00:00:00");
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Bangkok",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+      setTime(formatter.format(now));
+    };
+
+    updateTime();
+    const interval= setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section>
+      <div className="shrink-0 rounded-xl border border-[#eeeafd] bg-white/80 px-3 py-2 shadow-[0_3px_12px_rgba(93,76,166,0.04)] sm:px-4">
+        <div className="mb-0.5 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-[#858ba0]">
+          <span className="h-2 w-2 rounded-full bg-[#8a68ff]" />
+          Booth Sync Time
+        </div>
+        <div className="flex items-baseline gap-1">
+          {/* นำ State ของเวลามาแสดงตรงนี้ */}
+          <span className="text-2xl font-black leading-none tracking-tight sm:text-[26px]">
+            {time}
+          </span>
+          <span className="rounded bg-[#f2edff] px-1 py-0.5 text-[8px] font-bold text-[#7957ff]">
+            ICT
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const suppliers = [
   {
@@ -122,16 +164,7 @@ export default function ConsignDesk() {
               </span>
             </div>
           </div>
-          <div className="shrink-0 rounded-xl border border-[#eeeafd] bg-white/80 px-3 py-2 shadow-[0_3px_12px_rgba(93,76,166,0.04)] sm:px-4">
-            <div className="mb-0.5 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-[#858ba0]">
-              <span className="h-2 w-2 rounded-full bg-[#8a68ff]" />
-              Booth Sync Time
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black leading-none tracking-tight sm:text-[26px]">07:57:34</span>
-              <span className="rounded bg-[#f2edff] px-1 py-0.5 text-[8px] font-bold text-[#7957ff]">ICT</span>
-            </div>
-          </div>
+          <BoothSyncTime />
         </section>
 
         <section className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-[#eeeafd] bg-white px-3 py-2 shadow-[0_3px_12px_rgba(93,76,166,0.03)] sm:px-4">
