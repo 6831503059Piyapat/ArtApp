@@ -1,5 +1,5 @@
 'use client';
-
+import {useRouter} from "next/navigation";
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -13,6 +13,10 @@ import {
   Star,
   Users,
   Wallet,
+  LogIn,
+  UserRoundPlus,
+  X,
+  Keyboard,
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 
@@ -28,6 +32,21 @@ export default function DashboardPage() {
   const showOngoing = sessionFilter !== 'Completed';
   const showCompleted = sessionFilter !== 'Active';
 
+const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+const [runCode, setRunCode] = useState('');
+
+const router = useRouter();
+
+const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (!runCode.trim()) return;
+
+  // TODO: ตรวจสอบ runCode กับ Backend ก่อน
+  // หากรหัสถูกต้องจึงเข้าสู่หน้า Run
+  router.push('/sales/OnGoing');
+};
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#111747]">
       <Navbar />
@@ -42,13 +61,16 @@ export default function DashboardPage() {
             <p className="mt-1 text-xs text-[#858ba0]">Here&apos;s your stall overview and live consignment performance today.</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
-            <Link
-              href="/sales/OnGoing"
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#e9ebf3] bg-white px-3 text-xs font-semibold shadow-sm transition hover:border-violet-200 hover:bg-violet-50"
-            >
-              <Users size={15} className="text-violet-500" />
-              Join Run
-            </Link>
+           <button
+            type="button"
+            onClick={() => setIsJoinModalOpen(true)}
+            className="inline-flex h-9 items-center justify-center gap-2
+            rounded-xl border border-[#e9ebf3] bg-white px-3
+            text-xs font-semibold shadow-sm transition
+            hover:border-violet-200 hover:bg-violet-50" >
+  <Users size={15} className="text-violet-500" />
+  Join Run
+</button>
             <Link
               href="/SaleRun"
               className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-3 text-xs font-bold text-[#111747] shadow-[0_4px_12px_rgba(255,184,77,0.24)] transition hover:bg-[#ffad32]"
@@ -232,7 +254,131 @@ export default function DashboardPage() {
           )}
         </section>
       </main>
+{isJoinModalOpen && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center
+      bg-slate-950/50 p-4 backdrop-blur-sm
+      animate-in fade-in duration-200"
+    onClick={() => setIsJoinModalOpen(false)}
+  >
+    {/* MODAL */}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="join-run-title"
+      className="w-full max-w-[550px] rounded-[30px]
+        border border-[#e9e7f2] bg-white p-6
+        shadow-2xl sm:p-10"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <form onSubmit={handleJoinRun}>
+        {/* HEADER */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <UserRoundPlus
+                size={28}
+                className="text-violet-500"
+              />
+              <h2
+                id="join-run-title"
+                className="text-2xl font-extrabold tracking-tight
+                  text-[#111747] sm:text-3xl"
+              >
+                Join Sales Run
+              </h2>
+            </div>
 
+            <p className="mt-2 text-sm leading-6 text-[#858ba0]
+              sm:text-base">
+              Enter the 6 or 8-digit run code or PIN shared
+              by the booth host
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsJoinModalOpen(false)}
+            aria-label="Close modal"
+            className="shrink-0 rounded-lg p-1 text-[#777b91]
+              transition hover:bg-slate-100 hover:text-[#111747]"
+          >
+            <X size={23} />
+          </button>
+        </div>
+
+        <div className="my-5 border-t border-[#ececf4]" />
+
+        {/* INPUT */}
+        <label
+          htmlFor="run-code"
+          className="mb-2 block text-sm font-semibold
+            text-[#111747] sm:text-base"
+        >
+          RUN / ROOM CODE
+        </label>
+
+        <div className="flex h-16 items-center gap-3
+          rounded-[24px] border-2 border-violet-400
+          px-4 transition focus-within:border-violet-600
+          focus-within:ring-4 focus-within:ring-violet-100">
+          <input
+            id="run-code"
+            type="text"
+            value={runCode}
+            onChange={(e) => setRunCode(e.target.value)}
+            placeholder="E.G. 88X2-901 OR 482910"
+            autoComplete="off"
+            required
+            className="min-w-0 flex-1 bg-transparent text-base
+              text-[#111747] outline-none placeholder:text-[#858ba0]
+              sm:text-xl"
+          />
+
+          <Keyboard
+            size={21}
+            className="shrink-0 text-[#858ba0]"
+          />
+        </div>
+
+        <p className="mt-3 text-sm text-[#858ba0]">
+          Your active host run code is{' '}
+          <span className="font-bold text-violet-500">
+            88X2-901
+          </span>.
+        </p>
+
+        <div className="my-7 border-t border-[#ececf4]" />
+
+        {/* FOOTER BUTTONS */}
+        <div className="flex flex-col-reverse justify-end gap-3
+          sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={() => setIsJoinModalOpen(false)}
+            className="h-14 rounded-full border border-[#e9e7f2]
+              px-7 text-sm font-semibold text-[#777b91]
+              transition hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="inline-flex h-14 items-center justify-center
+              gap-2 rounded-full bg-violet-500 px-8
+              text-sm font-bold text-white shadow-lg
+              shadow-violet-200 transition
+              hover:bg-violet-600 active:scale-[0.98]"
+          >
+            <LogIn size={22} />
+            Join Run
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
       <footer className="mt-1 w-full border-t border-[#e9ebf3] bg-white">
         <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-3 px-4 py-4 text-[10px] text-[#858ba0] sm:flex-row sm:items-center sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center gap-2">
