@@ -29,7 +29,7 @@ export default function DashboardPage() {
   const showCompleted = sessionFilter !== 'Active';
 
   return (
-    <div className="min-h-screen bg-[#f7f8fc] text-[#111747]">
+    <div className="min-h-screen font-sans bg-[#f7f8fc] text-[#111747]">
       <Navbar />
 
       <main className="mx-auto max-w-[1280px] px-4 pb-8 pt-[70px] sm:px-6 lg:px-8">

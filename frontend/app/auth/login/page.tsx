@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { ArrowRight, AtSign, Eye, EyeOff, LockKeyhole, Store, UserRound } from 'lucide-react';
-
+import {auth, googleProvider} from '@/lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
 type AuthTab = 'sign-in' | 'create-account';
 
 export default function LoginPage() {
@@ -16,9 +17,31 @@ export default function LoginPage() {
   const [formMessage, setFormMessage] = useState('');
 
   const isCreatingAccount = activeTab === 'create-account';
+  const LoginWithGoogle = async () => {
+    try {
+      // 1. Login ผ่าน Firebase
+      const result = await signInWithPopup(auth, googleProvider);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+      // 2. ดึง Firebase ID Token
+      const token = await result.user.getIdToken();
+
+      // 3. ยิง API ไปยัง Spring Boot พร้อมส่ง Bearer Token
+      const res = await fetch("http://localhost:8080/api/protected-data", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Response from Spring Boot:", data);
+    } catch (error) {
+      console.error("Login Error:", error);
+    }
+  };
+  
+  const handleSubmit = async  (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+  
     setFormMessage('');
     setIsLoading(true);
 
@@ -201,6 +224,7 @@ export default function LoginPage() {
 
           <button
             type="button"
+            onClick={()=>LoginWithGoogle()}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-violet-100"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
