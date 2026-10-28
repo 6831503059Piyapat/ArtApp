@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent,useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, AtSign, Eye, EyeOff, LockKeyhole, Store, UserRound } from 'lucide-react';
 import {auth, googleProvider} from '@/lib/firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithRedirect,onAuthStateChanged } from 'firebase/auth';
 type AuthTab = 'sign-in' | 'create-account';
 
 export default function LoginPage() {
@@ -20,20 +20,7 @@ export default function LoginPage() {
   const LoginWithGoogle = async () => {
     try {
       // 1. Login ผ่าน Firebase
-      const result = await signInWithPopup(auth, googleProvider);
-
-      // 2. ดึง Firebase ID Token
-      const token = await result.user.getIdToken();
-
-      // 3. ยิง API ไปยัง Spring Boot พร้อมส่ง Bearer Token
-      const res = await fetch("http://localhost:8080/api/protected-data", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      console.log("Response from Spring Boot:", data);
+      const result = await signInWithRedirect(auth, googleProvider);
     } catch (error) {
       console.error("Login Error:", error);
     }
@@ -50,7 +37,30 @@ export default function LoginPage() {
       setFormMessage('Authentication is not connected yet. Connect an auth provider to continue.');
     }, 800);
   };
+useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // ดึง Token ได้อย่างปลอดภัย ไม่ขึ้นสีแดง
+        const token = await user.getIdToken();
+        console.log("Firebase Token:", token);
 
+        // ยิง API ไปยัง Spring Boot (Port 8081)
+        try {
+          const res = await fetch("http://localhost:8081/api/protected-data", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json();
+          console.log("Response from Spring Boot:", data);
+        } catch (error) {
+          console.error("Fetch API Error:", error);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f8fc] px-4 py-8 text-slate-900">
       <section className="w-full max-w-[420px] rounded-2xl border border-violet-100/80 bg-white px-6 py-7 shadow-[0_18px_55px_rgba(79,70,229,0.08)] sm:px-8">
