@@ -1,5 +1,5 @@
 'use client';
-
+import Navbar from '@/app/components/navbar';
 import React, { useState } from 'react';
 import { Store, User, CheckCircle2, Save, SlidersHorizontal } from 'lucide-react';
 
@@ -32,25 +32,9 @@ export default function ProfilePage() {
         <span className="text-sm font-semibold">Changes saved successfully!</span>
       </div>
 
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm/50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3.5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-pink-500/20"><Store className="w-5 h-5" /></div>
-            <span className="text-xl font-extrabold tracking-tight text-slate-900">Consign<span className="text-slate-800 font-normal">Desk</span></span>
-          </div>
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/50">
-            {['Dashboard', 'Sales Runs', 'Ongoing', 'Completed'].map((tab) => (
-              <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white text-purple-700 shadow-sm border border-slate-200/60' : 'text-slate-600 hover:text-slate-900'}`}>{tab}</button>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3 bg-slate-50 p-1.5 pr-4 rounded-full border border-slate-200/60">
-            <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-sm"><User className="w-4 h-4" /></div>
-            <span className="text-sm font-semibold text-slate-700">{username}</span>
-          </div>
-        </div>
-      </header>
+      <Navbar/>
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 mt-10">
         <h1 className="text-3xl font-extrabold text-slate-900 mb-6 tracking-tight">User Profile</h1>
         <div className="bg-white rounded-3xl border border-slate-200/70 shadow-sm p-6 md:p-8 space-y-8">
           <div className="bg-gradient-to-r from-purple-50/70 to-indigo-50/30 border border-purple-100/80 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">

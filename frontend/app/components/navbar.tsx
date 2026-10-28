@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname,useRouter } from 'next/navigation';
 import {signOut} from "firebase/auth";
 import { auth } from '@/lib/firebase';
+
 export default function Navbar() {
+  const router = useRouter();
   const pathname = usePathname();
 async function logout() {
   try {
@@ -45,9 +47,9 @@ async function logout() {
               <Link href="/sales/completed" className={linkClass('/sales/completed')} aria-current={isActive('/sales/completed') ? 'page' : undefined}>Completed</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-2.5">
+          <div onClick={()=>router.push('/profile')} className="flex items-center gap-2.5 cursor-pointer">
             <span className="text-[11px] font-semibold">Alex Chen</span>
-            <button aria-label="Alex Chen profile" className="w-7.5 h-7.5 rounded-full bg-gradient-to-tr from-primary via-creatory-pink to-creatory-orange flex items-center justify-center text-white shadow-sm">
+            <button aria-label="Alex Chen profile" className="w-7.5 h-7.5 cursor-pointer rounded-full bg-gradient-to-tr from-primary via-creatory-pink to-creatory-orange flex items-center justify-center text-white shadow-sm">
               <span className="material-symbols-outlined text-[5px]">person</span>
             </button>
           </div>
