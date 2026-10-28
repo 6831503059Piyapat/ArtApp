@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Store, User, CheckCircle2, Save, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Store, User, CheckCircle2, Save, SlidersHorizontal } from 'lucide-react';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('Completed');
@@ -121,13 +121,12 @@ export default function ProfilePage() {
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Currency Configuration</label>
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
-                    <select value={currency} onChange={handleCurrencyChange} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 pr-10 outline-none">
+                    <select value={currency} onChange={handleCurrencyChange} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none cursor-pointer shadow-sm">
                       <option value="THB">฿ Thai Baht (THB)</option>
                       <option value="USD">$ US Dollar (USD)</option>
                       <option value="EUR">€ Euro (EUR)</option>
                       <option value="JPY">¥ Japanese Yen (JPY)</option>
                     </select>
-                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
                   <div className="bg-purple-100/70 border border-purple-200 rounded-xl px-4 py-1.5 text-right min-w-[100px]">
                     <div className="text-[10px] font-bold text-purple-600 uppercase">Preview:</div>

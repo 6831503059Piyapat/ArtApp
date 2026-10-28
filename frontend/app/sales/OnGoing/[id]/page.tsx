@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
   Store,
   ShieldAlert,
@@ -35,6 +35,7 @@ import {
   Copy,
   QrCode,
   Shield,
+  UsersRound,
   ShieldCheck,
   RotateCcw,
   Check,
@@ -44,9 +45,17 @@ import Navbar from '@/app/components/navbar';
 import Footer from "@/app/components/footer";
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
-  const initialProducts = [
-    // My Products / Host Items
+  const Suppliers = [
     {
+    id: "host-8466468345",
+    name: "My Products",
+    role: "Host's inventory",
+    accent: "purple",
+    category: "host",
+    placeholder: "Item Name (e.g. Linen Coaster Set)",
+
+    products: [
+      {
       id: '1',
       name: 'Green Horned Frog',
       start: 10,
@@ -55,7 +64,7 @@ export default function SalesRunDetail() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-purple-100/70 text-purple-600',
-      category: 'host'
+      supplierId: "host-8466468345"
     },
     {
       id: '2',
@@ -66,7 +75,8 @@ export default function SalesRunDetail() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-amber-100/70 text-amber-500',
-      category: 'host'
+      supplierId: "host-8466468345"
+      
     },
     {
       id: '3',
@@ -77,71 +87,171 @@ export default function SalesRunDetail() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-purple-100/70 text-purple-600',
-      category: 'host'
+      supplierId: "host-8466468345"
+     
     },
-    // P' Kaimook
-    {
-      id: '4',
-      name: 'Japanese turtle (Big)',
-      start: 8,
-      stock: 3,
-      price: 250,
-      sold: 5,
-      icon: Rabbit,
-      iconBg: 'bg-pink-100/70 text-pink-500',
-      supplier: "P' Kaimook",
-      category: 'kaimook'
-    },
-    {
-      id: '5',
-      name: 'Japanese turtle (Small)',
-      start: 17,
-      stock: 10,
-      price: 100,
-      sold: 7,
-      icon: Fish,
-      iconBg: 'bg-pink-100/70 text-pink-500',
-      supplier: "P' Kaimook",
-      category: 'kaimook'
+    ],
+  },
+   {
+    id: "kaimook-8466468345",
+    name: "P Kaimook",
+    role: "Host's inventory",
+    accent: "purple",
+    placeholder: "Item Name (e.g. Linen Coaster Set)",
+    category: "supplier",
+    products: [
+      {
+      id: '1',
+      name: 'Green Horned Frog',
+      start: 10,
+      stock: 0,
+      price: 150,
+      sold: 10,
+      icon: Leaf,
+      iconBg: 'bg-purple-100/70 text-purple-600',
+      supplierId: "kaimook-8466468345"
+     
     },
     {
-      id: '6',
-      name: 'Turtle food 500g',
-      start: 62,
-      stock: 40,
-      price: 80,
-      sold: 22,
-      icon: Grid,
+      id: '2',
+      name: 'Yellow Horned Frog',
+      start: 10,
+      stock: 1,
+      price: 150,
+      sold: 9,
+      icon: Sun,
       iconBg: 'bg-amber-100/70 text-amber-500',
-      supplier: "P' Kaimook",
-      category: 'kaimook'
-    },
-    // Nong' Japan
-    {
-      id: '7',
-      name: 'Aquarium Moss Ball (Medium)',
-      start: 15,
-      stock: 8,
-      price: 60,
-      sold: 7,
-      icon: Package,
-      iconBg: 'bg-purple-100/70 text-purple-600',
-      supplier: "Nong' Japan",
-      category: 'japan'
+      supplierId: "kaimook-8466468345"
+     
     },
     {
-      id: '8',
-      name: 'Mini Terrarium Starter Glass',
-      start: 6,
-      stock: 3,
-      price: 190,
-      sold: 3,
-      icon: Droplets,
+      id: '3',
+      name: 'Brown Horned Frog',
+      start: 10,
+      stock: 6,
+      price: 150,
+      sold: 4,
+      icon: Mountain,
       iconBg: 'bg-purple-100/70 text-purple-600',
-      supplier: "Nong' Japan",
-      category: 'japan'
-    }
+      supplierId: "kaimook-8466468345"
+    },
+    ],
+  },
   ];
+  const assistants = [
+    {
+      id:'1',
+      name: 'Alex Chen',
+      status: true,
+      avatar: '/path/to/alex_chen.jpg',
+      permission:{
+        Sell:true,
+        Crud:true,
+        Record:true,
+        ViewLog:true,
+        ManagePermission:true
+      }
+    },
+  
+  ];
+  // const initialProducts = [
+  //   // My Products / Host Items
+  //   {
+  //     id: '1',
+  //     name: 'Green Horned Frog',
+  //     start: 10,
+  //     stock: 0,
+  //     price: 150,
+  //     sold: 10,
+  //     icon: Leaf,
+  //     iconBg: 'bg-purple-100/70 text-purple-600',
+  //     category: 'host'
+  //   },
+  //   {
+  //     id: '2',
+  //     name: 'Yellow Horned Frog',
+  //     start: 10,
+  //     stock: 1,
+  //     price: 150,
+  //     sold: 9,
+  //     icon: Sun,
+  //     iconBg: 'bg-amber-100/70 text-amber-500',
+  //     category: 'host'
+  //   },
+  //   {
+  //     id: '3',
+  //     name: 'Brown Horned Frog',
+  //     start: 10,
+  //     stock: 6,
+  //     price: 150,
+  //     sold: 4,
+  //     icon: Mountain,
+  //     iconBg: 'bg-purple-100/70 text-purple-600',
+  //     category: 'host'
+  //   },
+  //   // P' Kaimook
+  //   {
+  //     id: '4',
+  //     name: 'Japanese turtle (Big)',
+  //     start: 8,
+  //     stock: 3,
+  //     price: 250,
+  //     sold: 5,
+  //     icon: Rabbit,
+  //     iconBg: 'bg-pink-100/70 text-pink-500',
+  //     supplier: "P' Kaimook",
+  //     category: 'kaimook'
+  //   },
+  //   {
+  //     id: '5',
+  //     name: 'Japanese turtle (Small)',
+  //     start: 17,
+  //     stock: 10,
+  //     price: 100,
+  //     sold: 7,
+  //     icon: Fish,
+  //     iconBg: 'bg-pink-100/70 text-pink-500',
+  //     supplier: "P' Kaimook",
+  //     category: 'kaimook'
+  //   },
+  //   {
+  //     id: '6',
+  //     name: 'Turtle food 500g',
+  //     start: 62,
+  //     stock: 40,
+  //     price: 80,
+  //     sold: 22,
+  //     icon: Grid,
+  //     iconBg: 'bg-amber-100/70 text-amber-500',
+  //     supplier: "P' Kaimook",
+  //     category: 'kaimook'
+  //   },
+  //   // Nong' Japan
+  //   {
+  //     id: '7',
+  //     name: 'Aquarium Moss Ball (Medium)',
+  //     start: 15,
+  //     stock: 8,
+  //     price: 60,
+  //     sold: 7,
+  //     icon: Package,
+  //     iconBg: 'bg-purple-100/70 text-purple-600',
+  //     supplier: "Nong' Japan",
+  //     category: 'japan'
+  //   },
+  //   {
+  //     id: '8',
+  //     name: 'Mini Terrarium Starter Glass',
+  //     start: 6,
+  //     stock: 3,
+  //     price: 190,
+  //     sold: 3,
+  //     icon: Droplets,
+  //     iconBg: 'bg-purple-100/70 text-purple-600',
+  //     supplier: "Nong' Japan",
+  //     category: 'japan'
+  //   }
+  // ];
   const expensesList = [
     {
       id: '01',
@@ -166,9 +276,21 @@ export default function SalesRunDetail() {
       amount: '฿150.00'
     }
   ];
-  const [products, setProducts] = useState(initialProducts);
+  const StockList = [
+    {
+      id: '1',
+      name:"MFU outside night market (MON 14)",
+      totalsoldMax:85,
+      totalsold:66,
+      grossIntake:8490,
+    }
+  ];
+  const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
+  const [supplierFormOpen, setSupplierFormOpen] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState("");
+
   //State สำหรับ Toggle Sales Mode / Edit Mode
   const [stepMode, setStepMode] = useState("sales");
   // State สำหรับฟอร์ม Fast Log Shared Expense
@@ -178,9 +300,11 @@ export default function SalesRunDetail() {
   //INVITE MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [previousActions, setPreviousActions] = useState<{supplierId: string; productId: string; productName: string; quantity: number; time:string }[]>([]);
   // End Sales Run Modal
   const [isEndRunOpen, setIsEndRunOpen] = useState(false);
-
+const inputClass ="min-w-0 rounded-lg border  bg-white px-2 py-1.5 text-[8px] text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
+const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
   const joinPin = '88X2-901';
   // Toggle Switches State
@@ -194,6 +318,9 @@ export default function SalesRunDetail() {
     restockQuantities: true,
     addNewProducts: false
   });
+   const addSupplier = () => {
+    
+  };
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -202,20 +329,118 @@ export default function SalesRunDetail() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // ฟังก์ชันสำหรับแปลง timestamp เป็นข้อความเวลาแบบ "x นาทีที่แล้ว" หรือ "x ชั่วโมงที่แล้ว"
+  const formatTimeAgo = (timestamp: number) => {
+  const secondsAgo = Math.floor((Date.now() - timestamp) / 1000);
+
+  if (secondsAgo < 5) return 'เมื่อสักครู่';
+  if (secondsAgo < 60) return `${secondsAgo} วินาทีที่แล้ว`;
+  
+  const minutesAgo = Math.floor(secondsAgo / 60);
+  if (minutesAgo < 60) return `${minutesAgo} นาทีที่แล้ว`;
+  
+  const hoursAgo = Math.floor(minutesAgo / 60);
+  return `${hoursAgo} ชั่วโมงที่แล้ว`;
+};
+
+
+// Component สำหรับแสดงเวลาที่ผ่านมาแบบเรียลไทม์
+
+const ActionTimeAgo = ({ createdAt }: { createdAt: number }) => {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    // ให้ Re-render ตัวเองทุกๆ 1 วินาที เพื่ออัปเดตเวลาที่นับผ่านไป
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span>{formatTimeAgo(createdAt)}</span>; 
+};
+const handleUndo = () => {
+  if (previousActions.length === 0) return;
+
+  const lastAction = previousActions[previousActions.length - 1];
+
+  // 1. คืน Stock และ Sold ของสินค้าที่ขายล่าสุด
+  setProducts((prev) =>
+    prev.map((supplier) => {
+      // ค้นหา Supplier ที่ตรงกัน
+      if (supplier.id !== lastAction.supplierId) {
+        return supplier;
+      }
+
+      return {
+        ...supplier,
+        products: (supplier.products ?? []).map((item) => {
+          // ค้นหาสินค้าที่ต้องการ Undo
+          if (item.id !== lastAction.productId) {
+            return item;
+          }
+
+          return {
+            ...item,
+            stock: item.stock + lastAction.quantity,
+            sold: item.sold - lastAction.quantity,
+          };
+        }),
+      };
+    })
+  );
+
+  // 2. ลบ Action ล่าสุดออกจากประวัติ
+  setPreviousActions((prev) => prev.slice(0, -1));
+};
+
+
+
 const handleSell = (id: string) => {
-    setProducts((prev) =>
-      prev.map((item) => {
-        if (item.id === id && item.stock > 0) {
+
+  // 1. ค้นหาสินค้าจากทุก Supplier
+  const productToSell = products
+    .flatMap((supplier) => supplier.products ?? [])
+    .find((item) => item.id === id);
+
+  // 2. ตรวจสอบว่าสินค้ามีอยู่และมี Stock
+  if (!productToSell || productToSell.stock <= 0) {
+    console.log("Product not found or out of stock");
+    return;
+  }
+
+  // 3. อัปเดต Stock และ Sold โดยสร้าง State ใหม่
+  setProducts((prev) =>
+    prev.map((supplier) => ({
+      ...supplier,
+      products: (supplier.products ?? []).map((item) => {
+        if (item.id === id) {
           return {
             ...item,
             stock: item.stock - 1,
-            sold: item.sold + 1
+            sold: item.sold + 1,
           };
         }
+
         return item;
-      })
-    );
-  };
+      }),
+    }))
+  );
+
+  // 4. บันทึกประวัติการขาย
+  setPreviousActions((prev) => [
+    ...prev,
+    {
+      supplierId: productToSell.supplierId,
+      productId: id,
+      productName: productToSell.name,
+      quantity: 1,
+      time: Date.now().toString(),
+    },
+  ]);
+};
 
   return (
     <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
@@ -234,17 +459,17 @@ const handleSell = (id: string) => {
           {/* Title row */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <button className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors mt-0.5">
+              <button onClick={() => {window.history.back();}} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors mt-0.5">
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
                 <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                    MFU outside night market (MON 14)
+                    {StockList[0].name}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                    EDIT MODE
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${stepMode === "sales" ? "bg-green-50 text-green-600 border border-green-200/60" : "bg-amber-50 text-amber-600 border border-amber-200/60"} flex items-center gap-1`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${stepMode === "sales" ? "bg-green-500" : "bg-amber-500"}`}></span>
+                     {stepMode === "sales" ? "SALES MODE" : "EDIT MODE"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-purple-600 font-medium mt-1.5">
@@ -309,7 +534,7 @@ const handleSell = (id: string) => {
             <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">GROSS INTAKE</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">฿8,490.00</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">฿{StockList[0].grossIntake.toLocaleString('en-US')}</p>
               </div>
               <div className="p-2.5 bg-purple-100/60 text-purple-600 rounded-xl">
                 <Receipt className="w-5 h-5" />
@@ -321,8 +546,8 @@ const handleSell = (id: string) => {
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL SOLD UNITS</p>
                 <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-black text-slate-900">66</span>
-                  <span className="text-xs text-slate-400 font-medium">/ 85 starting</span>
+                  <span className="text-2xl font-black text-slate-900">{StockList[0].totalsold}</span>
+                  <span className="text-xs text-slate-400 font-medium">/ {StockList[0].totalsoldMax} starting</span>
                 </div>
               </div>
               <div className="p-2.5 bg-amber-100/60 text-amber-600 rounded-xl">
@@ -337,13 +562,13 @@ const handleSell = (id: string) => {
                   <History className="w-3 h-3 text-purple-500" /> LATEST ACTION
                 </p>
                 <p className="text-xs font-semibold text-slate-800 mt-1">
-                  Sold 5x Turtle food 500g (฿400)
+                  {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : 'No actions yet'}
                 </p>
                 <span className="inline-block mt-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
-                  24s ago
+                  {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
                 </span>
               </div>
-              <button className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1">
+              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`px-3 py-1.5 ${previousActions.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-amber-400 hover:bg-amber-500'}   text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1`}>
                 <Undo2 className="w-3.5 h-3.5" /> Undo
               </button>
             </div>
@@ -391,9 +616,32 @@ const handleSell = (id: string) => {
                 </button>
               </nav>
 
-              <button className="w-full py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/60 rounded-xl font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
-                <UserPlus className="w-3.5 h-3.5" /> + Add Supplier
-              </button>
+              {supplierFormOpen ? (
+                  <form
+                    className="flex gap-1 pt-1"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      addSupplier();
+                    }}
+                  >
+                    <input
+                      autoFocus
+                      required
+                      value={newSupplierName}
+                      onChange={(event) => setNewSupplierName(event.target.value)}
+                      aria-label="New supplier name"
+                      placeholder="Supplier name"
+                      className={`${inputClass} ${inputClass2} flex-1`}
+                    />
+                    <button type="submit" aria-label="Add supplier" className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg bg-[#7957ff] text-white hover:bg-[#6642ed]">
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </form>
+                ) : (
+                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-[8px] font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
+                    <UsersRound className="h-2.5 w-2.5" /> + Add Supplier
+                  </button>
+                )}
 
               <button onClick={()=>setStepMode("expense")} className="w-full py-2.5 px-3 bg-rose-50/60 hover:bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs transition-colors flex items-center justify-between border border-rose-100">
                 <div className="flex items-center gap-2">
@@ -423,134 +671,37 @@ const handleSell = (id: string) => {
             {/* 1. SECTION: MY PRODUCTS */}
             {stepMode === "edit" && (
                 <>
+
+{products.map((items) => (
+  <ProductGroupSection
+    key={items.id}
+    title={items.name}
+    badgeText={items.role}
+    badgeColor="bg-purple-100 text-purple-700"
+    itemCount={items.products?.length ?? 0}
+    dotColor="bg-purple-600"
+    items={items.products ?? []}
+    placeholderText="Item Name (e.g. Linen Coaster Set)"
+  />
+))}
+
             
-            <ProductGroupSection
-              
-              title="My Products"
-              badgeText="Host"
-              badgeColor="bg-purple-100 text-purple-700"
-              itemCount={3}
-              dotColor="bg-purple-600"
-              items={[
-                { id: 1, name: 'Green Horned Frog', qty: 0, price: 150, sold: 10 },
-                { id: 2, name: 'Yellow Horned Frog', qty: 0, price: 150, sold: 9 },
-                { id: 3, name: 'Brown Horned Frog', qty: 0, price: 150, sold: 4 },
-              ]}
-              placeholderText="Item Name (e.g. Linen Coaster Set)"
-            />
 
-            <ProductGroupSection
-              title="P' Kaimook"
-              badgeText="Supplier"
-              badgeColor="bg-pink-100 text-pink-700"
-              itemCount={3}
-              dotColor="bg-pink-500"
-              items={[
-                { id: 4, name: 'Japanese turtle (Big)', qty: 0, price: 250, sold: 5 },
-                { id: 5, name: 'Japanese turtle (Small)', qty: 0, price: 100, sold: 7 },
-                { id: 6, name: 'Turtle food 500g', qty: 0, price: 80, sold: 22 },
-              ]}
-              placeholderText="Item Name (e.g. Ceramic Vase)"
-            />
-
-            <ProductGroupSection
-              title="Nong' Japan"
-              badgeText="Supplier"
-              badgeColor="bg-amber-100 text-amber-700"
-              itemCount={2}
-              dotColor="bg-amber-500"
-              items={[
-                { id: 7, name: 'Aquarium Moss Ball (Medium)', qty: 0, price: 60, sold: 7 },
-                { id: 8, name: 'Mini Terrarium Starter Glass', qty: 0, price: 190, sold: 3 },
-              ]}
-              placeholderText="Item Name (e.g. Postcard Set)"
-            />
             </>
 )}
                {/* Product cards for each supplier  Sales Mode*/}
-               { stepMode === "sales" && (
-    <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-4xl mx-auto space-y-4">
-      
-      {/* 1. HOST PRODUCTS SECTION */}
-       <div className="pt-2 space-y-3">
-        {/* Supplier Header Badge */}
-        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
-            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
-                My Products
-            </h2>
-            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-              Host
-            </span>
-          </div>
-          <span className="bg-pink-50 text-pink-500 border border-pink-100 px-3 py-0.5 rounded-full text-xs font-bold">
-            3 items
-          </span>
-        </div>
+               
+{stepMode === "sales" && (
+  <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans max-w-4xl mx-auto space-y-4">
 
-        {/* Product Cards */}
-        {products
-          .filter((item) => item.category === 'host')
-          .map((item) => (
-            <ProductCard key={item.id} item={item} onSell={handleSell} />
-          ))}
-      </div>
+    {/* 1. HOST PRODUCTS */}
+   {products.map((supplier) => (
+    <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} />
+   ))}
 
-      {/* 2. SUPPLIER SECTION: P' KAIMOOK */}
-      <div className="pt-2 space-y-3">
-        {/* Supplier Header Badge */}
-        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
-            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
-              P Kaimook
-            </h2>
-            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-              Supplier
-            </span>
-          </div>
-          <span className="bg-pink-50 text-pink-500 border border-pink-100 px-3 py-0.5 rounded-full text-xs font-bold">
-            3 items
-          </span>
-        </div>
+  </div>
+)}
 
-        {/* Product Cards */}
-        {products
-          .filter((item) => item.category === 'kaimook')
-          .map((item) => (
-            <ProductCard key={item.id} item={item} onSell={handleSell} />
-          ))}
-      </div>
-
-      {/* 3. SUPPLIER SECTION: NONG' JAPAN */}
-      <div className="pt-2 space-y-3">
-        {/* Supplier Header Badge */}
-        <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <h2 className="font-bold text-slate-900 text-sm tracking-tight">
-              Nong Japan
-            </h2>
-            <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-              Supplier
-            </span>
-          </div>
-          <span className="bg-amber-50 text-amber-600 border border-amber-100 px-3 py-0.5 rounded-full text-xs font-bold">
-            3 items
-          </span>
-        </div>
-
-        {/* Product Cards */}
-        {products
-          .filter((item) => item.category === 'japan')
-          .map((item) => (
-            <ProductCard key={item.id} item={item} onSell={handleSell} />
-          ))}
-      </div>
-
-    </div>
-               )}
                {stepMode === "expense" && (
                 <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-5xl mx-auto space-y-5">
       
@@ -729,7 +880,7 @@ const handleSell = (id: string) => {
                 </div>
                 <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
               </div>
-              <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
@@ -1009,7 +1160,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
               <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-8 text-center font-bold text-purple-600">{item.qty}</span>
+              <span className="w-8 text-center font-bold text-purple-600">{item.stock}</span>
               <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
                 <Plus className="w-3 h-3" />
               </button>
@@ -1093,8 +1244,8 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
           <div className="flex items-center space-x-1 text-xs text-slate-400 font-medium">
             <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
-            <span className={isOutOfStock ? 'text-purple-600 font-semibold' : 'text-purple-600 font-semibold'}>
-              {isOutOfStock ? '0 remaining' : `${item.stock} in stock`}
+            <span className={isOutOfStock ? 'text-red-600 font-semibold' : 'text-purple-600 font-semibold'}>
+              {isOutOfStock ? 'Out of stock' : `${item.stock} in stock`}
             </span>
           </div>
         </div>
@@ -1117,7 +1268,7 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
           disabled={isOutOfStock}
           className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all active:scale-95 flex items-center gap-1 ${
             isOutOfStock
-              ? 'bg-purple-600 opacity-90 cursor-not-allowed'
+              ? 'bg-gray-400 opacity-90 cursor-not-allowed'
               : 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800'
           }`}
         >
@@ -1520,6 +1671,59 @@ function EndSalesRunModal({
         </div>
 
       </div>
+    </div>
+  );
+}
+
+function SaleSection({
+  products,
+  handleSell,
+  Name,
+  Role,
+  id,
+}: {
+  products: any[];
+  handleSell: (id: string) => void;
+  Name: string;
+  Role: string;
+  id: string;
+}) {
+  // กรองสินค้าของ Supplier ที่ตรงกับ ID
+  const filteredProducts = products.filter(
+    (item) => item && item.supplierId === id
+  );
+
+
+
+  return (
+    <div className="pt-2 space-y-3">
+      {/* Header */}
+      <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+
+          <h2 className="font-bold text-slate-900 text-sm tracking-tight">
+            {Name}
+          </h2>
+
+          <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+            {Role}
+          </span>
+        </div>
+
+        <span className="bg-amber-50 text-amber-600 border border-amber-100 px-3 py-0.5 rounded-full text-xs font-bold">
+          {filteredProducts.length} items
+        </span>
+      </div>
+
+      {/* Product Cards */}
+      {filteredProducts.map((cardItem) => (
+        <ProductCard
+          key={cardItem.id}
+          item={cardItem}
+          onSell={handleSell}
+        />
+      ))}
     </div>
   );
 }

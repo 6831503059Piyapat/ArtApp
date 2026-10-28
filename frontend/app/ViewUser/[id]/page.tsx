@@ -59,7 +59,15 @@ const BoothSyncTime = () => {
     </section>
   );
 };
-
+async function fetchData(){
+  // const response = await fetch("https://api.example.com/data",{
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   method: "GET",
+  // });
+  // console.log(response);
+}
 const suppliers = [
   {
     name: "My awesome amazing products",
