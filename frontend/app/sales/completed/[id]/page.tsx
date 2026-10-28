@@ -141,68 +141,68 @@ export default function ConsignDeskDashboard() {
       </Suspense>
 
       {/* Main Content */}
-      <main className="max-w-[1400px] mx-auto px-6 mt-6">
+      <main className="mx-auto mt-6 w-full max-w-[1280px] px-4 sm:px-6 md:w-[95%] lg:px-8">
         
         {/* Top Breadcrumb & Status */}
         <div className="flex justify-between items-center mb-4">
-          <button className="flex items-center text-gray-500 hover:text-gray-800 text-sm font-medium transition">
+          <button className="flex items-center text-gray-500 hover:text-gray-800 text-xs font-medium transition">
             <ArrowLeft size={16} className="mr-1" />
             Back to Completed Runs
           </button>
-          <div className="flex items-center text-sm text-gray-500">
+          <div className="flex items-center text-xs text-gray-500">
             <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
             Status: <span className="ml-1 text-gray-700">Reconciled & Ready</span>
           </div>
         </div>
 
         {/* Header Section */}
-        <div className="bg-orange-50/50 rounded-2xl p-6 mb-6 border border-orange-100/50">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-3 flex items-center gap-3">
-                MFU Outside Night Market (Mon 14)
-              </h1>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md flex items-center gap-1">
+        <div className="bg-orange-50/50 rounded-2xl p-4 md:p-5 mb-6 border border-orange-100/50">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-semibold rounded-md flex items-center gap-1">
                   🔒 Archived • Settled
                 </span>
               </div>
-              <div className="flex items-center text-sm text-gray-500 gap-4">
-                <span className="flex items-center gap-1">
+              <h1 className="text-xl font-bold text-slate-800 mb-3 flex items-center gap-3">
+                MFU Outside Night Market (Mon 14)
+              </h1>
+              <div className="flex flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap text-xs text-gray-500">
+                <span className="flex shrink-0 items-center gap-1">
                   <span className="w-3 h-3 rounded border border-gray-300 inline-block"></span>
                   Closed on 14/09/2026 at 22:30
                 </span>
-                <span className="flex items-center gap-1">
+                <span className="flex shrink-0 items-center gap-1">
                   <User size={14} /> Host: <strong className="text-gray-700">Alex Chen</strong>
                 </span>
-                <span className="flex items-center gap-1">
+                <span className="flex shrink-0 items-center gap-1">
                   <User size={14} /> Assistant: <strong className="text-gray-700">Ploy W.</strong>
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm">
-                <FileSpreadsheet size={16} className="text-blue-500" /> Download Excel (.xlsx)
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-700 hover:bg-gray-50 shadow-sm whitespace-nowrap">
+                <FileSpreadsheet size={13} className="text-blue-500" /> Download Excel (.xlsx)
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm">
-                <FileText size={16} className="text-pink-500" /> PDF Statement
+              <button className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-medium text-gray-700 hover:bg-gray-50 shadow-sm whitespace-nowrap">
+                <FileText size={13} className="text-pink-500" /> PDF Statement
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg text-sm font-medium text-white hover:opacity-90 shadow-sm">
-                <Share2 size={16} /> Share PDF File
+              <button className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg text-[10px] font-medium text-white hover:opacity-90 shadow-sm whitespace-nowrap">
+                <Share2 size={13} /> Share PDF File
               </button>
             </div>
           </div>
         </div>
 
         {/* Stats 4 Columns */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-2 mb-6">
           {/* Card 1 */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="min-w-0 bg-white p-2 sm:p-3 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <span className="text-xs font-bold text-gray-400 uppercase">Gross Sales</span>
               <div className="bg-purple-50 p-1.5 rounded-md"><Wallet size={16} className="text-purple-500" /></div>
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-4">฿8,490.00</div>
+            <div className="text-2xl font-bold text-purple-600 mb-3">฿8,490.00</div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
               <span>Units: 88 sold / 96 initial</span>
               <span className="text-purple-500 font-medium">91.6% sellout</span>
@@ -213,12 +213,12 @@ export default function ConsignDeskDashboard() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="min-w-0 bg-white p-2 sm:p-3 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <span className="text-xs font-bold text-gray-400 uppercase">Total Deductions</span>
               <div className="bg-orange-50 p-1.5 rounded-md"><Receipt size={16} className="text-orange-500" /></div>
             </div>
-            <div className="text-3xl font-bold text-orange-500 mb-4">฿70.00</div>
+            <div className="text-2xl font-bold text-orange-500 mb-3">฿70.00</div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
               <span>1 Stall Expense logged</span>
               <span className="text-orange-500 font-medium">Booth Rent</span>
@@ -229,12 +229,12 @@ export default function ConsignDeskDashboard() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="min-w-0 bg-white p-2 sm:p-3 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <span className="text-xs font-bold text-gray-400 uppercase">Net Total</span>
               <div className="bg-green-50 p-1.5 rounded-md"><DollarSign size={16} className="text-green-500" /></div>
             </div>
-            <div className="text-3xl font-bold text-slate-800 mb-4">฿8,420.00</div>
+            <div className="text-2xl font-bold text-slate-800 mb-3">฿8,420.00</div>
             <div className="flex justify-end text-xs text-green-600 font-medium mb-1">
               99.18% gained from gross sales
             </div>
@@ -244,7 +244,7 @@ export default function ConsignDeskDashboard() {
           </div>
 
           {/* Card 4 */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="min-w-0 bg-white p-2 sm:p-3 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <span className="text-xs font-bold text-gray-400 uppercase">3 Supplier Payouts</span>
               <div className="flex items-center text-xs text-purple-600 font-medium bg-purple-50 px-2 py-0.5 rounded-full">
@@ -274,9 +274,9 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-6 border-b border-gray-200 mb-6 px-2">
+        <div className="flex items-center gap-4 border-b border-gray-200 mb-6 px-2">
           <button onClick={() => setActiveTab('sales')}
-            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+            className={`flex items-center gap-2 pb-3 font-medium text-xs transition-colors ${
               activeTab === 'sales' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
@@ -285,7 +285,7 @@ export default function ConsignDeskDashboard() {
           </button>
           
           <button onClick={() => setActiveTab('expenses')}
-            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+            className={`flex items-center gap-2 pb-3 font-medium text-xs transition-colors ${
               activeTab === 'expenses' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
@@ -294,7 +294,7 @@ export default function ConsignDeskDashboard() {
           </button>
 
           <button onClick={() => setActiveTab('changes')}
-            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+            className={`flex items-center gap-2 pb-3 font-medium text-xs transition-colors ${
               activeTab === 'changes' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
@@ -303,7 +303,7 @@ export default function ConsignDeskDashboard() {
           </button>
 
           <button onClick={() => setActiveTab('payouts')}
-            className={`flex items-center gap-2 pb-3 font-medium text-sm transition-colors ${
+            className={`flex items-center gap-2 pb-3 font-medium text-xs transition-colors ${
               activeTab === 'payouts' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
