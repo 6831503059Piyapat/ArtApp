@@ -1,6 +1,8 @@
 'use client';
 import {useRouter} from "next/navigation";
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import {onAuthStateChanged} from "firebase/auth";
+import { auth } from '@/lib/firebase';
 import Link from 'next/link';
 import {
   CalendarDays,
@@ -31,12 +33,24 @@ export default function DashboardPage() {
   const [sessionFilter, setSessionFilter] = useState<SessionFilter>('All Sessions');
   const showOngoing = sessionFilter !== 'Completed';
   const showCompleted = sessionFilter !== 'Active';
-
+  const [DisplayName, setDisplayName] = useState<string>();
 const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 const [runCode, setRunCode] = useState('');
 
 const router = useRouter();
-
+async function fetchDisplayName() {
+   onAuthStateChanged(auth, (user) => {
+  if (user) {
+    
+    setDisplayName(user.displayName || '');
+  } else {
+    console.log("ยังไม่ได้ Login");
+  }});
+  }
+useEffect(()=>{
+  
+  fetchDisplayName();
+},[]);
 const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
@@ -56,7 +70,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           <section className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-[22px]">
-              Welcome back, Alex <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">— Ready for the next market?</span>
+              Welcome back, {DisplayName} <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">— Ready for the next market?</span>
             </h1>
             <p className="mt-1 text-xs text-[#858ba0]">Here&apos;s your stall overview and live consignment performance today.</p>
           </div>
