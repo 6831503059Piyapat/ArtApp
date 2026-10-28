@@ -2,10 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import {signOut} from "firebase/auth";
+import { auth } from '@/lib/firebase';
 export default function Navbar() {
   const pathname = usePathname();
+async function logout() {
+  try {
+    await signOut(auth);
 
+    // กลับไปหน้า Login
+    window.location.href = "/auth/login";
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+}
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 

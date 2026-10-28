@@ -1,6 +1,7 @@
 "use client";
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
+import Footer from "@/app/components/footer";
 import { useState, type FormEvent ,Suspense} from "react";
 import {
   CalendarDays,
@@ -356,9 +357,12 @@ export default function CreateSalesRun() {
             </section>
           </div>
         </div>
+        
       </main>
 
+
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
+        
         <div className="mx-auto flex min-h-[38px] w-full max-w-[1280px] items-center justify-between gap-2 px-[18px] py-1.5 md:w-[85%]">
           <div className="flex min-w-0 items-center gap-2 text-[10px]">
             <span className="flex shrink-0 items-center gap-1 font-semibold text-[#7957ff]">
@@ -377,9 +381,7 @@ export default function CreateSalesRun() {
         </div>
       </div>
 
-      <footer className="mx-auto mt-8 w-full max-w-[1280px] px-[18px] pb-1 pt-3 text-[10px] text-[#858ba0] md:w-[85%]">
-        © 2025 ConsignDesk POS • Artisanal Market System
-      </footer>
+      
     </div>
   );
 }
