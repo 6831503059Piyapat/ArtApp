@@ -2,12 +2,17 @@
 
 import { useState, type FormEvent,useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, AtSign, Eye, EyeOff, LockKeyhole, Store, UserRound } from 'lucide-react';
 import {auth, googleProvider} from '@/lib/firebase';
-import { signInWithRedirect,onAuthStateChanged } from 'firebase/auth';
+import {
+  signInWithPopup,
+  onAuthStateChanged
+} from 'firebase/auth';
 type AuthTab = 'sign-in' | 'create-account';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AuthTab>('sign-in');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -17,14 +22,29 @@ export default function LoginPage() {
   const [formMessage, setFormMessage] = useState('');
 
   const isCreatingAccount = activeTab === 'create-account';
-  const LoginWithGoogle = async () => {
-    try {
-      // 1. Login ผ่าน Firebase
-      const result = await signInWithRedirect(auth, googleProvider);
-    } catch (error) {
-      console.error("Login Error:", error);
-    }
-  };
+ 
+const LoginWithGoogle = async () => {
+  try {
+    setIsLoading(true);
+    setFormMessage('');
+
+    const result = await signInWithPopup(auth, googleProvider);
+
+    console.log('Google Login Success:', result.user.uid);
+    console.log('Email:', result.user.email);
+
+  } catch (error) {
+    console.error('Google Login Error:', error);
+    setFormMessage(
+      error instanceof Error
+        ? error.message
+        : 'Google Login failed'
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   
   const handleSubmit = async  (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,30 +57,81 @@ export default function LoginPage() {
       setFormMessage('Authentication is not connected yet. Connect an auth provider to continue.');
     }, 800);
   };
+
+
+
 useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // ดึง Token ได้อย่างปลอดภัย ไม่ขึ้นสีแดง
-        const token = await user.getIdToken();
-        console.log("Firebase Token:", token);
+  let cancelled = false;
 
-        // ยิง API ไปยัง Spring Boot (Port 8081)
-        try {
-          const res = await fetch("http://localhost:8081/api/protected-data", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const data = await res.json();
-          console.log("Response from Spring Boot:", data);
-        } catch (error) {
-          console.error("Fetch API Error:", error);
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    console.log('Firebase user:', user);
+    console.log('UID:', user?.uid);
+
+    if (!user) {
+      console.log('ยังไม่ได้ Login');
+      return;
+    }
+
+    try {
+      const token = await user.getIdToken();
+
+      if (cancelled) return;
+
+      const response = await fetch(
+        'http://localhost:8081/api/protected-data',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
         }
-      }
-    });
+      );
 
-    return () => unsubscribe();
-  }, []);
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(
+          `API Error ${response.status}: ${message}`
+        );
+      }
+
+      const data = await response.json();
+
+      console.log('Backend response:', data);
+
+      if (!cancelled) {
+        router.replace('/dashboard');
+      }
+    } catch (error) {
+      if (!cancelled) {
+        console.error('Authentication/API Error:', error);
+        setFormMessage(
+          error instanceof Error
+            ? error.message
+            : 'Unable to verify account'
+        );
+      }
+    }
+  });
+
+  return () => {
+    cancelled = true;
+    unsubscribe();
+  };
+}, [router]);
+
+// const aboutme = async () => {
+//  const res = await fetch("http://localhost:8081/api/me", {
+//     method: "GET",
+//     headers: {
+//       Authorization: `Bearer ${await auth.currentUser?.getIdToken()}`,
+//     },
+//   });
+//   console.log("Response from /api/me:", auth.currentUser?.getIdToken());
+//   console.log(res.status);
+//   console.log(await res.text());  
+// };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f8fc] px-4 py-8 text-slate-900">
       <section className="w-full max-w-[420px] rounded-2xl border border-violet-100/80 bg-white px-6 py-7 shadow-[0_18px_55px_rgba(79,70,229,0.08)] sm:px-8">
