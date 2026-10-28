@@ -123,11 +123,11 @@ export default function ConsignDeskDashboard() {
       <Navbar />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 pt-6 space-y-6 mt-15 mb-10">
+      <main className="mx-auto mt-15 mb-10 w-full max-w-[1280px] space-y-6 px-4 pt-6 md:w-[85%] md:px-8">
         
         {/* Page Title & Status Badges */}
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#161233]">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#161233] sm:text-[22px]">
             Ongoing Sales Runs
           </h1>
           
@@ -227,37 +227,37 @@ export default function ConsignDeskDashboard() {
 
             return <div
               key={run.id}
-              className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-100 relative overflow-hidden transition-all hover:shadow-md"
+              className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 relative overflow-hidden transition-all hover:shadow-md"
             >
               {/* Gradient Accent Bar at Top */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316]"></div>
 
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-1">
+              <div className="flex flex-col lg:mx-auto lg:w-[92%] lg:flex-row lg:items-center lg:justify-between gap-2 pt-1">
                 
                 {/* Left Info Column */}
-                <div className="space-y-3 flex-1">
+                <div className="space-y-1 flex-1">
                   
                   {/* Status Badge */}
                   <div>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${run.status ? 'bg-[#e8f8f0]  text-[#10b981]' : 'bg-[#ffebee] text-red-500'} text-[11px] font-bold tracking-wider`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${run.status ? 'bg-[#e8f8f0]  text-[#10b981]' : 'bg-[#ffebee] text-red-500'} text-[9px] font-bold tracking-wider`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${run.status ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></span>
                       {run.status ? 'LIVE RUN ACTIVE' : 'RUN INACTIVE'}
                     </span>
                   </div>
 
                   {/* Run Title */}
-                  <h2 className="text-xl font-bold text-[#141527] tracking-tight">
+                  <h2 className="text-sm font-bold text-[#141527] tracking-tight">
                     {run.title}
                   </h2>
 
                   {/* Progress Line and Time Details */}
-                  <div className="space-y-1.5 max-w-xl">
-                    <div className="flex justify-between text-xs font-semibold">
+                  <div className="space-y-1 max-w-xl">
+                    <div className="flex justify-between text-[10px] font-semibold">
                       <span className="text-slate-800"> Elapsed: {timing.elapsed}</span>
                       <span className="text-[#6c5ce7]">{timing.remaining}</span>
                     </div>
                     {/* Progress Bar Container */}
-                    <div className="w-full bg-[#eef0f6] h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#eef0f6] h-1.5 rounded-full overflow-hidden">
                       <div
                         className="bg-gradient-to-r from-[#7c3aed] to-[#ec4899] h-full rounded-full transition-all duration-500"
                         style={{ width: `${timing.progress}%` }}
@@ -267,46 +267,46 @@ export default function ConsignDeskDashboard() {
                 </div>
 
                 {/* Center Stats Block */}
-                <div className="bg-[#f8f9fd] border border-slate-100/80 rounded-2xl p-3.5 px-5 flex items-center justify-between gap-6 md:gap-8 min-w-max">
+                <div className="bg-[#f8f9fd] border border-slate-100/80 rounded-lg p-2 px-2.5 flex items-center justify-between gap-2 min-w-max">
                   {/* Gross Sales */}
                   <div>
                     <p className="text-[10px] font-bold tracking-wider uppercase text-slate-400">
                       Gross Sales
                     </p>
-                    <p className="text-lg font-extrabold text-[#11122a] leading-snug">
+                    <p className="text-sm font-extrabold text-[#11122a] leading-snug">
                       ฿{run.grossSales.toLocaleString('en-US')}
                     </p>
-                    <p className="text-[11px] font-medium text-slate-500">
+                    <p className="text-[10px] font-medium text-slate-500">
                      Net ฿{run.netSales.toLocaleString('en-US')}
                     </p>
                   </div>
 
-                  <div className="w-px h-8 bg-slate-200/60"></div>
+                  <div className="w-px h-6 bg-slate-200/60"></div>
 
                   {/* Items Cleared */}
                   <div>
                     <p className="text-[10px] font-bold tracking-wider uppercase text-slate-400">
                       Items Cleared
                     </p>
-                    <p className="text-lg font-extrabold text-[#11122a] leading-snug">
+                    <p className="text-sm font-extrabold text-[#11122a] leading-snug">
                       {run.itemsCleared} / {run.itemsCleardMax}
                     </p>
-                    <p className="text-[11px] font-semibold text-[#10b981]">
+                    <p className="text-[10px] font-semibold text-[#10b981]">
                       {run.soldPercentage} % sold out
                     </p>
                   </div>
 
-                  <div className="w-px h-8 bg-slate-200/60"></div>
+                  <div className="w-px h-6 bg-slate-200/60"></div>
 
                   {/* Booth Staff */}
                   <div>
                     <p className="text-[10px] font-bold tracking-wider uppercase text-slate-400">
                       Booth Staff
                     </p>
-                    <p className="text-lg font-extrabold text-[#11122a] leading-snug">
+                    <p className="text-sm font-extrabold text-[#11122a] leading-snug">
                       {run.boothStaffList.length} / {run.boothStaffMax}
                     </p>
-                    <p className="text-[11px] font-medium text-slate-400">
+                    <p className="text-[10px] font-medium text-slate-400">
                       
                       {run.boothStaffList.length < run.boothStaffMax
                         ? `Available Slots: ${run.boothStaffMax - run.boothStaffList.length}`
@@ -317,12 +317,12 @@ export default function ConsignDeskDashboard() {
                 </div>
 
                 {/* Right Action Buttons */}
-                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-[200px] justify-center">
-                  <Link href={`/sales/OnGoing/${run.id}`} className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 group">
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-1 min-w-[140px] justify-center">
+                  <Link href={`/sales/OnGoing/${run.id}`} className="w-full bg-[#6c5ce7] hover:bg-[#5b4bc4] text-white text-[10px] font-bold py-1.5 px-2.5 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-1.5 group">
                     <span>Enter Sales Terminal</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                  <Link href={`/ViewUser/${run.id}`} target="_blank" className="w-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-2 px-4 rounded-xl border border-slate-200/80 transition-all duration-200 text-center">
+                  <Link href={`/ViewUser/${run.id}`} target="_blank" className="w-full bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-bold py-1 px-2.5 rounded-lg border border-slate-200/80 transition-all duration-200 text-center">
                     Live Sales Activity
                   </Link>
                 </div>

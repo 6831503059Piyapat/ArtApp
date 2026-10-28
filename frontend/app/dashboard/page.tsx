@@ -29,38 +29,39 @@ export default function DashboardPage() {
   const showCompleted = sessionFilter !== 'Active';
 
   return (
-    <div className="min-h-screen font-sans bg-[#f7f8fc] text-[#111747]">
+    <div className="flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#111747]">
       <Navbar />
 
-      <main className="mx-auto max-w-[1280px] px-4 pb-8 pt-[70px] sm:px-6 lg:px-8">
-        <section className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pb-8 pt-[70px] sm:px-6 md:w-[85%] lg:px-8">
+        <div className="flex flex-col">
+          <section className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-[27px]">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-[22px]">
               Welcome back, Alex <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">— Ready for the next market?</span>
             </h1>
-            <p className="mt-1 text-sm text-[#858ba0]">Here&apos;s your stall overview and live consignment performance today.</p>
+            <p className="mt-1 text-xs text-[#858ba0]">Here&apos;s your stall overview and live consignment performance today.</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
             <Link
               href="/sales/OnGoing"
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e9ebf3] bg-white px-4 text-sm font-semibold shadow-sm transition hover:border-violet-200 hover:bg-violet-50"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#e9ebf3] bg-white px-3 text-xs font-semibold shadow-sm transition hover:border-violet-200 hover:bg-violet-50"
             >
               <Users size={15} className="text-violet-500" />
               Join Run
             </Link>
             <Link
               href="/SaleRun"
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-4 text-sm font-bold text-[#111747] shadow-[0_4px_12px_rgba(255,184,77,0.24)] transition hover:bg-[#ffad32]"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-3 text-xs font-bold text-[#111747] shadow-[0_4px_12px_rgba(255,184,77,0.24)] transition hover:bg-[#ffad32]"
             >
               <Plus size={16} />
               Create New Run
             </Link>
           </div>
-        </section>
+          </section>
 
-        <section className="mb-5 grid gap-4 lg:grid-cols-2">
-          <article className="rounded-2xl border border-[#eceef5] bg-white p-5 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:p-6">
-            <div className="mb-4 flex items-center justify-between">
+          <section className="mb-8 grid gap-4 md:grid-cols-2">
+          <article className="flex h-full flex-col rounded-2xl border border-[#eceef5] bg-white p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] md:p-4">
+            <div className="mb-3 flex items-center justify-between">
               <p className="text-[10px] font-bold uppercase tracking-wide text-[#858ba0]">Latest active run</p>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 text-[10px] font-semibold text-violet-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-500" /> Active Now
@@ -82,41 +83,41 @@ export default function DashboardPage() {
                 <span>Run created: 14/09/2026</span>
               </div>
             </div>
-            <div className="mt-5 flex items-end justify-between gap-4">
+            <div className="mt-4 flex items-end justify-between gap-4">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-[#858ba0]">Live booth revenue</p>
                 <p className="mt-0.5 text-2xl font-extrabold tracking-tight">฿980</p>
               </div>
               <Link
                 href="/sales/OnGoing"
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#eee9ff] px-4 py-2 text-xs font-bold text-[#7855ff] transition hover:bg-violet-100"
+                className="inline-flex items-center gap-1 rounded-full bg-[#eee9ff] px-3 py-1.5 text-[10px] font-bold text-[#7855ff] transition hover:bg-violet-100"
               >
                 <Wallet size={13} /> Resume Selling
               </Link>
             </div>
           </article>
 
-          <article className="rounded-2xl border border-[#eceef5] bg-white p-5 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:p-6">
-            <div className="mb-3 flex items-center gap-2">
-              <h2 className="text-xl font-bold tracking-tight">Personal records</h2>
+          <article className="flex h-full flex-col rounded-2xl border border-[#eceef5] bg-white p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] md:p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <h2 className="text-lg font-bold tracking-tight">Personal records</h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-[9px] font-semibold text-orange-500">
                 <CalendarDays size={11} /> All-time
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] p-3">
+              <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] p-2.5">
                 <p className="text-[10px] text-[#858ba0]">Created</p>
                 <p className="text-sm font-bold">14 Total</p>
               </div>
-              <div className="rounded-xl border border-violet-100 bg-violet-50/80 p-3">
+              <div className="rounded-xl border border-violet-100 bg-violet-50/80 p-2.5">
                 <p className="text-[10px] text-violet-500">Completed</p>
                 <p className="text-sm font-bold text-violet-500">12 Runs</p>
               </div>
-              <div className="rounded-xl border border-pink-100 bg-pink-50/80 p-3">
+              <div className="rounded-xl border border-pink-100 bg-pink-50/80 p-2.5">
                 <p className="text-[10px] text-pink-500">Active</p>
                 <p className="text-sm font-bold text-pink-500">1 Run</p>
               </div>
-              <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] p-3">
+              <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] p-2.5">
                 <p className="text-[10px] text-[#858ba0]">Products Sold</p>
                 <p className="text-sm font-bold">88 items sold</p>
               </div>
@@ -128,12 +129,13 @@ export default function DashboardPage() {
               <span className="text-sm font-extrabold text-amber-700">฿4,250</span>
             </div>
           </article>
-        </section>
+          </section>
+        </div>
 
         <section className="border-t border-[#e9ebf3] pt-5">
           <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <h2 className="text-xl font-bold tracking-tight">Market Runs Management</h2>
+              <h2 className="text-lg font-bold tracking-tight">Market Runs Management</h2>
               <p className="text-xs text-[#858ba0]">Track, edit, and access live consignment registers.</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start rounded-full border border-[#e9ebf3] bg-white p-1 sm:self-auto">
@@ -231,7 +233,7 @@ export default function DashboardPage() {
         </section>
       </main>
 
-      <footer className="mt-1 border-t border-[#e9ebf3] bg-white">
+      <footer className="mt-1 w-full border-t border-[#e9ebf3] bg-white">
         <div className="mx-auto flex max-w-[1280px] flex-col justify-between gap-3 px-4 py-4 text-[10px] text-[#858ba0] sm:flex-row sm:items-center sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center gap-2">
             <span>ConsignDesk Stalls © 2025</span>
