@@ -1,5 +1,6 @@
 "use client";
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Store,
   ShieldAlert,
@@ -13,13 +14,11 @@ import {
   Lock,
   Trash2,
   Undo2,
-  ArrowLeft,
   ShoppingBag,
   History,
   Lightbulb,
   Receipt,
   UserPlus,
-  Save,
   X,
   PlusCircle,
   Leaf,
@@ -41,8 +40,6 @@ import {
   Check,
   Minus
 } from 'lucide-react';
-import Navbar from '@/app/components/navbar';
-import Footer from "@/app/components/footer";
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
   const Suppliers = [
@@ -288,8 +285,6 @@ export default function SalesRunDetail() {
   const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
-  const [supplierFormOpen, setSupplierFormOpen] = useState(false);
-  const [newSupplierName, setNewSupplierName] = useState("");
 
   //State สำหรับ Toggle Sales Mode / Edit Mode
   const [stepMode, setStepMode] = useState("sales");
@@ -303,8 +298,6 @@ export default function SalesRunDetail() {
   const [previousActions, setPreviousActions] = useState<{supplierId: string; productId: string; productName: string; quantity: number; time:string }[]>([]);
   // End Sales Run Modal
   const [isEndRunOpen, setIsEndRunOpen] = useState(false);
-const inputClass ="min-w-0 rounded-lg border  bg-white px-2 py-1.5 text-[8px] text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
-const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
   const joinPin = '88X2-901';
   // Toggle Switches State
@@ -318,9 +311,6 @@ const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:
     restockQuantities: true,
     addNewProducts: false
   });
-   const addSupplier = () => {
-    
-  };
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -443,230 +433,217 @@ const handleSell = (id: string) => {
 };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans pb-20">
-      {/* 1. TOP NAVBAR */}
-      <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
-        <Suspense fallback={<div>Loading...</div>}>
-       <Navbar />
-       </Suspense>
-      </header>
-
-      {/* MAIN CONTAINER */}
-      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6 mt-5">
+    <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans">
+      <main className="mx-auto max-w-[1280px] space-y-3 px-2 pb-2 pt-0">
         
         {/* TOP HEADER SECTION CARD */}
-        <div className="bg-white rounded-2xl p-6 border border-purple-100/60 shadow-sm space-y-6">
+        <div className="space-y-2 rounded-xl border border-[#e9e5f7] bg-white px-2 pb-2 pt-0 shadow-sm">
           {/* Title row */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <button onClick={() => {window.history.back();}} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors mt-0.5">
-                <ArrowLeft className="w-4 h-4" />
-              </button>
+          <div className="flex flex-col gap-2 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
+            <div className="min-w-0">
               <div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <h1 className="text-[15px] font-extrabold leading-5 tracking-tight text-[#111747]">
                     {StockList[0].name}
                   </h1>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${stepMode === "sales" ? "bg-green-50 text-green-600 border border-green-200/60" : "bg-amber-50 text-amber-600 border border-amber-200/60"} flex items-center gap-1`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${stepMode === "sales" ? "bg-green-500" : "bg-amber-500"}`}></span>
-                     {stepMode === "sales" ? "SALES MODE" : "EDIT MODE"}
+                  <span className="flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0 text-[7px] font-bold text-emerald-600">
+                    <span className="h-1 w-1 rounded-full bg-emerald-500"></span>
+                     LIVE RUN
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-purple-600 font-medium mt-1.5">
-                  <span className="bg-purple-50 px-2.5 py-1 rounded-full flex items-center gap-1 border border-purple-100">
-                    <User className="w-3 h-3" /> 1 Assistant
+                <div className="mt-1 flex items-center gap-1 text-[7px] font-semibold text-[#7957ff]">
+                  <span className="flex items-center gap-1 rounded-full border border-[#e8e1ff] bg-[#f4f0ff] px-1.5 py-0">
+                    <User className="h-2 w-2" /> 1 Assistant
                   </span>
-                  <button  onClick={() => setIsOpen(true)} className="hover:underline font-semibold">+ Invite</button>
+                  <button onClick={() => setIsOpen(true)} className="font-semibold hover:underline">+ Invite</button>
                 </div>
               </div>
             </div>
 
             {/* Top Right Mode Toggle Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5">
               <div
-                className="relative flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 shadow-inner"
+                className="flex items-center gap-0.5 rounded-lg border border-[#e8e2fa] bg-[#f5f2ff] p-0.5"
                 role="group"
                 aria-label="Run mode"
               >
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-y-1 w-[calc(50%-0.25rem)] rounded-lg bg-white shadow-sm transition-transform duration-300 ease-out ${
-                    stepMode === "sales" ? "translate-x-0" : "translate-x-full"
-                  }`}
-                />
                 <button
                   type="button"
                   onClick={() => setStepMode("sales")}
                   aria-pressed={stepMode === "sales"}
-                  className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                  className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[8px] font-bold transition-colors ${
                     stepMode === "sales"
-                      ? "text-purple-700"
+                      ? "bg-[#7957ff] text-white shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <ShoppingBag className="h-3.5 w-3.5" /> Sales Mode
+                  <ShoppingBag className="h-2.5 w-2.5" /> Sales Mode
                 </button>
                 <button
                   type="button"
                   onClick={() => setStepMode("edit")}
                   aria-pressed={stepMode === "edit"}
-                  className={`relative z-10 flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                  className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[8px] font-bold transition-colors ${
                     stepMode === "edit"
-                      ? "text-purple-700"
+                      ? "bg-[#7957ff] text-white shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <Receipt className="h-3.5 w-3.5" /> Edit Mode
+                  <Receipt className="h-2.5 w-2.5" /> Edit Mode
                 </button>
               </div>
               <button 
                 type="button" 
                 onClick={() => setIsEndRunOpen(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-rose-100 px-3.5 py-1.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-50">
-                <X className="h-3.5 w-3.5" /> End Run
+                className="flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-1.5 py-0.5 text-[8px] font-bold text-rose-500 transition-colors hover:bg-rose-100">
+                <X className="h-2.5 w-2.5" /> End Run
               </button>
             </div>
           </div>
 
           {/* Key Stat Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-1.5 rounded-lg bg-[#f7f4ff] p-1.5 min-[600px]:grid-cols-3">
             {/* Gross Intake */}
-            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
+            <div className="flex min-h-[42px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-1">
               <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">GROSS INTAKE</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">฿{StockList[0].grossIntake.toLocaleString('en-US')}</p>
+                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">GROSS INTAKE</p>
+                <p className="mt-0.5 text-sm font-extrabold text-[#111747]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
               </div>
-              <div className="p-2.5 bg-purple-100/60 text-purple-600 rounded-xl">
-                <Receipt className="w-5 h-5" />
+              <div className="rounded-md bg-purple-100/60 p-1 text-purple-600">
+                <Receipt className="h-2.5 w-2.5" />
               </div>
             </div>
 
             {/* Total Sold Units */}
-            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
+            <div className="flex min-h-[42px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-1">
               <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL SOLD UNITS</p>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-black text-slate-900">{StockList[0].totalsold}</span>
-                  <span className="text-xs text-slate-400 font-medium">/ {StockList[0].totalsoldMax} starting</span>
+                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">TOTAL SOLD UNITS</p>
+                <div className="mt-0.5 flex items-baseline gap-1">
+                  <span className="text-sm font-extrabold text-[#111747]">{StockList[0].totalsold}</span>
+                  <span className="text-[7px] font-medium text-slate-400">/ {StockList[0].totalsoldMax} starting</span>
                 </div>
               </div>
-              <div className="p-2.5 bg-amber-100/60 text-amber-600 rounded-xl">
-                <ShoppingBag className="w-5 h-5" />
+              <div className="rounded-md bg-amber-100/60 p-1 text-amber-600">
+                <ShoppingBag className="h-2.5 w-2.5" />
               </div>
             </div>
 
             {/* Latest Action & Undo */}
-            <div className="bg-slate-50/70 rounded-xl p-4 border border-slate-100 flex justify-between items-center">
-              <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <History className="w-3 h-3 text-purple-500" /> LATEST ACTION
+            <div className="flex min-h-[42px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white px-2 py-1">
+              <div className="min-w-0">
+                <p className="flex items-center gap-1 text-[7px] font-bold uppercase tracking-wide text-slate-400">
+                  <History className="h-2 w-2 text-pink-500" /> LATEST ACTION
                 </p>
-                <p className="text-xs font-semibold text-slate-800 mt-1">
+                <p className="mt-0.5 truncate text-[8px] font-semibold text-slate-800">
                   {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : 'No actions yet'}
                 </p>
-                <span className="inline-block mt-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
+                <span className="mt-0.5 inline-block rounded-full bg-rose-50 px-1 py-0.5 text-[7px] font-bold text-rose-500">
                   {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
                 </span>
               </div>
-              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`px-3 py-1.5 ${previousActions.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-amber-400 hover:bg-amber-500'}   text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1`}>
-                <Undo2 className="w-3.5 h-3.5" /> Undo
+              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[8px] font-bold text-white transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400' : 'bg-amber-400 hover:bg-amber-500'}`}>
+                <Undo2 className="h-2 w-2" /> Undo
               </button>
             </div>
           </div>
         </div>
 
         {/* CONTENT SECTION: SIDEBAR + MAIN TABLES */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-[142px_minmax(0,1fr)] lg:grid-cols-[210px_minmax(0,1fr)]">
           
           {/* LEFT SIDEBAR / CATALOG INDEX */}
-          <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2">
+          <div className="space-y-2.5">
+            <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
+              <h3 className="px-1.5 text-[8px] font-bold uppercase tracking-wider text-slate-400">
                 CATALOG INDEX
               </h3>
               
-              <nav className="space-y-1">
-                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-purple-50 text-purple-700 font-semibold text-xs border border-purple-100">
-                  <div className="flex items-center gap-2.5">
-                    <LayoutGrid className="w-4 h-4 text-purple-600" />
+              <nav className="mt-1 space-y-0">
+                <button className="flex w-full items-center justify-between rounded-lg border border-purple-100 bg-purple-50 px-2 py-1 text-left text-[9px] font-semibold text-purple-700">
+                  <div className="flex items-center gap-1.5">
+                    <LayoutGrid className="h-3 w-3 text-purple-600" />
                     <span>All Products</span>
                   </div>
-                  <span className="bg-purple-200/60 text-purple-800 px-2 py-0.5 rounded-full text-[10px] font-bold">8</span>
+                  <span className="rounded-full bg-purple-200/60 px-1.5 py-0.5 text-[8px] font-bold text-purple-800">8</span>
                 </button>
 
-                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <User className="w-4 h-4 text-slate-400" />
+                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                  <div className="flex items-center gap-1.5">
+                    <User className="h-3 w-3 text-slate-400" />
                     <span>My Products (Host)</span>
                   </div>
                 </button>
 
-                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <Store className="w-4 h-4 text-pink-400" />
+                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                  <div className="flex items-center gap-1.5">
+                    <Store className="h-3 w-3 text-pink-400" />
                     <span>P Kaimook</span>
                   </div>
                 </button>
 
-                <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 text-xs font-medium transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <Store className="w-4 h-4 text-amber-400" />
+                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                  <div className="flex items-center gap-1.5">
+                    <Store className="h-3 w-3 text-amber-400" />
                     <span>Nong Japan</span>
                   </div>
                 </button>
               </nav>
 
-              {supplierFormOpen ? (
-                  <form
-                    className="flex gap-1 pt-1"
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      addSupplier();
-                    }}
-                  >
-                    <input
-                      autoFocus
-                      required
-                      value={newSupplierName}
-                      onChange={(event) => setNewSupplierName(event.target.value)}
-                      aria-label="New supplier name"
-                      placeholder="Supplier name"
-                      className={`${inputClass} ${inputClass2} flex-1`}
-                    />
-                    <button type="submit" aria-label="Add supplier" className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg bg-[#7957ff] text-white hover:bg-[#6642ed]">
-                      <Plus className="h-3 w-3" />
-                    </button>
-                  </form>
-                ) : (
-                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-[8px] font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
-                    <UsersRound className="h-2.5 w-2.5" /> + Add Supplier
-                  </button>
-                )}
-
-              <button onClick={()=>setStepMode("expense")} className="w-full py-2.5 px-3 bg-rose-50/60 hover:bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs transition-colors flex items-center justify-between border border-rose-100">
-                <div className="flex items-center gap-2">
-                  <Receipt className="w-4 h-4 text-rose-500" />
+              <button onClick={()=>setStepMode("expense")} className="mt-1 flex w-full items-center justify-between rounded-lg border border-rose-100 bg-orange-50 px-2 py-1 text-[9px] font-semibold text-orange-600 transition-colors hover:bg-orange-100">
+                <div className="flex items-center gap-1.5">
+                  <Receipt className="h-3 w-3 text-orange-500" />
                   <span>Booth Expenses</span>
                 </div>
-                <span>›</span>
+                <ChevronDown className="h-2.5 w-2.5 -rotate-90" />
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
+              <div className="flex items-center justify-between text-[9px] font-bold text-[#111747]">
+                <span className="flex items-center gap-1.5"><UsersRound className="h-3 w-3 text-purple-500" /> Assistants</span>
+                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[8px] text-emerald-600">• 1 Active</span>
+              </div>
+              <div className="mt-1.5 flex items-center justify-between rounded-lg bg-slate-50 px-1.5 py-0.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#7957ff] text-[8px] font-bold text-white">P</span>
+                  <div>
+                    <p className="text-[8px] font-bold leading-3 text-slate-700">Ploy W.</p>
+                    <p className="text-[7px] leading-3 text-slate-400">Cashier Mode</p>
+                  </div>
+                </div>
+                <span className="text-[7px] font-semibold text-emerald-600">• Online</span>
+              </div>
+              <button onClick={() => setIsOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-md bg-amber-400 px-2 py-0.5 text-[8px] font-bold text-slate-900 hover:bg-amber-500">
+                <UserPlus className="h-2.5 w-2.5" /> + Invite Assistant
+              </button>
+              <button onClick={() => setIsPermissionEnabled(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-md border border-[#e8e1ff] bg-[#f4f0ff] px-2 py-0.5 text-[8px] font-bold text-[#7957ff] hover:bg-[#ebe4ff]">
+                <ShieldCheck className="h-2.5 w-2.5" /> Manage Permissions
               </button>
             </div>
 
             {/* Quick Tip Box */}
-            <div className="bg-amber-50/60 border border-amber-200/60 rounded-2xl p-4 flex gap-3">
-              <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div className="text-xs space-y-1">
-                <p className="font-bold text-amber-900">Quick Tip</p>
-                <p className="text-amber-700/80 leading-relaxed">
+            <div className="flex gap-1.5 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
+              <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
+              <div className="space-y-0.5 text-[6px]">
+                <p className="font-bold text-[#111747]">Quick Tip</p>
+                <p className="leading-snug text-slate-400">
                   Click supplier tab to jump directly to items. Click action button to register immediate sales.
                 </p>
               </div>
             </div>
+
+            <Link href="/ViewUser/1" className="flex items-center justify-between rounded-lg bg-gradient-to-r from-[#b656ed] to-[#df67dc] px-2.5 py-2 text-white shadow-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
+                <span><span className="block text-[8px] font-bold">Sales Activity Board</span><span className="block text-[7px] text-white/80">Enter live sales feed & telemetry</span></span>
+              </span>
+              <span className="text-xs">→</span>
+            </Link>
           </div>
 
           {/* RIGHT PRODUCT LIST TABLES */}
           {/* Product cards for each supplier  Edit Mode*/}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="min-w-0 space-y-3">
             
             {/* 1. SECTION: MY PRODUCTS */}
             {stepMode === "edit" && (
@@ -692,7 +669,7 @@ const handleSell = (id: string) => {
                {/* Product cards for each supplier  Sales Mode*/}
                
 {stepMode === "sales" && (
-  <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans max-w-4xl mx-auto space-y-4">
+  <div className="w-full space-y-2">
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
@@ -890,26 +867,6 @@ const handleSell = (id: string) => {
             
         </div>
       </main>
-
-      {/* FOOTER BAR FOR UNSAVED MODIFICATIONS */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-3 px-8 z-40 flex items-center justify-between shadow-lg">
-        <div className="flex items-center space-x-2 text-xs font-semibold text-purple-600">
-          <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
-          <span>3 Unsaved Modifications</span>
-          <span className="text-slate-400 font-normal">
-            • Live run updates will apply instantly to register
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 rounded-xl text-xs font-bold text-rose-500 border border-rose-200 hover:bg-rose-50 transition-colors">
-            Discard Changes
-          </button>
-          <button className="px-5 py-2 rounded-xl text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors shadow-sm flex items-center gap-1.5">
-            <Save className="w-4 h-4" /> Apply to Run
-          </button>
-        </div>
-      </footer>
 
       {isOpen && (
         <SupplierInviteModal
@@ -1230,18 +1187,18 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
   const isOutOfStock = item.stock === 0;
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-slate-100/80 shadow-2xs hover:shadow-md transition-shadow flex items-center justify-between">
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-100/80 bg-white p-2 shadow-2xs transition-shadow hover:shadow-md">
       {/* Left Column: Icon + Name + Stock Info */}
-      <div className="flex items-center space-x-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.iconBg}`}>
-          <IconComponent className="w-6 h-6" />
+      <div className="flex min-w-0 items-center gap-2">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
+          <IconComponent className="h-3.5 w-3.5" />
         </div>
 
-        <div className="space-y-0.5">
-          <h3 className="font-bold text-slate-900 text-sm tracking-tight">
+        <div className="min-w-0 space-y-0.5">
+          <h3 className="truncate text-[9px] font-bold tracking-tight text-[#111747]">
             {item.name}
           </h3>
-          <div className="flex items-center space-x-1 text-xs text-slate-400 font-medium">
+          <div className="flex flex-wrap items-center gap-x-1 text-[7px] font-medium text-slate-400">
             <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
             <span className={isOutOfStock ? 'text-red-600 font-semibold' : 'text-purple-600 font-semibold'}>
@@ -1252,13 +1209,13 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
       </div>
 
       {/* Right Column: Price + Sold Count + Sell Button */}
-      <div className="flex items-center space-x-5">
+      <div className="flex shrink-0 items-center gap-2.5">
         <div className="text-right">
-          <div className="text-base font-black text-slate-900 flex items-center justify-end leading-none">
-            <span className="text-sm font-extrabold mr-0.5">฿</span>
+          <div className="flex items-center justify-end text-[11px] font-black leading-none text-[#111747]">
+            <span className="mr-0.5 text-[9px] font-extrabold">฿</span>
             {item.price}
           </div>
-          <p className="text-[11px] text-slate-400 font-medium mt-1">
+          <p className="mt-0.5 text-[7px] font-medium text-slate-400">
             Sold: <span className="font-bold text-slate-700">{item.sold}</span>
           </p>
         </div>
@@ -1266,7 +1223,7 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
         <button
           onClick={() => onSell(item.id)}
           disabled={isOutOfStock}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all active:scale-95 flex items-center gap-1 ${
+          className={`flex h-[18px] w-[60px] items-center justify-center gap-1 rounded-md text-[7px] font-bold text-white shadow-xs transition-all active:scale-95 ${
             isOutOfStock
               ? 'bg-gray-400 opacity-90 cursor-not-allowed'
               : 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800'
@@ -1692,26 +1649,30 @@ function SaleSection({
   const filteredProducts = products.filter(
     (item) => item && item.supplierId === id
   );
-
+  const accent = id.toLowerCase().includes("kaimook")
+    ? { dot: "bg-pink-400", count: "border-pink-100 bg-pink-50 text-pink-500" }
+    : id.toLowerCase().includes("nong")
+      ? { dot: "bg-orange-400", count: "border-orange-100 bg-orange-50 text-orange-500" }
+      : { dot: "bg-purple-500", count: "border-purple-100 bg-purple-50 text-purple-600" };
 
 
   return (
-    <div className="pt-2 space-y-3">
+    <div className="space-y-2">
       {/* Header */}
-      <div className="bg-white rounded-2xl px-5 py-3 border border-slate-100/80 shadow-2xs flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+      <div className="flex items-center justify-between rounded-xl border border-slate-100/80 bg-white px-2.5 py-1.5 shadow-2xs">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className={`h-2 w-2 shrink-0 rounded-full ${accent.dot}`} />
 
-          <h2 className="font-bold text-slate-900 text-sm tracking-tight">
+          <h2 className="truncate text-[10px] font-bold tracking-tight text-[#111747]">
             {Name}
           </h2>
 
-          <span className="bg-purple-100/80 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-            {Role}
+          <span className="rounded-full bg-purple-100/80 px-1.5 py-0.5 text-[7px] font-bold text-purple-600">
+            {Role === "host" ? "Host" : "Supplier"}
           </span>
         </div>
 
-        <span className="bg-amber-50 text-amber-600 border border-amber-100 px-3 py-0.5 rounded-full text-xs font-bold">
+        <span className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[8px] font-bold ${accent.count}`}>
           {filteredProducts.length} items
         </span>
       </div>

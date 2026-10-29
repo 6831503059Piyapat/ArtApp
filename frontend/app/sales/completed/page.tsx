@@ -175,7 +175,8 @@ export default function CompletedRunsPage() {
             <div className="mt-[2px] flex flex-col gap-[10px]">
               {filteredRuns.length > 0 ? (
                 filteredRuns.map((run) => (
-                  <div key={run.id} className="min-h-[120px] rounded-[14px] border border-creatory-border bg-white px-4 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div key={run.id} className="rounded-[14px] border border-creatory-border bg-white px-4 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)]">
+                    <div className="flex min-w-0 flex-col gap-3 px-2 py-1 sm:px-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex min-w-0 flex-col gap-1 md:flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary/20 bg-creatory-lavender px-1.5 py-0.5 text-[10px] font-bold text-primary">
@@ -183,7 +184,7 @@ export default function CompletedRunsPage() {
                           Settled & Closed
                         </span>
                       </div>
-                      <h2 className="mt-0.5 text-sm font-bold leading-5 tracking-tight">{run.title} ({run.shortDay})</h2>
+                      <h2 className="mt-0.5 text-sm font-bold leading-5 tracking-tight sm:text-base">{run.title} ({run.shortDay})</h2>
                       <p className="text-[10px] text-creatory-gray">{run.date}</p>
                     </div>
                     
@@ -206,6 +207,7 @@ export default function CompletedRunsPage() {
                         <span>View Run Breakdown</span>
                         <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
                       </Link>
+                    </div>
                     </div>
                   </div>
                 ))

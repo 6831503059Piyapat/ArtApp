@@ -2,7 +2,7 @@
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
 import Footer from "@/app/components/footer";
-import { useState, type FormEvent ,Suspense} from "react";
+import { useState, type FormEvent } from "react";
 import {
   CalendarDays,
   Check,
@@ -80,7 +80,7 @@ const accentStyles = {
   },
 };
 
-const inputClass ="min-w-0 rounded-lg border  bg-white px-2 py-1.5 text-xs text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
+const inputClass ="min-w-0 rounded-lg border  bg-white px-2.5 py-2 text-sm text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
 const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
 export default function CreateSalesRun() {
@@ -182,23 +182,26 @@ export default function CreateSalesRun() {
     <div className="min-h-screen bg-[#f7f8fc] pb-20 font-sans text-[#111747]">
       
       
-      <Suspense fallback={<div>Loading...</div>}>
-       <Navbar />
-      </Suspense>
+      <Navbar />
       
-      <main className="mx-auto w-full max-w-[1280px] px-[18px] pt-5 md:w-[85%]">
-        
+      <main className="mx-auto w-full max-w-[1280px] px-4 pt-[84px] sm:px-6 md:w-[85%] lg:px-8">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#111747]">Create Sales Run</h1>
+          <span className="rounded-full border border-[#ded3ff] bg-[#f1edff] px-3 py-1.5 text-sm font-semibold text-[#7957ff]">
+            Step by step
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[147px_minmax(0,1fr)] mt-15 " >
+        <div className="mt-4 grid grid-cols-1 items-start gap-3 sm:grid-cols-[170px_minmax(0,1fr)]">
           <aside className="space-y-2 sm:sticky sm:top-[54px]">
             <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
-              <h2 className="mb-1 px-1 text-[10px] font-bold uppercase tracking-wide text-[#858ba0]">Sections &amp; Inventory</h2>
+              <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]">Catalog Index</h2>
               <div className="space-y-0.5">
-                <a href="#run-details" className="flex items-center gap-1.5 rounded-lg border border-[#ded3ff] bg-[#f1edff] px-1.5 py-1.5 text-[10px] font-semibold text-[#111747]">
+                <a href="#run-details" className="flex items-center gap-1.5 rounded-lg border border-[#ded3ff] bg-[#f1edff] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
                   <Store className="h-2.5 w-2.5 text-[#7957ff]" /> Run Details
                 </a>
                 {sections.map((section) => (
-                  <a key={section.id} href={`#${section.id}`} className="flex items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-[10px] text-[#4c526a] hover:bg-[#f7f5ff]">
+                  <a key={section.id} href={`#${section.id}`} className="flex items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-xs text-[#4c526a] hover:bg-[#f7f5ff]">
                     {section.id === "host"
                       ? <UserRound className="h-2.5 w-2.5 text-[#7957ff]" />
                       : <span className={`h-2 w-2 rounded-full ${accentStyles[section.accent].dot}`} />}
@@ -227,13 +230,13 @@ export default function CreateSalesRun() {
                     </button>
                   </form>
                 ) : (
-                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-[10px] font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
+                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-xs font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
                     <UsersRound className="h-2.5 w-2.5" /> + Add Supplier
                   </button>
                 )}
               </div>
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
-                <a href="#booth-expenses" className="flex items-center justify-between rounded-lg bg-[#fff4ef] px-1.5 py-1.5 text-[10px] font-semibold text-[#111747]">
+                <a href="#booth-expenses" className="flex items-center justify-between rounded-lg bg-[#fff4ef] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
                   <span className="flex items-center gap-1.5"><Receipt className="h-2.5 w-2.5 text-[#f15a24]" /> Booth Expenses</span>
                   <ChevronRight className="h-2.5 w-2.5 text-[#858ba0]" />
                 </a>
@@ -245,8 +248,8 @@ export default function CreateSalesRun() {
                 <Lightbulb className="h-3 w-3" />
               </span>
               <div>
-                <h3 className="text-[10px] font-bold">Quick Tip</h3>
-                <p className="mt-0.5 text-[10px] leading-[1.45] text-[#858ba0]">Click supplier tab to jump directly to items. Click action button to register immediate sales.</p>
+                <h3 className="text-xs font-bold">Quick Tip</h3>
+                <p className="mt-0.5 text-xs leading-[1.45] text-[#858ba0]">Click supplier tab to jump directly to items. Click action button to register immediate sales.</p>
               </div>
             </div>
           </aside>
@@ -255,9 +258,9 @@ export default function CreateSalesRun() {
             <section id="run-details" className="overflow-hidden rounded-xl border border-[#d9ceff] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
               <div className="h-[3px] bg-gradient-to-r from-[#7957ff] via-[#ed72bd] to-[#ffb84d]" />
               <div className="p-2.5">
-                <h2 className="rounded-md bg-gradient-to-r from-[#ffdb9c] via-[#f5b4cc] to-[#efa2dc] px-2.5 py-1 text-base font-bold leading-tight">Run’s Information</h2>
+                <h2 className="rounded-md bg-gradient-to-r from-[#ffdb9c] via-[#f5b4cc] to-[#efa2dc] px-3 py-1.5 text-lg font-extrabold leading-tight">Run’s Information</h2>
                 <div className="mt-2.5 space-y-2.5">
-                  <label className="block text-[10px] font-bold">
+                  <label className="block text-xs font-bold">
                     Run Name <span className="text-[#f15a24]">*</span>
                     <span className="relative mt-1 block">
                       <Store className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runNameError ? 'text-[#f15a24]':' text-[#7957ff]'}`} />
@@ -265,14 +268,14 @@ export default function CreateSalesRun() {
                     </span>
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                    <label className="block text-[10px] font-bold">
+                    <label className="block text-xs font-bold">
                       Run Date / Period
                       <span className="relative mt-1 block">
                         <CalendarDays className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runDateError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
                         <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} ${runDateError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
-                    <label className="block text-[10px] font-bold">
+                    <label className="block text-xs font-bold">
                       Booth Location
                       <span className="relative mt-1 block">
                         <MapPin className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runLocationError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
@@ -305,17 +308,17 @@ export default function CreateSalesRun() {
                 <div className="flex items-center gap-1.5">
                   <span className="flex h-4 w-4 items-center justify-center rounded-md bg-[#f15a24] text-white"><Receipt className="h-2.5 w-2.5" /></span>
                   <div>
-                    <h2 className="text-sm font-bold">Booth Expenses</h2>
-                    <p className="text-[10px] text-[#858ba0]">Shared expenses</p>
+                    <h2 className="text-base font-bold">Booth Expenses</h2>
+                    <p className="text-xs text-[#858ba0]">Shared expenses</p>
                   </div>
                 </div>
-                <span className="rounded-full border border-[#ffd3c5] bg-[#ffe7dc] px-2 py-1 text-[10px] text-[#e34d1b]">
+                <span className="rounded-full border border-[#ffd3c5] bg-[#ffe7dc] px-2 py-1 text-xs text-[#e34d1b]">
                   Total Overhead: <strong className="ml-1">฿{totalExpenses.toLocaleString()}</strong>
                 </span>
               </div>
               <div className="mx-2.5 overflow-x-auto rounded-lg border border-[#e7e9f1] bg-white">
                 <table className="w-full min-w-[360px] text-left">
-                  <thead className="bg-[#f7f8fc] text-[10px] font-bold uppercase text-[#111747]">
+                  <thead className="bg-[#f7f8fc] text-xs font-bold uppercase text-[#111747]">
                     <tr>
                       <th className="px-2 py-1.5">Expense Item</th>
                       <th className="px-2 py-1.5">Category</th>
@@ -325,9 +328,9 @@ export default function CreateSalesRun() {
                   </thead>
                   <tbody className="divide-y divide-[#eff0f5]">
                     {expenses.map((expense) => (
-                      <tr key={expense.id} className="text-xs hover:bg-[#fffaf8]">
+                      <tr key={expense.id} className="text-sm hover:bg-[#fffaf8]">
                         <td className="px-2 py-2 font-medium">{expense.name}</td>
-                        <td className="px-2 py-2 text-[10px] text-[#858ba0]">{expense.category}</td>
+                        <td className="px-2 py-2 text-xs text-[#858ba0]">{expense.category}</td>
                         <td className="px-2 py-2 text-right font-semibold text-[#f15a24]">฿{expense.amount.toLocaleString()}</td>
                         <td className="px-2 py-2 text-center">
                           <button type="button" aria-label={`Remove ${expense.name}`} onClick={() => setExpenses((current) => current.filter((item) => item.id !== expense.id))} className="text-[#a3a8b6] hover:text-[#e34d1b]">
@@ -337,7 +340,7 @@ export default function CreateSalesRun() {
                       </tr>
                     ))}
                     {expenses.length === 0 && (
-                      <tr><td colSpan={4} className="px-2 py-3 text-center text-xs text-[#858ba0]">No expenses added yet</td></tr>
+                      <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]">No expenses added yet</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -350,7 +353,7 @@ export default function CreateSalesRun() {
                   <option>Travel</option>
                 </select>
                 <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder="Amount ฿" className={`${inputClass} ${inputClass2} flex-[1_1_55px]`} />
-                <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-2.5 py-1.5 text-[10px] font-semibold text-white transition hover:bg-[#df4e1c]">
+                <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#df4e1c]">
                   <Plus className="h-2.5 w-2.5" /> Add Expense
                 </button>
               </form>
@@ -364,7 +367,7 @@ export default function CreateSalesRun() {
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
         
         <div className="mx-auto flex min-h-[38px] w-full max-w-[1280px] items-center justify-between gap-2 px-[18px] py-1.5 md:w-[85%]">
-          <div className="flex min-w-0 items-center gap-2 text-[10px]">
+          <div className="flex min-w-0 items-center gap-2 text-xs">
             <span className="flex shrink-0 items-center gap-1 font-semibold text-[#7957ff]">
               <Check className="h-2.5 w-2.5" /> All changes saved
             </span>
@@ -374,7 +377,7 @@ export default function CreateSalesRun() {
           </div>
           <div className="flex shrink-0 gap-1.5">
             <button type="button" className="rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-[10px] font-semibold text-[#e34d55] hover:bg-[#ffebeb]">Cancel</button>
-            <button type="button" onClick={() => hamdleSubmit()} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-1.5 text-[10px] font-bold text-[#111747] shadow-sm hover:brightness-105">
+            <button type="button" onClick={() => hamdleSubmit()} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm hover:brightness-105">
               <Rocket className="h-2.5 w-2.5" /> {launched ? "Launched" : "Launch Run"}
             </button>
           </div>
@@ -417,17 +420,17 @@ function ProductSection({
     <section id={section.id} className="overflow-hidden rounded-xl border border-[#e6e9f2] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
       <div className="flex items-center justify-between gap-2 px-2.5 py-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${accent.number}`}>{index}</span>
-          <h2 className="truncate text-sm font-bold">{section.name}</h2>
-          <span className={`shrink-0 rounded-full px-1 py-0.5 text-[10px] font-medium ${accent.badge}`}>{section.role}</span>
+          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${accent.number}`}>{index}</span>
+          <h2 className="truncate text-base font-extrabold">{section.name}</h2>
+          <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium ${accent.badge}`}>{section.role}</span>
         </div>
-        <button type="button" className="flex shrink-0 items-center gap-1 rounded-full border border-[#e7ddff] bg-[#f7f3ff] px-1.5 py-1 text-[10px] font-medium text-[#7957ff] hover:bg-[#eee7ff]">
+        <button type="button" className="flex shrink-0 items-center gap-1 rounded-full border border-[#e7ddff] bg-[#f7f3ff] px-2 py-1.5 text-xs font-semibold text-[#7957ff] hover:bg-[#eee7ff]">
           <FileDown className="h-2 w-2" /> Import CSV
         </button>
       </div>
       <div className="mx-2.5 overflow-x-auto rounded-lg border border-[#e7e9f1]">
         <table className="w-full min-w-[360px] text-left">
-          <thead className="bg-[#f7f8fc] text-[10px] font-bold uppercase text-[#111747]">
+          <thead className="bg-[#f7f8fc] text-xs font-bold uppercase text-[#111747]">
             <tr>
               <th className="px-2 py-1.5">Product Name</th>
               <th className="w-[13%] px-2 py-1.5 text-center">Qty</th>
@@ -437,13 +440,13 @@ function ProductSection({
           </thead>
           <tbody className="divide-y divide-[#eff0f5]">
             {section.products.map((product) => (
-              <tr key={product.id} className="text-xs hover:bg-[#fcfbff]">
+              <tr key={product.id} className="text-sm hover:bg-[#fcfbff]">
                 <td className="px-2 py-2">
                   <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${accent.dot}`} />
                   <span className="font-medium">{product.name}</span>
                 </td>
                 <td className="px-2 py-2 text-center">
-                  <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${accent.badge}`}>{product.quantity}</span>
+                  <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${accent.badge}`}>{product.quantity}</span>
                 </td>
                 <td className="px-2 py-2 text-right font-semibold">฿{product.price.toLocaleString()}</td>
                 <td className="px-2 py-2 text-center">
@@ -454,7 +457,7 @@ function ProductSection({
               </tr>
             ))}
             {section.products.length === 0 && (
-              <tr><td colSpan={4} className="px-2 py-3 text-center text-xs text-[#858ba0]">No products added yet</td></tr>
+              <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]">No products added yet</td></tr>
             )}
           </tbody>
         </table>
@@ -464,7 +467,7 @@ function ProductSection({
         <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder="Qty" className={`${inputClass} ${inputClass2} flex-[1_1_42px]`} />
         <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Price ฿" className={`${inputClass} ${inputClass2} flex-[1_1_52px]`} />
         <input hidden value={section.id} onChange={(e)=>setOwnerP(e.target.value)}/>
-        <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-2.5 py-1.5 text-[10px] font-semibold text-white transition hover:bg-[#6642ed]">
+        <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#6642ed]">
           <Plus className="h-2.5 w-2.5" /> Add Product
         </button>
       </form>
