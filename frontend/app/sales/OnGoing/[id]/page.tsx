@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
+  ChevronRight,
   Store,
   ShieldAlert,
   ChevronDown,
@@ -40,6 +41,8 @@ import {
   Check,
   Minus
 } from 'lucide-react';
+import Navbar from '@/app/components/navbar';
+import Footer from '@/app/components/footer';
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
   const Suppliers = [
@@ -60,7 +63,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 10,
       icon: Leaf,
-      iconBg: 'bg-purple-100/70 text-purple-600',
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
       supplierId: "host-8466468345"
     },
     {
@@ -71,7 +74,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 9,
       icon: Sun,
-      iconBg: 'bg-amber-100/70 text-amber-500',
+      iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
       supplierId: "host-8466468345"
       
     },
@@ -83,7 +86,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 4,
       icon: Mountain,
-      iconBg: 'bg-purple-100/70 text-purple-600',
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
       supplierId: "host-8466468345"
      
     },
@@ -105,7 +108,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 10,
       icon: Leaf,
-      iconBg: 'bg-purple-100/70 text-purple-600',
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
       supplierId: "kaimook-8466468345"
      
     },
@@ -117,7 +120,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 9,
       icon: Sun,
-      iconBg: 'bg-amber-100/70 text-amber-500',
+      iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
       supplierId: "kaimook-8466468345"
      
     },
@@ -129,7 +132,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 4,
       icon: Mountain,
-      iconBg: 'bg-purple-100/70 text-purple-600',
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
       supplierId: "kaimook-8466468345"
     },
     ],
@@ -254,9 +257,9 @@ export default function SalesRunDetail() {
       id: '01',
       timestamp: '14/9/26 12:43:05',
       detail: 'Weekend Market Stall Rent',
-      dotColor: 'bg-amber-400',
+      dotColor: 'bg-[#FFB24C]',
       category: 'Booth Fee',
-      categoryBg: 'bg-orange-50 text-orange-600 border-orange-100',
+      categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
       loggedBy: 'Alex Chen',
       role: '(Host)',
       amount: '฿700.00'
@@ -265,9 +268,9 @@ export default function SalesRunDetail() {
       id: '02',
       timestamp: '14/9/26 15:10:20',
       detail: 'Ice bucket, string bags & tape',
-      dotColor: 'bg-purple-600',
+      dotColor: 'bg-[#7C5CFF]',
       category: 'Stall expense',
-      categoryBg: 'bg-orange-50 text-orange-600 border-orange-100',
+      categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
       loggedBy: 'Alex Chen',
       role: '(Host)',
       amount: '฿150.00'
@@ -433,37 +436,44 @@ const handleSell = (id: string) => {
 };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fe] text-slate-800 font-sans">
-      <main className="mx-auto max-w-[1280px] space-y-3 px-2 pb-2 pt-0">
+    <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
+      <Navbar />
+      <main className="mx-auto w-full max-w-[1280px] flex-1 space-y-5 px-4 pb-6 pt-16 sm:px-6">
         
         {/* TOP HEADER SECTION CARD */}
-        <div className="space-y-2 rounded-xl border border-[#e9e5f7] bg-white px-2 pb-2 pt-0 shadow-sm">
+        <div className="space-y-4 rounded-2xl border border-[#7C5CFF]/15 bg-white px-4 pb-4 pt-5 shadow-sm sm:px-5 sm:pb-5 sm:pt-6">
           {/* Title row */}
-          <div className="flex flex-col gap-2 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
+          <div className="flex flex-col gap-3 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
             <div className="min-w-0">
-              <div>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <h1 className="text-[15px] font-extrabold leading-5 tracking-tight text-[#111747]">
-                    {StockList[0].name}
-                  </h1>
-                  <span className="flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0 text-[7px] font-bold text-emerald-600">
-                    <span className="h-1 w-1 rounded-full bg-emerald-500"></span>
-                     LIVE RUN
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center gap-1 text-[7px] font-semibold text-[#7957ff]">
-                  <span className="flex items-center gap-1 rounded-full border border-[#e8e1ff] bg-[#f4f0ff] px-1.5 py-0">
-                    <User className="h-2 w-2" /> 1 Assistant
-                  </span>
-                  <button onClick={() => setIsOpen(true)} className="font-semibold hover:underline">+ Invite</button>
-                </div>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
+                  {StockList[0].name}
+                </h1>
+                <span className="flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                   LIVE RUN
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Top Right Mode Toggle Buttons */}
-            <div className="flex shrink-0 items-center gap-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-[#7C5CFF]">
+              <span className="flex items-center gap-1.5 rounded-full border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2.5 py-0.5">
+                <User className="h-3.5 w-3.5" /> 1 Assistant
+              </span>
+              <button
+                onClick={() => setIsOpen(true)}
+                className="rounded-lg border border-[#7C5CFF]/25 bg-[#7C5CFF]/10 px-2.5 py-1 font-bold text-[#7C5CFF] transition-colors hover:border-[#7C5CFF]/40 hover:bg-[#7C5CFF]/20 hover:text-[#0B0F4F]"
+              >
+                + Invite
+              </button>
+            </div>
+
+            {/* Run mode toggle buttons */}
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
               <div
-                className="flex items-center gap-0.5 rounded-lg border border-[#e8e2fa] bg-[#f5f2ff] p-0.5"
+                className="flex items-center gap-0.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 p-0.5"
                 role="group"
                 aria-label="Run mode"
               >
@@ -471,173 +481,178 @@ const handleSell = (id: string) => {
                   type="button"
                   onClick={() => setStepMode("sales")}
                   aria-pressed={stepMode === "sales"}
-                  className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[8px] font-bold transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors ${
                     stepMode === "sales"
-                      ? "bg-[#7957ff] text-white shadow-sm"
+                      ? "bg-[#7C5CFF] text-white shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <ShoppingBag className="h-2.5 w-2.5" /> Sales Mode
+                  <ShoppingBag className="h-3.5 w-3.5" /> Sales Mode
                 </button>
                 <button
                   type="button"
                   onClick={() => setStepMode("edit")}
                   aria-pressed={stepMode === "edit"}
-                  className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[8px] font-bold transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors ${
                     stepMode === "edit"
-                      ? "bg-[#7957ff] text-white shadow-sm"
+                      ? "bg-[#7C5CFF] text-white shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <Receipt className="h-2.5 w-2.5" /> Edit Mode
+                  <Receipt className="h-3.5 w-3.5" /> Edit Mode
                 </button>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setIsEndRunOpen(true)}
-                className="flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-1.5 py-0.5 text-[8px] font-bold text-rose-500 transition-colors hover:bg-rose-100">
-                <X className="h-2.5 w-2.5" /> End Run
+                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#F062C0]/30 bg-[#F062C0]/10 px-2.5 py-1.5 text-xs font-bold text-[#F062C0] transition-colors hover:bg-[#F062C0]/20"
+              >
+                <X className="h-3.5 w-3.5" /> End Run
               </button>
             </div>
           </div>
 
           {/* Key Stat Cards Grid */}
-          <div className="grid grid-cols-1 gap-1.5 rounded-lg bg-[#f7f4ff] p-1.5 min-[600px]:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4">
             {/* Gross Intake */}
-            <div className="flex min-h-[42px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-1">
+            <div className="flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
-                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">GROSS INTAKE</p>
-                <p className="mt-0.5 text-sm font-extrabold text-[#111747]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Gross Intake</p>
+                <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
               </div>
-              <div className="rounded-md bg-purple-100/60 p-1 text-purple-600">
-                <Receipt className="h-2.5 w-2.5" />
+              <div className="rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
+                <Receipt className="h-4 w-4" />
               </div>
             </div>
 
             {/* Total Sold Units */}
-            <div className="flex min-h-[42px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-1">
+            <div className="flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
-                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">TOTAL SOLD UNITS</p>
-                <div className="mt-0.5 flex items-baseline gap-1">
-                  <span className="text-sm font-extrabold text-[#111747]">{StockList[0].totalsold}</span>
-                  <span className="text-[7px] font-medium text-slate-400">/ {StockList[0].totalsoldMax} starting</span>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Total Sold Units</p>
+                <div className="mt-0.5 flex items-baseline gap-1.5">
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">{StockList[0].totalsold}</span>
+                  <span className="text-xs font-medium text-slate-400">/ {StockList[0].totalsoldMax} starting</span>
                 </div>
               </div>
-              <div className="rounded-md bg-amber-100/60 p-1 text-amber-600">
-                <ShoppingBag className="h-2.5 w-2.5" />
+              <div className="rounded-md bg-[#FFB24C]/15 p-2 text-[#FFB24C]">
+                <ShoppingBag className="h-4 w-4" />
               </div>
             </div>
 
             {/* Latest Action & Undo */}
-            <div className="flex min-h-[42px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white px-2 py-1">
-              <div className="min-w-0">
-                <p className="flex items-center gap-1 text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  <History className="h-2 w-2 text-pink-500" /> LATEST ACTION
+            <div className="flex min-h-[76px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white py-2.5 pl-3 pr-5 shadow-sm min-[900px]:col-span-2">
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  <History className="h-3 w-3 text-[#F062C0]" /> Latest Action
                 </p>
-                <p className="mt-0.5 truncate text-[8px] font-semibold text-slate-800">
-                  {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : 'No actions yet'}
+                <p className="mt-0.5 flex min-w-0 items-center gap-2 truncate text-xs font-semibold text-slate-800">
+                  <span className="min-w-0 truncate">
+                    {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : 'No actions yet'}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-[#F062C0]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#F062C0]">
+                    {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
+                  </span>
                 </p>
-                <span className="mt-0.5 inline-block rounded-full bg-rose-50 px-1 py-0.5 text-[7px] font-bold text-rose-500">
-                  {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
-                </span>
               </div>
-              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[8px] font-bold text-white transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400' : 'bg-amber-400 hover:bg-amber-500'}`}>
-                <Undo2 className="h-2 w-2" /> Undo
+              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-[#FFB24C] hover:bg-[#f5a733]'}`}>
+                <Undo2 className="h-3.5 w-3.5" /> Undo
               </button>
             </div>
           </div>
         </div>
 
         {/* CONTENT SECTION: SIDEBAR + MAIN TABLES */}
-        <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-[142px_minmax(0,1fr)] lg:grid-cols-[210px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[210px_minmax(0,1fr)]">
           
           {/* LEFT SIDEBAR / CATALOG INDEX */}
-          <div className="space-y-2.5">
-            <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
-              <h3 className="px-1.5 text-[8px] font-bold uppercase tracking-wider text-slate-400">
-                CATALOG INDEX
+          <div className="space-y-4">
+            <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(11,15,79,0.025)]">
+              <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]">
+                Catalog Index
               </h3>
               
-              <nav className="mt-1 space-y-0">
-                <button className="flex w-full items-center justify-between rounded-lg border border-purple-100 bg-purple-50 px-2 py-1 text-left text-[9px] font-semibold text-purple-700">
+              <nav className="space-y-0.5">
+                <button className="flex w-full items-center justify-between gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/10 px-1.5 py-1.5 text-left text-xs font-semibold text-[#0B0F4F]">
                   <div className="flex items-center gap-1.5">
-                    <LayoutGrid className="h-3 w-3 text-purple-600" />
+                    <LayoutGrid className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>All Products</span>
                   </div>
-                  <span className="rounded-full bg-purple-200/60 px-1.5 py-0.5 text-[8px] font-bold text-purple-800">8</span>
+                  <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">8</span>
                 </button>
 
-                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
                   <div className="flex items-center gap-1.5">
-                    <User className="h-3 w-3 text-slate-400" />
+                    <User className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>My Products (Host)</span>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
                   <div className="flex items-center gap-1.5">
-                    <Store className="h-3 w-3 text-pink-400" />
+                    <Store className="h-2.5 w-2.5 shrink-0 text-[#F062C0]" />
                     <span>P Kaimook</span>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-[9px] font-medium text-slate-600 transition-colors hover:bg-slate-50">
+                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
                   <div className="flex items-center gap-1.5">
-                    <Store className="h-3 w-3 text-amber-400" />
+                    <Store className="h-2.5 w-2.5 shrink-0 text-[#FFB24C]" />
                     <span>Nong Japan</span>
                   </div>
                 </button>
               </nav>
 
-              <button onClick={()=>setStepMode("expense")} className="mt-1 flex w-full items-center justify-between rounded-lg border border-rose-100 bg-orange-50 px-2 py-1 text-[9px] font-semibold text-orange-600 transition-colors hover:bg-orange-100">
-                <div className="flex items-center gap-1.5">
-                  <Receipt className="h-3 w-3 text-orange-500" />
-                  <span>Booth Expenses</span>
-                </div>
-                <ChevronDown className="h-2.5 w-2.5 -rotate-90" />
-              </button>
+              <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
+                <button onClick={()=>setStepMode("expense")} className="flex w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-1.5 py-1.5 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20">
+                  <div className="flex items-center gap-1.5">
+                    <Receipt className="h-2.5 w-2.5 text-[#FFB24C]" />
+                    <span>Booth Expenses</span>
+                  </div>
+                  <ChevronDown className="h-2.5 w-2.5 -rotate-90 text-[#858ba0]" />
+                </button>
+              </div>
             </div>
 
             <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
-              <div className="flex items-center justify-between text-[9px] font-bold text-[#111747]">
-                <span className="flex items-center gap-1.5"><UsersRound className="h-3 w-3 text-purple-500" /> Assistants</span>
-                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[8px] text-emerald-600">• 1 Active</span>
+              <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-bold text-[#0B0F4F]">
+                <span className="flex items-center gap-1.5"><UsersRound className="h-3.5 w-3.5 text-[#7C5CFF]" /> Assistants</span>
+                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• 1 Active</span>
               </div>
-              <div className="mt-1.5 flex items-center justify-between rounded-lg bg-slate-50 px-1.5 py-0.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#7957ff] text-[8px] font-bold text-white">P</span>
+              <div className="mt-2 flex items-center justify-between gap-1.5 rounded-lg bg-slate-50 px-1.5 py-1.5">
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#7C5CFF] text-xs font-bold text-white">P</span>
                   <div>
-                    <p className="text-[8px] font-bold leading-3 text-slate-700">Ploy W.</p>
-                    <p className="text-[7px] leading-3 text-slate-400">Cashier Mode</p>
+                    <p className="text-xs font-bold leading-4 text-slate-700">Ploy W.</p>
+                    <p className="text-[10px] leading-3.5 text-slate-400">Cashier Mode</p>
                   </div>
                 </div>
-                <span className="text-[7px] font-semibold text-emerald-600">• Online</span>
+                <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• Online</span>
               </div>
-              <button onClick={() => setIsOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-md bg-amber-400 px-2 py-0.5 text-[8px] font-bold text-slate-900 hover:bg-amber-500">
-                <UserPlus className="h-2.5 w-2.5" /> + Invite Assistant
+              <button onClick={() => setIsOpen(true)} className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733]">
+                <UserPlus className="h-3 w-3 shrink-0" /> + Invite Assistant
               </button>
-              <button onClick={() => setIsPermissionEnabled(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-md border border-[#e8e1ff] bg-[#f4f0ff] px-2 py-0.5 text-[8px] font-bold text-[#7957ff] hover:bg-[#ebe4ff]">
-                <ShieldCheck className="h-2.5 w-2.5" /> Manage Permissions
+              <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Manage Permissions
               </button>
             </div>
 
             {/* Quick Tip Box */}
             <div className="flex gap-1.5 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
-              <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
-              <div className="space-y-0.5 text-[6px]">
-                <p className="font-bold text-[#111747]">Quick Tip</p>
+              <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FFB24C]" />
+              <div className="min-w-0 space-y-1 text-xs">
+                <p className="font-bold text-[#0B0F4F]">Quick Tip</p>
                 <p className="leading-snug text-slate-400">
                   Click supplier tab to jump directly to items. Click action button to register immediate sales.
                 </p>
               </div>
             </div>
 
-            <Link href="/ViewUser/1" className="flex items-center justify-between rounded-lg bg-gradient-to-r from-[#b656ed] to-[#df67dc] px-2.5 py-2 text-white shadow-sm">
-              <span className="flex items-center gap-1.5">
-                <span className="rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
-                <span><span className="block text-[8px] font-bold">Sales Activity Board</span><span className="block text-[7px] text-white/80">Enter live sales feed & telemetry</span></span>
+            <Link href="/ViewUser/1" className="flex items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-1.5 py-1.5 text-white shadow-sm">
+              <span className="flex min-w-0 items-start gap-1">
+                <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
+                <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5">Sales Activity Board</span><span className="block text-[9px] leading-3 text-white/80">Enter live sales feed &amp; telemetry</span></span>
               </span>
-              <span className="text-xs">→</span>
+              <ChevronRight className="h-3 w-3 shrink-0" />
             </Link>
           </div>
 
@@ -654,9 +669,9 @@ const handleSell = (id: string) => {
     key={items.id}
     title={items.name}
     badgeText={items.role}
-    badgeColor="bg-purple-100 text-purple-700"
+    badgeColor="bg-[#7C5CFF]/10 text-[#7C5CFF]"
     itemCount={items.products?.length ?? 0}
-    dotColor="bg-purple-600"
+    dotColor="bg-[#7C5CFF]"
     items={items.products ?? []}
     placeholderText="Item Name (e.g. Linen Coaster Set)"
   />
@@ -680,16 +695,16 @@ const handleSell = (id: string) => {
 )}
 
                {stepMode === "expense" && (
-                <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-slate-800 font-sans max-w-5xl mx-auto space-y-5">
+                <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-[#0B0F4F] font-sans max-w-5xl mx-auto space-y-5">
       
       {/* 1. HEADER CARD: Booth's Operating Expenses */}
       <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-orange-100/70 text-orange-500 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#FFB24C]/15 text-[#FFB24C] flex items-center justify-center shrink-0">
             <Wallet className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-xl font-bold text-[#0B0F4F] tracking-tight">
               Booth’s Operating Expenses
             </h1>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
@@ -699,7 +714,7 @@ const handleSell = (id: string) => {
         </div>
 
         {/* Status Badge */}
-        <div className="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full border border-purple-100 flex items-center gap-2 text-xs font-semibold">
+        <div className="bg-[#7C5CFF]/5 text-[#7C5CFF] px-3 py-1.5 rounded-full border border-[#7C5CFF]/20 flex items-center gap-2 text-xs font-semibold">
           <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span>Synchronized Ledger</span>
         </div>
@@ -709,7 +724,7 @@ const handleSell = (id: string) => {
       <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-2xs space-y-4">
         {/* Section Title */}
         <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
-          <PlusCircle className="w-4 h-4 text-orange-500" />
+          <PlusCircle className="w-4 h-4 text-[#FFB24C]" />
           <span>Fast Log Shared Expense</span>
         </div>
 
@@ -727,7 +742,7 @@ const handleSell = (id: string) => {
                 type="text"
                 value={expenseTitle}
                 onChange={(e) => setExpenseTitle(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-purple-500 transition-colors"
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-[#7C5CFF] transition-colors"
               />
             </div>
           </div>
@@ -741,7 +756,7 @@ const handleSell = (id: string) => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 appearance-none focus:bg-white focus:outline-purple-500 transition-colors pr-8 cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 appearance-none focus:bg-white focus:outline-[#7C5CFF] transition-colors pr-8 cursor-pointer"
               >
                 <option value="Stall Supplies">Stall Supplies</option>
                 <option value="Booth Fee">Booth Fee</option>
@@ -764,14 +779,14 @@ const handleSell = (id: string) => {
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-slate-800 text-right focus:bg-white focus:outline-purple-500 transition-colors"
+                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-slate-800 text-right focus:bg-white focus:outline-[#7C5CFF] transition-colors"
               />
             </div>
           </div>
 
           {/* Record Button */}
           <div className="md:col-span-2">
-            <button className="w-full py-2.5 bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-slate-900 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1">
+            <button className="w-full py-2.5 bg-[#FFB24C] hover:bg-[#f5a733] active:bg-[#e99a2e] text-[#0B0F4F] font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1">
               <Plus className="w-4 h-4 stroke-[3]" /> Record
             </button>
           </div>
@@ -783,8 +798,8 @@ const handleSell = (id: string) => {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
         {/* Card Header */}
         <div className="p-5 flex items-center justify-between border-b border-slate-100">
-          <div className="flex items-center space-x-2 text-slate-900 font-bold text-base">
-            <Receipt className="w-5 h-5 text-orange-500" />
+          <div className="flex items-center space-x-2 text-[#0B0F4F] font-bold text-base">
+            <Receipt className="w-5 h-5 text-[#FFB24C]" />
             <span>Recorded Expenses</span>
           </div>
           <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium">
@@ -808,7 +823,7 @@ const handleSell = (id: string) => {
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {expensesList.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 px-5 font-bold text-slate-900">{item.id}</td>
+                  <td className="py-4 px-5 font-bold text-[#0B0F4F]">{item.id}</td>
                   <td className="py-4 px-4 text-slate-400 text-[11px]">{item.timestamp}</td>
                   <td className="py-4 px-4">
                     <div className="flex items-center space-x-2">
@@ -823,9 +838,9 @@ const handleSell = (id: string) => {
                   </td>
                   <td className="py-4 px-4 text-center">
                     <span className="font-semibold text-slate-700">{item.loggedBy} </span>
-                    <span className="text-orange-500 font-bold text-[11px]">{item.role}</span>
+                    <span className="text-[#FFB24C] font-bold text-[11px]">{item.role}</span>
                   </td>
-                  <td className="py-4 px-5 text-right font-black text-slate-900 text-sm">
+                  <td className="py-4 px-5 text-right font-black text-[#0B0F4F] text-sm">
                     {item.amount}
                   </td>
                 </tr>
@@ -841,7 +856,7 @@ const handleSell = (id: string) => {
           </span>
           <div className="flex items-center space-x-1.5">
             <span className="text-slate-400 font-medium">Subtotal Logged:</span>
-            <span className="font-black text-orange-500 text-sm">฿850.00</span>
+            <span className="font-black text-[#FFB24C] text-sm">฿850.00</span>
           </div>
         </div>
       </div>
@@ -852,12 +867,12 @@ const handleSell = (id: string) => {
             {stepMode === "edit" &&(
             <div className="bg-slate-50/80 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 text-purple-600 rounded-xl">
+                <div className="p-2 bg-[#7C5CFF]/10 text-[#7C5CFF] rounded-xl">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
               </div>
-              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+              <button className="px-4 py-2 bg-[#7C5CFF] hover:bg-[#6847e8] text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
@@ -867,6 +882,8 @@ const handleSell = (id: string) => {
             
         </div>
       </main>
+
+      <Footer />
 
       {isOpen && (
         <SupplierInviteModal
@@ -932,11 +949,11 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
         {/* 1. MODAL HEADER */}
         <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100">
           <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-purple-500 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#7C5CFF] to-[#F062C0] text-white flex items-center justify-center shrink-0 shadow-sm">
               <UserPlus className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-snug">
+              <h2 className="text-lg font-bold text-[#0B0F4F] tracking-tight leading-snug">
                 Invite Run Assistants
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
@@ -968,12 +985,12 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                   RUN INVITE LINK
                 </label>
                 <div className="flex items-center gap-1.5">
-                  <div className="bg-purple-50/60 border border-purple-100/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 truncate w-full">
+                  <div                   className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 truncate w-full">
                     {inviteUrl}
                   </div>
                   <button
                     onClick={() => onCopy()}
-                    className="bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-slate-900 font-bold text-xs px-3 py-2 rounded-xl transition-colors shadow-xs flex items-center gap-1 shrink-0"
+                    className="bg-[#FFB24C] hover:bg-[#f5a733] active:bg-[#e99a2e] text-[#0B0F4F] font-bold text-xs px-3 py-2 rounded-xl transition-colors shadow-xs flex items-center gap-1 shrink-0"
                   >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -986,7 +1003,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   RUN JOIN CODE / PIN
                 </label>
-                <div className="bg-purple-50/80 border border-purple-100/80 rounded-xl px-3 py-2.5 text-center text-purple-600 font-black text-base tracking-wider">
+                <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-xl px-3 py-2.5 text-center text-[#7C5CFF] font-black text-base tracking-wider">
                   {joinPin}
                 </div>
               </div>
@@ -998,7 +1015,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
               <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
                 {/* Simulated QR Code Graphic */}
                 <div className="w-16 h-16 bg-white relative flex items-center justify-center">
-                  <QrCode className="w-full h-full text-slate-900" />
+                  <QrCode className="w-full h-full text-[#0B0F4F]" />
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
@@ -1016,9 +1033,9 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
 
             <div className="space-y-2">
               {/* Assistant 1: @may_craft (Active) */}
-              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
+                  <div className="w-8 h-8 rounded-full bg-[#7C5CFF] text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
                     MC
                   </div>
                   <span className="text-xs font-bold text-slate-800">
@@ -1032,7 +1049,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
               </div>
 
               {/* Assistant 2: granawan.b (Offline) */}
-              <div className="bg-purple-50/40 border border-purple-100/60 rounded-2xl p-3 flex items-center justify-between">
+              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center uppercase">
                     TB
@@ -1053,14 +1070,14 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
 
         {/* 3. MODAL FOOTER */}
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
-          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-purple-600 border border-purple-200/80 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-purple-600" />
+          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-[#7C5CFF] border border-[#7C5CFF]/20 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-[#7C5CFF]" />
             <span>Assistant Permissions</span>
           </button>
           
           <button
             onClick={() => onClose()}
-            className="px-5 py-2 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="px-5 py-2 bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2] text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
           >
             Done
           </button>
@@ -1080,18 +1097,18 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center space-x-2.5">
           <span className={`w-2.5 h-2.5 rounded-full ${dotColor}`}></span>
-          <h2 className="font-bold text-slate-900 text-base">{title}</h2>
+          <h2 className="font-bold text-[#0B0F4F] text-base">{title}</h2>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}`}>
             {badgeText}
           </span>
         </div>
-        <span className="px-2.5 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[11px] font-bold border border-purple-100">
+        <span className="px-2.5 py-0.5 bg-[#7C5CFF]/5 text-[#7C5CFF] rounded-full text-[11px] font-bold border border-[#7C5CFF]/20">
           {itemCount} items
         </span>
       </div>
 
       {/* Table Header */}
-      <div className="grid grid-cols-12 text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1">
+      <div className="grid grid-cols-12 text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">
         <div className="col-span-5">PRODUCT NAME</div>
         <div className="col-span-3 text-center">STOCK / QTY</div>
         <div className="col-span-2 text-center">PRICE (฿)</div>
@@ -1102,13 +1119,13 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
       {/* Product Rows */}
       <div className="space-y-2">
         {items.map((item:any) => (
-          <div key={item.id} className="grid grid-cols-12 items-center px-3 py-2 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors text-xs font-medium">
+          <div key={item.id} className="grid grid-cols-12 items-center px-3 py-3 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors text-sm font-medium">
             <div className="col-span-5 flex items-center gap-2">
               <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></span>
               <input
                 type="text"
                 defaultValue={item.name}
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-800 w-full font-semibold focus:outline-purple-500 text-xs shadow-2xs"
+                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 w-full font-semibold focus:outline-[#7C5CFF] text-sm shadow-2xs"
               />
             </div>
 
@@ -1117,7 +1134,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
               <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-8 text-center font-bold text-purple-600">{item.stock}</span>
+              <span className="w-8 text-center font-bold text-[#7C5CFF]">{item.stock}</span>
               <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
                 <Plus className="w-3 h-3" />
               </button>
@@ -1126,7 +1143,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
             {/* Price */}
             <div className="col-span-2 flex items-center justify-center">
               <div className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1 w-20 shadow-2xs">
-                <span className="text-amber-500 font-bold">฿</span>
+                <span className="text-[#FFB24C] font-bold">฿</span>
                 <input
                   type="text"
                   defaultValue={item.price}
@@ -1156,25 +1173,25 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
           <input
             type="text"
             placeholder={placeholderText}
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
             placeholder="Qty"
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
             placeholder="Price ฿"
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-purple-500 transition-all placeholder:text-slate-400"
+            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
           />
         </div>
         <div className="col-span-2">
-          <button className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1">
+          <button className="w-full py-2 bg-[#7C5CFF] hover:bg-[#6847e8] text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1">
             <PlusCircle className="w-3.5 h-3.5" /> Add Product
           </button>
         </div>
@@ -1187,21 +1204,21 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
   const isOutOfStock = item.stock === 0;
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-100/80 bg-white p-2 shadow-2xs transition-shadow hover:shadow-md">
+    <div className="flex min-h-[88px] items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-4 shadow-2xs transition-shadow hover:shadow-md">
       {/* Left Column: Icon + Name + Stock Info */}
       <div className="flex min-w-0 items-center gap-2">
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
-          <IconComponent className="h-3.5 w-3.5" />
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
+          <IconComponent className="h-5 w-5" />
         </div>
 
         <div className="min-w-0 space-y-0.5">
-          <h3 className="truncate text-[9px] font-bold tracking-tight text-[#111747]">
+          <h3 className="truncate text-base font-bold tracking-tight text-[#0B0F4F]">
             {item.name}
           </h3>
-          <div className="flex flex-wrap items-center gap-x-1 text-[7px] font-medium text-slate-400">
+          <div className="flex flex-wrap items-center gap-x-1.5 text-sm font-medium text-slate-400">
             <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
-            <span className={isOutOfStock ? 'text-red-600 font-semibold' : 'text-purple-600 font-semibold'}>
+            <span className={isOutOfStock ? 'text-red-600 font-semibold' : 'text-[#7C5CFF] font-semibold'}>
               {isOutOfStock ? 'Out of stock' : `${item.stock} in stock`}
             </span>
           </div>
@@ -1209,13 +1226,13 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
       </div>
 
       {/* Right Column: Price + Sold Count + Sell Button */}
-      <div className="flex shrink-0 items-center gap-2.5">
+      <div className="flex shrink-0 items-center gap-3">
         <div className="text-right">
-          <div className="flex items-center justify-end text-[11px] font-black leading-none text-[#111747]">
-            <span className="mr-0.5 text-[9px] font-extrabold">฿</span>
+          <div className="flex items-center justify-end text-lg font-black leading-none text-[#0B0F4F]">
+            <span className="mr-0.5 text-sm font-extrabold">฿</span>
             {item.price}
           </div>
-          <p className="mt-0.5 text-[7px] font-medium text-slate-400">
+          <p className="mt-1 text-sm font-medium text-slate-400">
             Sold: <span className="font-bold text-slate-700">{item.sold}</span>
           </p>
         </div>
@@ -1223,10 +1240,10 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
         <button
           onClick={() => onSell(item.id)}
           disabled={isOutOfStock}
-          className={`flex h-[18px] w-[60px] items-center justify-center gap-1 rounded-md text-[7px] font-bold text-white shadow-xs transition-all active:scale-95 ${
+          className={`flex h-10 min-w-[84px] items-center justify-center gap-1 rounded-lg px-2.5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
             isOutOfStock
               ? 'bg-gray-400 opacity-90 cursor-not-allowed'
-              : 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800'
+              : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
           }`}
         >
           Sell - 1
@@ -1281,11 +1298,11 @@ function AssistantPermissionsModal({
         {/* 1. MODAL HEADER */}
         <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-start justify-between gap-3 border-b border-slate-100 shrink-0">
           <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#7C5CFF]/10 text-[#7C5CFF] flex items-center justify-center shrink-0">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-lg sm:text-xl font-extrabold text-[#0B0F4F] tracking-tight">
                 Assistant Permissions
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-1 leading-relaxed max-w-xs">
@@ -1313,19 +1330,19 @@ function AssistantPermissionsModal({
             </div>
 
             {/* Custom Dropdown Box */}
-            <div className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-purple-50/70 transition-colors">
+            <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-[#7C5CFF]/10 transition-colors">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-full bg-indigo-500 text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
+                <div className="w-9 h-9 rounded-full bg-[#7C5CFF] text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
                   P
                 </div>
                 <div>
                   <div className="flex items-center space-x-1.5">
-                    <span className="font-bold text-slate-900 text-sm">
+                    <span className="font-bold text-[#0B0F4F] text-sm">
                       {selectedAssistant}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1 text-xs font-semibold">
-                    <span className="text-amber-500">
+                    <span className="text-[#FFB24C]">
                       Restricted (Viewer only)
                     </span>
                     <span className="text-slate-300">•</span>
@@ -1346,7 +1363,7 @@ function AssistantPermissionsModal({
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 PERMISSIONS
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-amber-500">
+              <span className="text-[11px] sm:text-xs font-bold text-[#FFB24C]">
                 All permissions off by default ({enabledCount}/5 enabled)
               </span>
             </div>
@@ -1356,7 +1373,7 @@ function AssistantPermissionsModal({
               
               {/* Item 1: Sell Products / Cashier Mode */}
               <PermissionToggleRow
-                icon={<Calculator className="w-5 h-5 text-purple-600" />}
+                icon={<Calculator className="w-5 h-5 text-[#7C5CFF]" />}
                 title="Sell Products / Cashier Mode"
                 description="Sell products and register sales transactions in Sales Mode"
                 enabled={permissions.sellProducts}
@@ -1365,7 +1382,7 @@ function AssistantPermissionsModal({
 
               {/* Item 2: Add / Edit / Delete Products */}
               <PermissionToggleRow
-                icon={<Edit3 className="w-5 h-5 text-purple-600" />}
+                icon={<Edit3 className="w-5 h-5 text-[#7C5CFF]" />}
                 title="Add / Edit / Delete Products"
                 description="Manage catalog items, quantities, and pricing"
                 enabled={permissions.editProducts}
@@ -1374,7 +1391,7 @@ function AssistantPermissionsModal({
 
               {/* Item 3: Record Booth Expenses */}
               <PermissionToggleRow
-                icon={<Receipt className="w-5 h-5 text-purple-600" />}
+                icon={<Receipt className="w-5 h-5 text-[#7C5CFF]" />}
                 title="Record Booth Expenses"
                 description="Record booth expenses and operational costs"
                 enabled={permissions.recordExpenses}
@@ -1383,7 +1400,7 @@ function AssistantPermissionsModal({
 
               {/* Item 4: View Sales Log & Gross Stats */}
               <PermissionToggleRow
-                icon={<History className="w-5 h-5 text-purple-600" />}
+                icon={<History className="w-5 h-5 text-[#7C5CFF]" />}
                 title="View Sales Log & Gross Stats"
                 description="Access transaction history, undo sales, and total stats"
                 enabled={permissions.viewSalesLog}
@@ -1392,7 +1409,7 @@ function AssistantPermissionsModal({
 
               {/* Item 5: Manage & Grant Permissions */}
               <PermissionToggleRow
-                icon={<Shield className="w-5 h-5 text-purple-600" />}
+                icon={<Shield className="w-5 h-5 text-[#7C5CFF]" />}
                 title="Manage & Grant Permissions"
                 badgeText="RESTRICTED"
                 description="Assign roles and grant assistant permissions"
@@ -1416,7 +1433,7 @@ function AssistantPermissionsModal({
           
           <button
             onClick={() => onSave(permissions)}
-            className="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
             <span>Save Permissions</span>
@@ -1452,16 +1469,16 @@ function PermissionToggleRow({
       className="p-3.5 rounded-2xl border border-slate-100/90 bg-white hover:bg-slate-50/60 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-2xs"
     >
       <div className="flex items-start space-x-3.5 pr-2">
-        <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 mt-0.5">
+        <div className="w-10 h-10 rounded-xl bg-[#7C5CFF]/5 flex items-center justify-center shrink-0 mt-0.5">
           {icon}
         </div>
         <div className="space-y-0.5">
           <div className="flex items-center space-x-2">
-            <h3 className="font-bold text-slate-900 text-xs tracking-tight">
+            <h3 className="font-bold text-[#0B0F4F] text-xs tracking-tight">
               {title}
             </h3>
             {badgeText && (
-              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-purple-100 text-purple-600 uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-[#7C5CFF]/10 text-[#7C5CFF] uppercase tracking-wider">
                 {badgeText}
               </span>
             )}
@@ -1480,7 +1497,7 @@ function PermissionToggleRow({
           onToggle();
         }}
         className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none ${
-          enabled ? 'bg-purple-600' : 'bg-slate-200'
+          enabled ? 'bg-[#7C5CFF]' : 'bg-slate-200'
         }`}
       >
         <div
@@ -1528,7 +1545,7 @@ function EndSalesRunModal({
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xl font-extrabold text-[#0B0F4F] tracking-tight">
                 End Active Sales Run
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
@@ -1571,11 +1588,11 @@ function EndSalesRunModal({
             {/* CONFIRMATION CHECKBOX BOX */}
             <label
               onClick={() => setIsConfirmed(!isConfirmed)}
-              className="bg-purple-50/40 border border-purple-100/80 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-purple-50/70 transition-colors select-none"
+              className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-[#7C5CFF]/10 transition-colors select-none"
             >
               <div
                 className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
-                  isConfirmed ? 'bg-purple-600 text-white' : 'border border-slate-300 bg-white'
+                  isConfirmed ? 'bg-[#7C5CFF] text-white' : 'border border-slate-300 bg-white'
                 }`}
               >
                 {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -1650,29 +1667,29 @@ function SaleSection({
     (item) => item && item.supplierId === id
   );
   const accent = id.toLowerCase().includes("kaimook")
-    ? { dot: "bg-pink-400", count: "border-pink-100 bg-pink-50 text-pink-500" }
+    ? { dot: "bg-[#F062C0]", count: "border-[#F062C0]/20 bg-[#F062C0]/10 text-[#F062C0]" }
     : id.toLowerCase().includes("nong")
-      ? { dot: "bg-orange-400", count: "border-orange-100 bg-orange-50 text-orange-500" }
-      : { dot: "bg-purple-500", count: "border-purple-100 bg-purple-50 text-purple-600" };
+      ? { dot: "bg-[#FFB24C]", count: "border-[#FFB24C]/20 bg-[#FFB24C]/10 text-[#FFB24C]" }
+      : { dot: "bg-[#7C5CFF]", count: "border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[#7C5CFF]" };
 
 
   return (
     <div className="space-y-2">
       {/* Header */}
-      <div className="flex items-center justify-between rounded-xl border border-slate-100/80 bg-white px-2.5 py-1.5 shadow-2xs">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <span className={`h-2 w-2 shrink-0 rounded-full ${accent.dot}`} />
+      <div className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white px-4 py-3 shadow-2xs">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${accent.dot}`} />
 
-          <h2 className="truncate text-[10px] font-bold tracking-tight text-[#111747]">
+          <h2 className="truncate text-sm font-extrabold tracking-tight text-[#0B0F4F]">
             {Name}
           </h2>
 
-          <span className="rounded-full bg-purple-100/80 px-1.5 py-0.5 text-[7px] font-bold text-purple-600">
+          <span className="shrink-0 rounded-full bg-[#7C5CFF]/10 px-2 py-1 text-[10px] font-extrabold text-[#7C5CFF]">
             {Role === "host" ? "Host" : "Supplier"}
           </span>
         </div>
 
-        <span className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[8px] font-bold ${accent.count}`}>
+        <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${accent.count}`}>
           {filteredProducts.length} items
         </span>
       </div>
