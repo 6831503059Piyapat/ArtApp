@@ -3,7 +3,7 @@
 import { useState, type FormEvent,useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, AtSign, Eye, EyeOff, LockKeyhole, Store, UserRound } from 'lucide-react';
+import { AtSign, Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
 import {auth, googleProvider} from '@/lib/firebase';
 import {
   signInWithPopup,
@@ -126,20 +126,26 @@ useEffect(() => {
 
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f7f8fc] px-4 py-8 text-slate-900">
-      <section className="w-full max-w-[420px] rounded-2xl border border-violet-100/80 bg-white px-6 py-7 shadow-[0_18px_55px_rgba(79,70,229,0.08)] sm:px-8">
-        <header className="mb-6 text-center">
-          <div className="relative mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-200">
-            <Store size={23} strokeWidth={2.4} />
-            {isCreatingAccount && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-orange-400" />}
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f8fc] px-4 py-8 text-[#0B0F4F]">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-[8%] top-[4%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(240,98,192,0.22)_0%,rgba(240,98,192,0.1)_42%,transparent_72%)] blur-3xl" />
+        <div className="absolute right-[5%] top-[30%] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(124,92,255,0.2)_0%,rgba(124,92,255,0.09)_46%,transparent_74%)] blur-3xl" />
+        <div className="absolute bottom-[-10%] left-[28%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(255,178,76,0.2)_0%,rgba(255,178,76,0.09)_46%,transparent_74%)] blur-3xl" />
+      </div>
+      <section className="relative z-10 w-full max-w-[360px] rounded-3xl border border-[#e8e4f6] bg-white px-6 py-6 shadow-[0_18px_55px_rgba(124,92,255,0.12)] sm:px-6">
+        <header className="mb-4 text-center">
+          <div className={`relative mx-auto mb-3 flex h-[42px] w-[42px] items-center justify-center rounded-xl text-white shadow-sm ${isCreatingAccount ? 'bg-[linear-gradient(35deg,#7C5CFF_0%,#C45BE8_38%,#F062C0_100%)] shadow-[#7C5CFF]/30' : 'bg-gradient-to-tr from-primary via-creatory-pink to-creatory-orange shadow-primary/30'}`}>
+            <span className="material-symbols-outlined text-[23px]">storefront</span>
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">ConsignDesk</h1>
-          <p className="mx-auto mt-1 max-w-[280px] text-sm leading-5 text-slate-500">
+          <h1 className="font-sans text-lg font-bold tracking-tight text-[#0B0F4F]">
+            Consign<span className="text-primary">Desk</span>
+          </h1>
+          <p className="mx-auto mt-1 max-w-[280px] text-xs leading-5 text-slate-500">
             Art booths and pop-up market consignment
           </p>
         </header>
 
-        <div className="mb-5 grid grid-cols-2 rounded-xl bg-violet-50 p-1" role="tablist" aria-label="Account access">
+        <div className="mb-4 grid grid-cols-2 rounded-xl border border-[#7C5CFF]/10 bg-[#7C5CFF]/5 p-1" role="tablist" aria-label="Account access">
           <button
             id="sign-in-tab"
             type="button"
@@ -147,10 +153,10 @@ useEffect(() => {
             aria-selected={!isCreatingAccount}
             aria-controls="auth-panel"
             onClick={() => setActiveTab('sign-in')}
-            className={`rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+            className={`rounded-lg px-3 py-1.5 text-[10px] font-extrabold transition ${
               !isCreatingAccount
-                ? 'bg-white text-violet-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-white text-[#0B0F4F] shadow-sm'
+                : 'text-slate-500 hover:text-[#0B0F4F]'
             }`}
           >
             Sign In
@@ -162,10 +168,10 @@ useEffect(() => {
             aria-selected={isCreatingAccount}
             aria-controls="auth-panel"
             onClick={() => setActiveTab('create-account')}
-            className={`rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+            className={`rounded-lg px-3 py-1.5 text-[10px] font-extrabold transition ${
               isCreatingAccount
-                ? 'bg-white text-violet-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-white text-[#0B0F4F] shadow-sm'
+                : 'text-slate-500 hover:text-[#0B0F4F]'
             }`}
           >
             Create Account
@@ -177,14 +183,14 @@ useEffect(() => {
           role="tabpanel"
           aria-labelledby={isCreatingAccount ? 'create-account-tab' : 'sign-in-tab'}
         >
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {isCreatingAccount && (
               <div>
-                <label htmlFor="username" className="mb-1.5 block text-xs font-semibold text-slate-800">
-                  USERNAME
+                <label htmlFor="username" className="mb-1 block text-xs font-semibold text-[#0B0F4F]">
+                  Username
                 </label>
                 <div className="relative">
-                  <UserRound size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <UserRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     id="username"
                     type="text"
@@ -193,7 +199,7 @@ useEffect(() => {
                     placeholder="Your booth or artist name"
                     value={username}
                     onChange={(event) => setUsername(event.target.value)}
-                    className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                    className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-xs text-[#0B0F4F] outline-none transition placeholder:text-slate-400 focus:border-[#7C5CFF]/60 focus:ring-4 focus:ring-[#7C5CFF]/10"
                   />
                 </div>
               </div>
@@ -201,13 +207,12 @@ useEffect(() => {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between gap-2">
-                <label htmlFor="email" className="text-xs font-semibold text-slate-800">
-                  {isCreatingAccount ? 'EMAIL' : 'EMAIL OR USERNAME'}
+                <label htmlFor="email" className="text-xs font-semibold text-[#0B0F4F]">
+                  {isCreatingAccount ? 'Email' : 'Username or Email'}
                 </label>
-                {!isCreatingAccount && <span className="text-[10px] text-slate-400">artist or vendor ID</span>}
               </div>
               <div className="relative">
-                <AtSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <AtSign size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   id="email"
                   type={isCreatingAccount ? 'email' : 'text'}
@@ -216,24 +221,24 @@ useEffect(() => {
                   placeholder={isCreatingAccount ? 'you@example.com' : 'name@studio.art'}
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                  className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-xs text-[#0B0F4F] outline-none transition placeholder:text-slate-400 focus:border-[#7C5CFF]/60 focus:ring-4 focus:ring-[#7C5CFF]/10"
                 />
               </div>
             </div>
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="text-xs font-semibold text-slate-800">
-                  PASSWORD
+                <label htmlFor="password" className="text-xs font-semibold text-[#0B0F4F]">
+                  Password
                 </label>
                 {!isCreatingAccount && (
-                  <Link href="/forgot-password" className="text-xs font-medium text-violet-600 hover:text-violet-700">
+                  <Link href="/forgot-password" className="text-xs font-bold text-[#7C5CFF] hover:text-[#6847E8]">
                     Forgot?
                   </Link>
                 )}
               </div>
               <div className="relative">
-                <LockKeyhole size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <LockKeyhole size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -243,13 +248,13 @@ useEffect(() => {
                   placeholder={isCreatingAccount ? 'At least 8 characters' : 'Enter your password'}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                  className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-11 text-xs text-[#0B0F4F] outline-none transition placeholder:text-slate-400 focus:border-[#7C5CFF]/60 focus:ring-4 focus:ring-[#7C5CFF]/10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((visible) => !visible)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-[#0B0F4F]"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -257,40 +262,35 @@ useEffect(() => {
             </div>
 
             {!isCreatingAccount && (
-              <div className="flex items-center justify-between pt-0.5">
-                <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center pt-0.5">
+                <label className="flex cursor-pointer items-center gap-2 text-[10px] font-medium text-slate-600">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded accent-violet-600 focus:ring-violet-500"
+                    className="h-3.5 w-3.5 rounded accent-[#7C5CFF] focus:ring-[#7C5CFF]"
                   />
                   Remember booth on this device
                 </label>
-                <span className="rounded-full bg-violet-50 px-2 py-1 text-[9px] font-medium text-violet-500">
-                  ● Live sync
-                </span>
               </div>
             )}
 
             <button
-              type="submit"
+              type="button"
+              onClick={() => router.replace('/dashboard')}
               disabled={isLoading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#ffae43] px-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-[#ffa329] focus:outline-none focus:ring-4 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-[#FFB24C] px-4 text-xs font-bold text-[#0B0F4F] shadow-[0_4px_10px_rgba(255,178,76,0.25)] transition hover:bg-[#F4A62F] focus:outline-none focus:ring-4 focus:ring-[#FFB24C]/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading
                 ? (isCreatingAccount ? 'Creating account...' : 'Signing in...')
-                : (isCreatingAccount ? 'Create Account' : 'Sign In to Terminal')}
-              {!isLoading && !isCreatingAccount && <ArrowRight size={16} />}
+                : (isCreatingAccount ? 'Create Account' : 'Sign In')}
             </button>
-            {formMessage && (
-              <p role="status" className="text-center text-xs text-slate-500">
-                {formMessage}
-              </p>
-            )}
+            <p role="status" aria-live="polite" className="sr-only">
+              {formMessage}
+            </p>
           </form>
 
-          <div className="my-4 flex items-center gap-3">
+          <div className="my-3 flex items-center gap-2">
             <span className="h-px flex-1 bg-slate-100" />
-            <span className="text-xs font-medium tracking-wide text-slate-400">
+            <span className="text-[9px] font-semibold tracking-wide text-slate-500">
               {isCreatingAccount ? 'OR SIGN UP WITH' : 'OR SIGN IN WITH'}
             </span>
             <span className="h-px flex-1 bg-slate-100" />
@@ -299,7 +299,7 @@ useEffect(() => {
           <button
             type="button"
             onClick={()=>LoginWithGoogle()}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-violet-100"
+            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 text-xs font-bold text-[#0B0F4F] transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-[#7C5CFF]/10"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -311,12 +311,12 @@ useEffect(() => {
           </button>
         </div>
 
-        <footer className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-slate-100 pt-4 text-[10px] text-slate-400">
+        <footer className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-slate-100 pt-3 text-[9px] text-slate-400">
           <span>ConsignDesk Market v2.4</span>
           <nav className="flex items-center gap-2.5">
-            <Link href="/privacy" className="hover:text-slate-600">Privacy</Link>
+            <Link href="/privacy" className="hover:text-[#0B0F4F]">Privacy</Link>
             <span aria-hidden="true">•</span>
-            <Link href="/help" className="hover:text-slate-600">Help Desk</Link>
+            <Link href="/help" className="hover:text-[#0B0F4F]">Help Desk</Link>
           </nav>
         </footer>
       </section>

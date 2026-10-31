@@ -1,7 +1,9 @@
 'use client';
 import Navbar from '@/app/components/navbar';
+import Footer from '@/app/components/footer';
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { BadgeCheck, Banknote, Clock3, ShoppingBag } from 'lucide-react';
 
 // Mock Data
 const INITIAL_RUNS = [
@@ -58,92 +60,82 @@ export default function CompletedRunsPage() {
       
     <Navbar />
       {/* Main Content */}
-      <main className="flex-1 w-full pt-12">
-        <div className="max-w-[1280px] mx-auto px-[18px] pt-[28px]">
+      <main className="mb-8 flex-1 w-full pt-12">
+        <div className="mx-auto w-full max-w-[1280px] px-[18px] pt-[28px] md:w-[85%]">
           <div className="flex flex-col w-full gap-4">
             
             {/* Breadcrumb & Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="flex flex-col gap-1">
-                <div className="h-3 flex items-center gap-1 text-[9px] leading-3 font-semibold text-creatory-gray">
-                  <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[11px]">home</span>
-                    <span>Home</span>
-                  </Link>
-                  <span>/</span>
-                  <span className="hover:text-primary transition-colors cursor-pointer">Sales Runs</span>
-                  <span>/</span>
-                  <span className="text-primary font-bold">Completed Runs</span>
-                </div>
-                <h1 className="h-6 text-[22px] leading-6 font-extrabold tracking-tight flex items-center gap-2">
+                <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight leading-7">
                   Completed Sales Runs
-                  <span className="px-1.5 py-0.5 rounded-full bg-creatory-lavender font-bold text-[8px] text-primary border border-primary/20">3 Archived</span>
+                  <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary">3 Archived</span>
                 </h1>
               </div>
             </div>
 
             {/* Quick Stats Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[10px]">
-              <div className="h-[90px] p-[10px] rounded-[14px] bg-white border border-creatory-border shadow-[0_4px_16px_rgba(11,15,79,0.03)] flex flex-col justify-between hover:border-primary/30 transition-all">
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-primary/30">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="uppercase tracking-wide font-bold text-[8px]">Settled Runs</span>
-                  <div className="w-7 h-7 rounded-lg bg-creatory-lavender flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined text-[13px]">verified</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">Settled Runs</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-creatory-lavender text-primary">
+                    <BadgeCheck className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[22px] leading-6 font-extrabold">3</span>
-                    <span className="text-[8px] text-primary font-bold bg-creatory-lavender px-1.5 py-0.5 rounded-full">Completed</span>
+                  <div className="-translate-y-1 flex items-baseline gap-1">
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">3</span>
+                    <span className="rounded-full bg-creatory-lavender px-1.5 py-0.5 text-[9px] font-bold text-primary">Completed</span>
                   </div>
-                  <p className="text-[8px] leading-3 text-creatory-gray">100% reconciled across all artists</p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">100% reconciled across all artists</p>
                 </div>
               </div>
               
-              <div className="h-[90px] p-[10px] rounded-[14px] bg-white border border-creatory-border shadow-[0_4px_16px_rgba(11,15,79,0.03)] flex flex-col justify-between hover:border-creatory-pink/30 transition-all">
+              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-pink/30">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="uppercase tracking-wide font-bold text-[8px]">AVG RUN TIME</span>
-                  <div className="w-7 h-7 rounded-lg bg-pink-50 flex items-center justify-center text-creatory-pink">
-                    <span className="material-symbols-outlined text-[13px]">schedule</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">AVG RUN TIME</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-pink-50 text-creatory-pink">
+                    <Clock3 className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[22px] leading-6 font-extrabold">6h 10m</span>
-                    <span className="text-[8px] text-creatory-gray font-semibold">Avg / run</span>
+                  <div className="-translate-y-1 flex items-baseline gap-1">
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">6h 10m</span>
+                    <span className="text-[9px] font-semibold text-creatory-gray">Avg / run</span>
                   </div>
-                  <p className="text-[8px] leading-3 text-creatory-gray">18h 30m Total duration recorded</p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18h 30m Total duration recorded</p>
                 </div>
               </div>
 
-              <div className="h-[90px] p-[10px] rounded-[14px] bg-white border border-creatory-border shadow-[0_4px_16px_rgba(11,15,79,0.03)] flex flex-col justify-between hover:border-creatory-orange/40 transition-all">
+              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-orange/40">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="uppercase tracking-wide font-bold text-[8px]">Total Items Sold</span>
-                  <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-creatory-orange">
-                    <span className="material-symbols-outlined text-[13px]">shopping_bag</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">Total Items Sold</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-creatory-orange">
+                    <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[22px] leading-6 font-extrabold">195</span>
-                    <span className="text-[8px] text-creatory-gray font-semibold">Items</span>
+                  <div className="-translate-y-1 flex items-baseline gap-1">
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">195</span>
+                    <span className="text-[9px] font-semibold text-creatory-gray">Items</span>
                   </div>
-                  <p className="text-[8px] leading-3 text-creatory-gray">Clearance Rate: <strong className="text-creatory-navy font-semibold">85%</strong></p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">Clearance Rate: <strong className="font-semibold text-creatory-navy">85%</strong></p>
                 </div>
               </div>
 
-              <div className="h-[90px] p-[10px] rounded-[14px] bg-gradient-to-br from-creatory-lavender to-white border border-creatory-pink/40 shadow-[0_4px_20px_rgba(124,92,255,0.08)] flex flex-col justify-between">
+              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-pink/40 bg-gradient-to-br from-creatory-lavender to-white p-2.5 shadow-[0_4px_20px_rgba(124,92,255,0.08)]">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="uppercase tracking-wide font-bold text-[8px] text-creatory-navy">Total Revenue</span>
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-creatory-pink to-creatory-orange flex items-center justify-center text-white shadow-sm">
-                    <span className="material-symbols-outlined text-[13px]">payments</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide text-creatory-navy md:text-[10px]">Total Revenue</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-creatory-pink to-creatory-orange text-white shadow-sm">
+                    <Banknote className="h-6 w-6" aria-hidden="true" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-[22px] leading-6 font-extrabold tracking-tight">฿20,770</span>
+                  <div className="-translate-y-1 flex items-baseline gap-1.5">
+                    <span className="text-lg font-extrabold leading-5 tracking-tight md:text-xl">฿20,770</span>
                   </div>
-                  <p className="text-[8px] leading-3 font-semibold text-primary">Avg ฿6,923 / run intake</p>
+                  <p className="text-[9px] font-semibold leading-3 text-primary md:text-[10px]">Avg ฿6,923 / run intake</p>
                 </div>
               </div>
             </div>
@@ -157,7 +149,7 @@ export default function CompletedRunsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search completed runs by name, location, or date..." 
-                  className="w-full bg-transparent text-creatory-navy placeholder-creatory-gray text-[10px] font-medium focus:outline-none"
+                  className="w-full bg-transparent text-xs font-medium text-creatory-navy placeholder-creatory-gray focus:outline-none"
                 />
                 {searchQuery && (
                   <button aria-label="Clear search" onClick={() => setSearchQuery('')} className="text-creatory-gray hover:text-creatory-navy">
@@ -168,10 +160,10 @@ export default function CompletedRunsPage() {
             </div>
 
             {/* List Header */}
-            <div className="h-3 flex items-center justify-between text-[8px] leading-3 font-semibold text-creatory-gray px-0.5">
+            <div className="flex items-center justify-between px-0.5 text-[10px] font-semibold leading-4 text-creatory-gray">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[12px] text-primary">folder_special</span>
-                <span>Finalized Ledger Archive</span>
+                <span>Archived Runs</span>
               </div>
               <div className="flex items-center gap-2">
                 <span>Sorted by</span>
@@ -183,37 +175,39 @@ export default function CompletedRunsPage() {
             <div className="mt-[2px] flex flex-col gap-[10px]">
               {filteredRuns.length > 0 ? (
                 filteredRuns.map((run) => (
-                  <div key={run.id} className="min-h-[111px] rounded-[14px] bg-white border border-creatory-border hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)] transition-all px-[13px] py-[11px] flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div className="flex flex-col gap-1 min-w-0 md:w-[82px] md:flex-none">
+                  <div key={run.id} className="rounded-[14px] border border-creatory-border bg-white px-4 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)]">
+                    <div className="flex min-w-0 flex-col gap-3 px-2 py-1 sm:px-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex min-w-0 flex-col gap-1 md:flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-creatory-lavender text-primary text-[8px] font-bold border border-primary/20 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary/20 bg-creatory-lavender px-1.5 py-0.5 text-[10px] font-bold text-primary">
                           <span className="w-1 h-1 rounded-full bg-primary"></span>
                           Settled & Closed
                         </span>
                       </div>
-                      <h2 className="text-[11px] leading-[17px] font-bold tracking-tight mt-0.5">{run.title} ({run.shortDay})</h2>
-                      <p className="text-[8px] text-creatory-gray">{run.date}</p>
+                      <h2 className="mt-0.5 text-sm font-bold leading-5 tracking-tight sm:text-base">{run.title} ({run.shortDay})</h2>
+                      <p className="text-[10px] text-creatory-gray">{run.date}</p>
                     </div>
                     
                     <div className="flex flex-wrap items-center gap-4 md:self-center md:ml-auto">
                       <div className="flex items-center gap-4">
                         <div className="flex flex-col">
-                          <span className="text-[7px] text-creatory-gray uppercase tracking-wider font-bold">Total Sold</span>
-                          <span className="text-[10px] font-bold">{run.sold} items</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray">Total Sold</span>
+                          <span className="text-xs font-bold">{run.sold} items</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[7px] text-creatory-gray uppercase tracking-wider font-bold">Gross</span>
-                          <span className="text-[10px] font-bold">{run.gross}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray">Gross</span>
+                          <span className="text-xs font-bold">{run.gross}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[7px] text-primary uppercase tracking-wider font-bold">Net Intake</span>
-                          <span className="text-[10px] text-primary font-extrabold">{run.net}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Net Intake</span>
+                          <span className="text-xs font-extrabold text-primary">{run.net}</span>
                         </div>
                       </div>
-                      <Link href={`/sales/completed/${run.id}`} className="inline-flex items-center gap-1 px-[10px] py-1 rounded-xl bg-gradient-to-r from-primary to-[#6842FF] hover:from-[#6A47F2] hover:to-[#5730EA] text-white text-[8px] font-bold transition-all shadow-sm shadow-primary/30 ml-auto md:ml-0 whitespace-nowrap">
+                      <Link href={`/sales/completed/${run.id}`} className="ml-auto inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-gradient-to-r from-primary to-[#6842FF] px-[10px] py-1.5 text-[10px] font-bold text-white transition-all shadow-sm shadow-primary/30 hover:from-[#6A47F2] hover:to-[#5730EA] md:ml-0">
                         <span>View Run Breakdown</span>
                         <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
                       </Link>
+                    </div>
                     </div>
                   </div>
                 ))
@@ -241,6 +235,7 @@ export default function CompletedRunsPage() {
         </div>
       </main>
 
+      <Footer />
     </div>
   );
 }
