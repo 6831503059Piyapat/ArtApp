@@ -42,7 +42,6 @@ import {
   Minus
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
-import Footer from '@/app/components/footer';
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
   const Suppliers = [
@@ -58,8 +57,8 @@ export default function SalesRunDetail() {
       {
       id: '1',
       name: 'Green Horned Frog',
-      start: 10,
-      stock: 0,
+      start: 13,
+      stock: 3,
       price: 150,
       sold: 10,
       icon: Leaf,
@@ -74,7 +73,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 9,
       icon: Sun,
-      iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
       supplierId: "host-8466468345"
       
     },
@@ -103,12 +102,12 @@ export default function SalesRunDetail() {
       {
       id: '1',
       name: 'Green Horned Frog',
-      start: 10,
-      stock: 0,
+      start: 13,
+      stock: 3,
       price: 150,
       sold: 10,
       icon: Leaf,
-      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
+      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
       supplierId: "kaimook-8466468345"
      
     },
@@ -120,7 +119,7 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 9,
       icon: Sun,
-      iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
+      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
       supplierId: "kaimook-8466468345"
      
     },
@@ -132,9 +131,52 @@ export default function SalesRunDetail() {
       price: 150,
       sold: 4,
       icon: Mountain,
-      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
+      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
       supplierId: "kaimook-8466468345"
     },
+    ],
+  },
+  {
+    id: "nong-japan-8466468345",
+    name: "Nong' Japan",
+    role: "Supplier inventory",
+    accent: "yellow",
+    placeholder: "Item Name (e.g. Linen Coaster Set)",
+    category: "supplier",
+    products: [
+      {
+        id: 'nong-japan-1',
+        name: 'Aquarium Moss Ball (Medium)',
+        start: 15,
+        stock: 8,
+        price: 60,
+        sold: 7,
+        icon: Package,
+        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
+        supplierId: "nong-japan-8466468345"
+      },
+      {
+        id: 'nong-japan-2',
+        name: 'Mini Terrarium Starter Glass',
+        start: 6,
+        stock: 3,
+        price: 190,
+        sold: 3,
+        icon: Droplets,
+        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
+        supplierId: "nong-japan-8466468345"
+      },
+      {
+        id: 'nong-japan-3',
+        name: 'Terrarium Pebble Pack',
+        start: 12,
+        stock: 9,
+        price: 45,
+        sold: 3,
+        icon: Grid,
+        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
+        supplierId: "nong-japan-8466468345"
+      },
     ],
   },
   ];
@@ -438,40 +480,41 @@ const handleSell = (id: string) => {
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
       <Navbar />
-      <main className="mx-auto w-full max-w-[1280px] flex-1 space-y-5 px-4 pb-6 pt-16 sm:px-6">
+      <main className={`mx-auto w-full max-w-[1280px] flex-1 space-y-5 px-4 pt-16 sm:px-6 ${stepMode === "edit" ? "pb-24" : "pb-6"}`}>
         
         {/* TOP HEADER SECTION CARD */}
-        <div className="space-y-4 rounded-2xl border border-[#7C5CFF]/15 bg-white px-4 pb-4 pt-5 shadow-sm sm:px-5 sm:pb-5 sm:pt-6">
-          {/* Title row */}
+        <div className="space-y-3 rounded-2xl border border-[#7C5CFF]/15 bg-white px-4 py-4 shadow-sm sm:px-5">
           <div className="flex flex-col gap-3 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
-            <div className="min-w-0">
+            <div className="flex min-w-0 flex-col gap-2">
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
                   {StockList[0].name}
                 </h1>
-                <span className="flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                   LIVE RUN
-                </span>
+                {stepMode === "edit" ? (
+                  <span className="flex items-center gap-1.5 rounded-full border border-[#FDE68A] bg-[#FFFBEB] px-2.5 py-1 text-[10px] font-bold text-[#B45309]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FFB24C]"></span>
+                    EDIT MODE
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    LIVE RUN
+                  </span>
+                )}
               </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-[#7C5CFF]">
-              <span className="flex items-center gap-1.5 rounded-full border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2.5 py-0.5">
-                <User className="h-3.5 w-3.5" /> 1 Assistant
-              </span>
               <button
+                type="button"
                 onClick={() => setIsOpen(true)}
-                className="rounded-lg border border-[#7C5CFF]/25 bg-[#7C5CFF]/10 px-2.5 py-1 font-bold text-[#7C5CFF] transition-colors hover:border-[#7C5CFF]/40 hover:bg-[#7C5CFF]/20 hover:text-[#0B0F4F]"
+                className="flex w-fit items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF]"
               >
-                + Invite
+                <UsersRound className="h-4 w-4 text-[#7C5CFF]" />
+                <span>1 Assistant</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-[#7C5CFF]">+ Invite</span>
               </button>
             </div>
 
-            {/* Run mode toggle buttons */}
-            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5 min-[600px]:self-center">
               <div
                 className="flex items-center gap-0.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 p-0.5"
                 role="group"
@@ -495,7 +538,7 @@ const handleSell = (id: string) => {
                   aria-pressed={stepMode === "edit"}
                   className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors ${
                     stepMode === "edit"
-                      ? "bg-[#7C5CFF] text-white shadow-sm"
+                      ? "bg-[#FFB24C] text-[#0B0F4F] shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
@@ -505,7 +548,7 @@ const handleSell = (id: string) => {
               <button
                 type="button"
                 onClick={() => setIsEndRunOpen(true)}
-                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#F062C0]/30 bg-[#F062C0]/10 px-2.5 py-1.5 text-xs font-bold text-[#F062C0] transition-colors hover:bg-[#F062C0]/20"
+                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15"
               >
                 <X className="h-3.5 w-3.5" /> End Run
               </button>
@@ -515,18 +558,18 @@ const handleSell = (id: string) => {
           {/* Key Stat Cards Grid */}
           <div className="grid grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4">
             {/* Gross Intake */}
-            <div className="flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Gross Intake</p>
                 <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
               </div>
-              <div className="rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
+              <div className="absolute right-3 top-3 rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
                 <Receipt className="h-4 w-4" />
               </div>
             </div>
 
             {/* Total Sold Units */}
-            <div className="flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Total Sold Units</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
@@ -534,7 +577,7 @@ const handleSell = (id: string) => {
                   <span className="text-xs font-medium text-slate-400">/ {StockList[0].totalsoldMax} starting</span>
                 </div>
               </div>
-              <div className="rounded-md bg-[#FFB24C]/15 p-2 text-[#FFB24C]">
+              <div className="absolute right-3 top-3 rounded-md bg-[#FFB24C]/15 p-2 text-[#FFB24C]">
                 <ShoppingBag className="h-4 w-4" />
               </div>
             </div>
@@ -554,8 +597,8 @@ const handleSell = (id: string) => {
                   </span>
                 </p>
               </div>
-              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-[#FFB24C] hover:bg-[#f5a733]'}`}>
-                <Undo2 className="h-3.5 w-3.5" /> Undo
+              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex min-w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-gradient-to-r from-[#FFB24C] to-[#F062C0] hover:brightness-95'}`}>
+                <Undo2 className="h-3.5 w-3.5 shrink-0" /> <span className="leading-none">Undo</span>
               </button>
             </div>
           </div>
@@ -577,7 +620,7 @@ const handleSell = (id: string) => {
                     <LayoutGrid className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>All Products</span>
                   </div>
-                  <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">8</span>
+                  <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">9</span>
                 </button>
 
                 <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
@@ -597,7 +640,7 @@ const handleSell = (id: string) => {
                 <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
                   <div className="flex items-center gap-1.5">
                     <Store className="h-2.5 w-2.5 shrink-0 text-[#FFB24C]" />
-                    <span>Nong Japan</span>
+                    <span>Nong&apos; Japan</span>
                   </div>
                 </button>
               </nav>
@@ -648,7 +691,7 @@ const handleSell = (id: string) => {
             </div>
 
             <Link href="/ViewUser/1" className="flex items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-1.5 py-1.5 text-white shadow-sm">
-              <span className="flex min-w-0 items-start gap-1">
+              <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5">Sales Activity Board</span><span className="block text-[9px] leading-3 text-white/80">Enter live sales feed &amp; telemetry</span></span>
               </span>
@@ -658,24 +701,28 @@ const handleSell = (id: string) => {
 
           {/* RIGHT PRODUCT LIST TABLES */}
           {/* Product cards for each supplier  Edit Mode*/}
-          <div className="min-w-0 space-y-3">
+          <div className="min-w-0 space-y-5">
             
             {/* 1. SECTION: MY PRODUCTS */}
             {stepMode === "edit" && (
                 <>
 
-{products.map((items) => (
-  <ProductGroupSection
-    key={items.id}
-    title={items.name}
-    badgeText={items.role}
-    badgeColor="bg-[#7C5CFF]/10 text-[#7C5CFF]"
-    itemCount={items.products?.length ?? 0}
-    dotColor="bg-[#7C5CFF]"
-    items={items.products ?? []}
-    placeholderText="Item Name (e.g. Linen Coaster Set)"
-  />
-))}
+{products.map((items) => {
+  const accent = getSupplierAccent(items.id);
+  return (
+    <ProductGroupSection
+      key={items.id}
+      title={items.name}
+      badgeText={items.category}
+      badgeColor={accent.badge}
+      countColor={accent.count}
+      itemCount={items.products?.length ?? 0}
+      dotColor={accent.dot}
+      items={items.products ?? []}
+      placeholderText="Item Name (e.g. Linen Coaster Set)"
+    />
+  );
+})}
 
             
 
@@ -684,7 +731,7 @@ const handleSell = (id: string) => {
                {/* Product cards for each supplier  Sales Mode*/}
                
 {stepMode === "sales" && (
-  <div className="w-full space-y-2">
+  <div className="w-full space-y-5">
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
@@ -865,14 +912,14 @@ const handleSell = (id: string) => {
                )}
             {/* ADD NEW SUPPLIER BOTTOM CARD */}
             {stepMode === "edit" &&(
-            <div className="bg-slate-50/80 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-2xl border-2 border-dashed border-[#DDD6FE] bg-[#EEEEFE] p-5">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#7C5CFF]/10 text-[#7C5CFF] rounded-xl">
+                <div className="rounded-xl bg-[#6366F1]/10 p-2 text-[#6366F1]">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
               </div>
-              <button className="px-4 py-2 bg-[#7C5CFF] hover:bg-[#6847e8] text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+              <button className="flex items-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]">
                 <Plus className="w-4 h-4" /> Add Supplier
               </button>
             </div>
@@ -883,7 +930,35 @@ const handleSell = (id: string) => {
         </div>
       </main>
 
-      <Footer />
+      {stepMode === "edit" && (
+        <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
+          <div className="mx-auto flex min-h-[56px] w-full max-w-[1280px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2 text-xs">
+              <span className="shrink-0 font-bold text-[#7C5CFF]">0 Unsaved changes</span>
+              <span className="hidden text-[#d5d7df] sm:inline">•</span>
+              <span className="hidden truncate text-[11px] text-[#6F7485] sm:inline">
+                Live run updates will apply instantly to register
+              </span>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => setStepMode("sales")}
+                className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#BA1A1A] transition-colors hover:bg-[#FEE2E2]"
+              >
+                Discard Changes
+              </button>
+              <button
+                type="button"
+                onClick={() => setStepMode("sales")}
+                className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-4 py-2 text-xs font-bold text-[#111747] shadow-sm transition hover:brightness-105"
+              >
+                <Check className="h-3.5 w-3.5" /> Apply to run
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isOpen && (
         <SupplierInviteModal
@@ -944,12 +1019,12 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
     <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
       
       {/* MODAL CARD */}
-      <div onClick={(e) => e.stopPropagation()}  className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100/80 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+      <div onClick={(e) => e.stopPropagation()}  className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-100/80 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         
         {/* 1. MODAL HEADER */}
         <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100">
           <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#7C5CFF] to-[#F062C0] text-white flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] text-white flex items-center justify-center shrink-0 shadow-sm">
               <UserPlus className="w-6 h-6" />
             </div>
             <div>
@@ -1003,7 +1078,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   RUN JOIN CODE / PIN
                 </label>
-                <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-xl px-3 py-2.5 text-center text-[#7C5CFF] font-black text-base tracking-wider">
+                <div className="inline-flex w-fit min-w-[8rem] items-center justify-center whitespace-nowrap rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-4 py-2.5 text-center text-base font-black tracking-wider text-[#7C5CFF]">
                   {joinPin}
                 </div>
               </div>
@@ -1070,14 +1145,14 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
 
         {/* 3. MODAL FOOTER */}
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
-          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-[#7C5CFF] border border-[#7C5CFF]/20 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-[#7C5CFF]" />
+          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-[#6366F1] border border-[#6366F1]/20 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-[#6366F1]" />
             <span>Assistant Permissions</span>
           </button>
           
           <button
             onClick={() => onClose()}
-            className="px-5 py-2 bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2] text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="px-5 py-2 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
           >
             Done
           </button>
@@ -1090,25 +1165,48 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
 
 
 // COMPONENT: Product Group Section (ใช้สร้างตารางสินค้าแต่ละ Supplier)
-function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor, items, placeholderText }:any) {
+function getSupplierAccent(id: string) {
+  if (id.toLowerCase().includes("kaimook")) {
+    return {
+      dot: "bg-[#F062C0]",
+      badge: "text-[#6366F1]",
+      count: "border-[#F062C0]/20 bg-[#F062C0]/10 text-[#F062C0]",
+    };
+  }
+  if (id.toLowerCase().includes("nong")) {
+    return {
+      dot: "bg-[#FFB24C]",
+      badge: "text-[#6366F1]",
+      count: "border-[#FFB24C]/30 bg-[#FFB24C]/10 text-[#B7791F]",
+    };
+  }
+  return {
+    dot: "bg-[#7C5CFF]",
+    badge: "text-[#6366F1]",
+    count: "border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[#7C5CFF]",
+  };
+}
+
+function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText }:any) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden space-y-3 p-5">
+    <div className="space-y-3">
       {/* Group Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div className="flex items-center space-x-2.5">
-          <span className={`w-2.5 h-2.5 rounded-full ${dotColor}`}></span>
-          <h2 className="font-bold text-[#0B0F4F] text-base">{title}</h2>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}`}>
-            {badgeText}
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-[#EEE9FF] bg-white px-4 py-3 shadow-sm">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotColor}`}></span>
+          <h2 className="truncate font-bold text-[#0B0F4F] text-xl">{title}</h2>
+          <span className={`flex shrink-0 items-center self-center rounded-full px-2 py-1 text-[10px] font-extrabold leading-none ${badgeColor}`}>
+            {badgeText === "host" ? "Host" : "Supplier"}
           </span>
         </div>
-        <span className="px-2.5 py-0.5 bg-[#7C5CFF]/5 text-[#7C5CFF] rounded-full text-[11px] font-bold border border-[#7C5CFF]/20">
+        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${countColor}`}>
           {itemCount} items
         </span>
       </div>
 
       {/* Table Header */}
-      <div className="grid grid-cols-12 text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">
+      <div className="overflow-hidden rounded-2xl border border-[#EEE9FF] bg-white shadow-sm">
+      <div className="grid grid-cols-12 border-b border-[#EEE9FF] bg-[#EEE9FF] px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#0B0F4F]">
         <div className="col-span-5">PRODUCT NAME</div>
         <div className="col-span-3 text-center">STOCK / QTY</div>
         <div className="col-span-2 text-center">PRICE (฿)</div>
@@ -1117,37 +1215,37 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
       </div>
 
       {/* Product Rows */}
-      <div className="space-y-2">
+      <div>
         {items.map((item:any) => (
-          <div key={item.id} className="grid grid-cols-12 items-center px-3 py-3 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors text-sm font-medium">
+          <div key={item.id} className="grid grid-cols-12 items-center border-b border-slate-200 px-4 py-3 text-xs font-medium transition-colors last:border-b-0 hover:bg-slate-50/70">
             <div className="col-span-5 flex items-center gap-2">
-              <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></span>
+              <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
               <input
                 type="text"
                 defaultValue={item.name}
-                className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 w-full font-semibold focus:outline-[#7C5CFF] text-sm shadow-2xs"
+                className="w-fit min-w-[50%] max-w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF]"
               />
             </div>
 
             {/* Qty Stepper */}
-            <div className="col-span-3 flex items-center justify-center gap-1">
-              <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
-                <Minus className="w-3 h-3" />
+            <div className="col-span-3 flex w-fit items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-2 py-1">
+              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
+                <Minus className="h-2.5 w-2.5" />
               </button>
-              <span className="w-8 text-center font-bold text-[#7C5CFF]">{item.stock}</span>
-              <button className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 shadow-2xs">
-                <Plus className="w-3 h-3" />
+              <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
+              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
+                <Plus className="h-2.5 w-2.5" />
               </button>
             </div>
 
             {/* Price */}
             <div className="col-span-2 flex items-center justify-center">
-              <div className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1 w-20 shadow-2xs">
-                <span className="text-[#FFB24C] font-bold">฿</span>
+              <div className="flex w-20 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 shadow-2xs">
+                <span className="font-bold text-[#FFB24C]">฿</span>
                 <input
                   type="text"
                   defaultValue={item.price}
-                  className="w-full bg-transparent font-bold text-slate-800 text-center focus:outline-none"
+                  className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
                 />
               </div>
             </div>
@@ -1159,43 +1257,44 @@ function ProductGroupSection({ title, badgeText, badgeColor, itemCount, dotColor
 
             {/* Delete Action */}
             <div className="col-span-1 text-center">
-              <button className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 transition-colors">
-                <Trash2 className="w-4 h-4 mx-auto" />
+              <button className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
+                <Trash2 className="mx-auto h-3.5 w-3.5" />
               </button>
             </div>
           </div>
         ))}
       </div>
 
+      </div>
       {/* Add Item Form Row */}
-      <div className="grid grid-cols-12 gap-2 pt-2 items-center">
+      <div className="grid grid-cols-12 items-center gap-2 rounded-2xl border border-[#EEE9FF] bg-[#EEE9FF] p-3">
         <div className="col-span-6">
           <input
             type="text"
             placeholder={placeholderText}
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
             placeholder="Qty"
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
             placeholder="Price ฿"
-            className="w-full bg-slate-50/70 border border-slate-200 rounded-xl px-3 py-2 text-xs text-center focus:bg-white focus:outline-[#7C5CFF] transition-all placeholder:text-slate-400"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
-          <button className="w-full py-2 bg-[#7C5CFF] hover:bg-[#6847e8] text-white font-semibold text-xs rounded-xl shadow-sm transition-colors flex items-center justify-center gap-1">
+          <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
             <PlusCircle className="w-3.5 h-3.5" /> Add Product
           </button>
         </div>
-    </div>
+      </div>
     </div>
   );
 }
@@ -1207,18 +1306,18 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
     <div className="flex min-h-[88px] items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-4 shadow-2xs transition-shadow hover:shadow-md">
       {/* Left Column: Icon + Name + Stock Info */}
       <div className="flex min-w-0 items-center gap-2">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
-          <IconComponent className="h-5 w-5" />
+        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
+          <IconComponent className="h-7 w-7" />
         </div>
 
         <div className="min-w-0 space-y-0.5">
           <h3 className="truncate text-base font-bold tracking-tight text-[#0B0F4F]">
             {item.name}
           </h3>
-          <div className="flex flex-wrap items-center gap-x-1.5 text-sm font-medium text-slate-400">
+          <div className="flex flex-wrap items-center gap-x-1.5 text-xs font-medium text-slate-400">
             <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
-            <span className={isOutOfStock ? 'text-red-600 font-semibold' : 'text-[#7C5CFF] font-semibold'}>
+            <span className={isOutOfStock ? 'text-[#ED571B] font-semibold' : 'text-[#7C5CFF] font-semibold'}>
               {isOutOfStock ? 'Out of stock' : `${item.stock} in stock`}
             </span>
           </div>
@@ -1240,7 +1339,7 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
         <button
           onClick={() => onSell(item.id)}
           disabled={isOutOfStock}
-          className={`flex h-10 min-w-[84px] items-center justify-center gap-1 rounded-lg px-2.5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
+          className={`flex h-9 min-w-[112px] items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
             isOutOfStock
               ? 'bg-gray-400 opacity-90 cursor-not-allowed'
               : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
@@ -1293,12 +1392,12 @@ function AssistantPermissionsModal({
     <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-2 sm:p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
       
       {/* MODAL CONTAINER */}
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg max-h-[calc(100vh-1rem)] sm:max-h-[90vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-3xl max-h-[calc(100vh-1rem)] sm:max-h-[90vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
         
         {/* 1. MODAL HEADER */}
         <div className="p-4 sm:p-6 pb-4 sm:pb-5 flex items-start justify-between gap-3 border-b border-slate-100 shrink-0">
           <div className="flex items-start gap-2.5 sm:gap-3.5 min-w-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#7C5CFF]/10 text-[#7C5CFF] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center shrink-0">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
@@ -1320,7 +1419,7 @@ function AssistantPermissionsModal({
         </div>
 
         {/* 2. MODAL BODY */}
-        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
+        <div className="p-4 sm:p-5 space-y-3 sm:overflow-visible overflow-y-auto">
           
           {/* SELECT ASSISTANT SECTION */}
           <div className="space-y-2">
@@ -1330,9 +1429,9 @@ function AssistantPermissionsModal({
             </div>
 
             {/* Custom Dropdown Box */}
-            <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:bg-[#7C5CFF]/10 transition-colors">
+            <div className="bg-[#6366F1]/5 border border-[#6366F1]/20 rounded-2xl p-2.5 flex items-center justify-between cursor-pointer hover:bg-[#6366F1]/10 transition-colors">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-full bg-[#7C5CFF] text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-[#6366F1] text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
                   P
                 </div>
                 <div>
@@ -1358,22 +1457,22 @@ function AssistantPermissionsModal({
           </div>
 
           {/* PERMISSIONS SECTION */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 PERMISSIONS
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-[#FFB24C]">
+              <span className={`text-[11px] sm:text-xs font-bold ${enabledCount > 0 ? "text-emerald-600" : "text-[#6366F1]"}`}>
                 All permissions off by default ({enabledCount}/5 enabled)
               </span>
             </div>
 
             {/* LIST OF PERMISSION TOGGLES */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               
               {/* Item 1: Sell Products / Cashier Mode */}
               <PermissionToggleRow
-                icon={<Calculator className="w-5 h-5 text-[#7C5CFF]" />}
+                icon={<Calculator className={`w-5 h-5 ${permissions.sellProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title="Sell Products / Cashier Mode"
                 description="Sell products and register sales transactions in Sales Mode"
                 enabled={permissions.sellProducts}
@@ -1382,7 +1481,7 @@ function AssistantPermissionsModal({
 
               {/* Item 2: Add / Edit / Delete Products */}
               <PermissionToggleRow
-                icon={<Edit3 className="w-5 h-5 text-[#7C5CFF]" />}
+                icon={<Edit3 className={`w-5 h-5 ${permissions.editProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title="Add / Edit / Delete Products"
                 description="Manage catalog items, quantities, and pricing"
                 enabled={permissions.editProducts}
@@ -1391,7 +1490,7 @@ function AssistantPermissionsModal({
 
               {/* Item 3: Record Booth Expenses */}
               <PermissionToggleRow
-                icon={<Receipt className="w-5 h-5 text-[#7C5CFF]" />}
+                icon={<Receipt className={`w-5 h-5 ${permissions.recordExpenses ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title="Record Booth Expenses"
                 description="Record booth expenses and operational costs"
                 enabled={permissions.recordExpenses}
@@ -1400,7 +1499,7 @@ function AssistantPermissionsModal({
 
               {/* Item 4: View Sales Log & Gross Stats */}
               <PermissionToggleRow
-                icon={<History className="w-5 h-5 text-[#7C5CFF]" />}
+                icon={<History className={`w-5 h-5 ${permissions.viewSalesLog ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title="View Sales Log & Gross Stats"
                 description="Access transaction history, undo sales, and total stats"
                 enabled={permissions.viewSalesLog}
@@ -1409,7 +1508,7 @@ function AssistantPermissionsModal({
 
               {/* Item 5: Manage & Grant Permissions */}
               <PermissionToggleRow
-                icon={<Shield className="w-5 h-5 text-[#7C5CFF]" />}
+                icon={<Shield className={`w-5 h-5 ${permissions.managePermissions ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title="Manage & Grant Permissions"
                 badgeText="RESTRICTED"
                 description="Assign roles and grant assistant permissions"
@@ -1433,7 +1532,7 @@ function AssistantPermissionsModal({
           
           <button
             onClick={() => onSave(permissions)}
-            className="w-full sm:w-auto px-5 py-2.5 bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
             <span>Save Permissions</span>
@@ -1466,24 +1565,28 @@ function PermissionToggleRow({
   return (
     <div
       onClick={onToggle}
-      className="p-3.5 rounded-2xl border border-slate-100/90 bg-white hover:bg-slate-50/60 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-2xs"
+      className={`flex items-center justify-between gap-3 rounded-xl border p-2.5 shadow-2xs transition-colors cursor-pointer ${
+        enabled
+          ? 'border-emerald-200 bg-emerald-50/70 hover:bg-emerald-50'
+          : 'border-slate-100/90 bg-white hover:bg-slate-50/60'
+      }`}
     >
-      <div className="flex items-start space-x-3.5 pr-2">
-        <div className="w-10 h-10 rounded-xl bg-[#7C5CFF]/5 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="flex min-w-0 items-center space-x-3 pr-2">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${enabled ? 'bg-emerald-100' : 'bg-[#6366F1]/5'}`}>
           {icon}
         </div>
-        <div className="space-y-0.5">
+        <div className="min-w-0 space-y-0.5">
           <div className="flex items-center space-x-2">
-            <h3 className="font-bold text-[#0B0F4F] text-xs tracking-tight">
+            <h3 className="font-bold text-[#0B0F4F] text-[11px] tracking-tight">
               {title}
             </h3>
             {badgeText && (
-              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-[#7C5CFF]/10 text-[#7C5CFF] uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-[#6366F1]/10 text-[#6366F1] uppercase tracking-wider">
                 {badgeText}
               </span>
             )}
           </div>
-          <p className="text-[11px] text-slate-400 font-medium leading-normal">
+          <p className="truncate text-[10px] text-slate-400 font-medium leading-normal">
             {description}
           </p>
         </div>
@@ -1497,7 +1600,7 @@ function PermissionToggleRow({
           onToggle();
         }}
         className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none ${
-          enabled ? 'bg-[#7C5CFF]' : 'bg-slate-200'
+          enabled ? 'bg-emerald-500' : 'bg-slate-200'
         }`}
       >
         <div
@@ -1541,11 +1644,11 @@ function EndSalesRunModal({
         {/* 1. MODAL HEADER */}
         <div className="p-6 pb-5 flex items-start justify-between border-b border-slate-100">
           <div className="flex items-start space-x-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-[#BE123C]/5 border border-[#BE123C]/15 text-[#BE123C] flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-[#0B0F4F] tracking-tight">
+              <h2 className="text-xl font-extrabold text-[#BE123C] tracking-tight">
                 End Active Sales Run
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
@@ -1566,8 +1669,8 @@ function EndSalesRunModal({
         <div className="p-6 space-y-5">
           
           {/* STEP 1: SESSION LOCKDOWN WARNINGS BOX */}
-          <div className="bg-rose-50/60 border border-rose-200/60 rounded-2xl p-4 space-y-2">
-            <div className="flex items-center space-x-2 text-rose-600 font-bold text-xs">
+          <div className="bg-[#BE123C]/5 border border-[#BE123C]/15 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center space-x-2 text-[#BE123C] font-bold text-xs">
               <Lock className="w-4 h-4 shrink-0" />
               <span>Step 1: Session Lockdown Warnings</span>
             </div>
@@ -1588,11 +1691,11 @@ function EndSalesRunModal({
             {/* CONFIRMATION CHECKBOX BOX */}
             <label
               onClick={() => setIsConfirmed(!isConfirmed)}
-              className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-[#7C5CFF]/10 transition-colors select-none"
+              className="bg-[#BE123C]/5 border border-[#BE123C]/20 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-[#BE123C]/10 transition-colors select-none"
             >
               <div
                 className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
-                  isConfirmed ? 'bg-[#7C5CFF] text-white' : 'border border-slate-300 bg-white'
+                  isConfirmed ? 'bg-[#BE123C] text-white' : 'border border-slate-300 bg-white'
                 }`}
               >
                 {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -1605,14 +1708,14 @@ function EndSalesRunModal({
             {/* INPUT CONFIRMATION TEXT */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700 block">
-                Type <span className="font-bold text-rose-500">END RUN</span> below to confirm:
+                Type <span className="font-bold text-[#BE123C]">END RUN</span> below to confirm:
               </label>
               <input
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="END RUN"
-                className="w-full bg-slate-50/60 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-rose-500 uppercase transition-all placeholder:text-slate-300"
+                className="w-full bg-slate-50/60 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-[#BE123C] uppercase transition-all placeholder:text-slate-300"
               />
             </div>
           </div>
@@ -1635,8 +1738,8 @@ function EndSalesRunModal({
             disabled={!isReadyToSubmit}
             className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all flex items-center gap-1.5 ${
               isReadyToSubmit
-                ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 cursor-pointer'
-                : 'bg-rose-300 cursor-not-allowed opacity-70'
+                ? 'bg-[#BE123C] hover:bg-[#9F1239] active:bg-[#881337] cursor-pointer'
+                : 'bg-[#BE123C]/40 cursor-not-allowed opacity-70'
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
@@ -1666,25 +1769,21 @@ function SaleSection({
   const filteredProducts = products.filter(
     (item) => item && item.supplierId === id
   );
-  const accent = id.toLowerCase().includes("kaimook")
-    ? { dot: "bg-[#F062C0]", count: "border-[#F062C0]/20 bg-[#F062C0]/10 text-[#F062C0]" }
-    : id.toLowerCase().includes("nong")
-      ? { dot: "bg-[#FFB24C]", count: "border-[#FFB24C]/20 bg-[#FFB24C]/10 text-[#FFB24C]" }
-      : { dot: "bg-[#7C5CFF]", count: "border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[#7C5CFF]" };
+  const accent = getSupplierAccent(id);
 
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {/* Header */}
       <div className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white px-4 py-3 shadow-2xs">
         <div className="flex min-w-0 items-center gap-2">
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${accent.dot}`} />
 
-          <h2 className="truncate text-sm font-extrabold tracking-tight text-[#0B0F4F]">
+          <h2 className="truncate text-xl font-extrabold tracking-tight text-[#0B0F4F]">
             {Name}
           </h2>
 
-          <span className="shrink-0 rounded-full bg-[#7C5CFF]/10 px-2 py-1 text-[10px] font-extrabold text-[#7C5CFF]">
+          <span className={`flex shrink-0 items-center self-center rounded-full px-2.5 py-1.5 text-xs font-extrabold leading-none ${accent.badge}`}>
             {Role === "host" ? "Host" : "Supplier"}
           </span>
         </div>

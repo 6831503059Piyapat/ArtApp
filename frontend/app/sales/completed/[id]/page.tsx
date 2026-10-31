@@ -135,17 +135,23 @@ export default function ConsignDeskDashboard() {
  
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8f9fc] font-sans text-[#0B0F4F]">
+    <div className="relative isolate flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#0B0F4F]">
       {/* Navigation Bar */}
       <Suspense fallback={<div>Loading...</div>}>
         <Navbar />
       </Suspense>
 
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[82px] z-0 overflow-hidden">
+        <div className="absolute -left-40 top-[4%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(240,98,192,0.22)_0%,rgba(240,98,192,0.1)_42%,transparent_72%)] blur-3xl" />
+        <div className="absolute -right-36 top-[30%] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(124,92,255,0.2)_0%,rgba(124,92,255,0.09)_46%,transparent_74%)] blur-3xl" />
+        <div className="absolute left-[28%] top-[62%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(255,178,76,0.2)_0%,rgba(255,178,76,0.09)_46%,transparent_74%)] blur-3xl" />
+      </div>
+
       {/* Main Content */}
-      <main className="mx-auto mt-[60px] w-full max-w-[1280px] flex-1 px-4 pb-10 sm:px-6 md:w-[95%] lg:px-8">
+      <main className="relative z-10 mx-auto mt-[60px] w-full max-w-[1280px] flex-1 px-4 pb-10 sm:px-6 md:w-[95%] lg:px-8">
 
         {/* Header Section */}
-        <div className="relative isolate mb-5 overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white p-4 shadow-sm md:p-5">
+        <div className="relative isolate mb-6 overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white/90 p-4 shadow-sm md:p-5">
           <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-[#FFB24C]/30 blur-2xl" />
           <div className="relative flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-start min-[900px]:justify-between">
             <div className="min-w-0">
@@ -186,7 +192,7 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* Stats 4 Columns */}
-        <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
           {/* Card 1 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
@@ -267,7 +273,7 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-5 flex items-center gap-1 overflow-x-auto border-b border-gray-200 px-2">
+        <div className="mb-6 flex items-center gap-1 overflow-x-auto border-b border-gray-200 px-2">
           <button onClick={() => setActiveTab('sales')}
             className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 pt-2.5 pb-3 font-medium text-xs transition-colors ${
               activeTab === 'sales' ? 'text-[#7C5CFF] bg-[#7C5CFF]/10 border-b-2 border-[#7C5CFF]' : 'text-gray-500 hover:text-[#0B0F4F]'
@@ -606,7 +612,7 @@ export default function ConsignDeskDashboard() {
           {/* ถ้าเลือก Tab Payouts (โค้ดการ์ด 3 ใบของหนูอยู่ตรงนี้ทั้งหมด) */}
           {activeTab === 'payouts' && (
             <div className="mb-8 overflow-x-auto pb-2">
-              <div className="flex min-w-full gap-4">
+              <div className="flex min-w-full gap-5">
               {/* Card 1 - Host */}
               <div className="relative flex min-w-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm">
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#7C5CFF]/25 via-[#7C5CFF]/10 to-transparent blur-2xl" />
