@@ -45,10 +45,14 @@ const LoginWithGoogle = async () => {
   }
 };
 
-  
+  // ขั้นตอนต่อไป ทำfirebase email password register และ Login  จากนั้นทำ ตัวเช็คว่า register ไปแล้วรึยัง
+  //(ต้องทำปุ่ม Logout ด้วย) และทำการเช็คว่า login แล้วรึยัง ถ้า login แล้วให้ไปหน้า dashboard
+  //อย่าลืมเตือนทีมงานว่าให้ทำ landing page และ แปลภาษาหน้าเว็ปด้วย
   const handleSubmit = async  (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+    if(isCreatingAccount){
+
+    }
     setFormMessage('');
     setIsLoading(true);
 
@@ -120,17 +124,6 @@ useEffect(() => {
   };
 }, [router]);
 
-// const aboutme = async () => {
-//  const res = await fetch("http://localhost:8081/api/me", {
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${await auth.currentUser?.getIdToken()}`,
-//     },
-//   });
-//   console.log("Response from /api/me:", auth.currentUser?.getIdToken());
-//   console.log(res.status);
-//   console.log(await res.text());  
-// };
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7f8fc] px-4 py-8 text-slate-900">

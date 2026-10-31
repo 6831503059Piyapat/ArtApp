@@ -1,7 +1,9 @@
 'use client';
 import Navbar from '@/app/components/navbar';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Store, User, CheckCircle2, Save, SlidersHorizontal } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('Completed');
@@ -12,6 +14,12 @@ export default function ProfilePage() {
   const [stallAlias, setStallAlias] = useState('alexchen');
   const [email, setEmail] = useState('alex.chen@artmarket.io');
   const [showToast, setShowToast] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  function handleLanuageChange(lang: 'EN' | 'TH', currency: string) {
+    localStorage.setItem('language', lang);
+    localStorage.setItem('Currency', currency.toString());
+  }
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
@@ -24,6 +32,17 @@ export default function ProfilePage() {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUsername(user.displayName || '');
+        setStallAlias(user.email?.split('@')[0] || '');
+        setEmail(user.email || '');
+        setProfileImage(user.photoURL || null);
+      }
+    });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f6f8fd] text-slate-800 font-sans antialiased">
@@ -38,18 +57,47 @@ export default function ProfilePage() {
         <h1 className="text-3xl font-extrabold text-slate-900 mb-6 tracking-tight">User Profile</h1>
         <div className="bg-white rounded-3xl border border-slate-200/70 shadow-sm p-6 md:p-8 space-y-8">
           <div className="bg-gradient-to-r from-purple-50/70 to-indigo-50/30 border border-purple-100/80 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-            <div className="w-20 h-20 rounded-2xl bg-purple-200/60 border border-purple-300/40 text-purple-700 font-bold text-2xl flex items-center justify-center shrink-0">AC</div>
-            <div className="space-y-1.5 flex-1">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h2 className="text-xl font-bold text-slate-900">{username}</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">@{stallAlias}</span>
-              </div>
-              <p className="text-sm font-medium text-slate-500">{email}</p>
-              <div className="flex items-center gap-2 text-xs font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full w-fit border border-purple-100 mt-2">
-                <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>Active Host: MFU Night Market (MON 14)
-              </div>
-            </div>
-          </div>
+
+  {/* Profile Image */}
+  <div className="w-20 h-20 rounded-2xl bg-purple-200/60 border border-purple-300/40 flex items-center justify-center shrink-0 overflow-hidden">
+    {profileImage ? (
+      <img
+        src={profileImage}
+        alt={`${username}'s profile`}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+    ) : (
+      <span className="text-purple-700 font-bold text-2xl">
+        {username?.slice(0, 2).toUpperCase() || 'AC'}
+      </span>
+    )}
+  </div>
+
+  {/* User Information */}
+  <div className="space-y-1.5 flex-1">
+    <div className="flex items-center gap-2.5 flex-wrap">
+      <h2 className="text-xl font-bold text-slate-900">
+        {username}
+      </h2>
+
+      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">
+        @{stallAlias}
+      </span>
+    </div>
+
+    <p className="text-sm font-medium text-slate-500">
+      {email}
+    </p>
+
+    <div className="flex items-center gap-2 text-xs font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full w-fit border border-purple-100 mt-2">
+      <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+      Active Host: MFU Night Market (MON 14)
+    </div>
+  </div>
+</div>
 
           <div className="space-y-5">
             <div className="border-b border-slate-100 pb-3"><h3 className="text-lg font-bold text-slate-900">Personal information</h3></div>
