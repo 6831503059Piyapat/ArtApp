@@ -2,7 +2,7 @@
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
 import Footer from "@/app/components/footer";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent,useEffect } from "react";
 import {
   CalendarDays,
   Check,
@@ -84,6 +84,9 @@ const inputClass ="min-w-0 rounded-lg border  bg-white px-2.5 py-2 text-sm text-
 const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
 export default function CreateSalesRun() {
+  // State for manage sections and expenses
+  const [language, setLanguage] = useState<'EN' | 'TH'>('EN');
+
   const [sections, setSections] = useState<SupplierSection[]>(initialSections);
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   // State for run name and Form for send to backend
@@ -121,13 +124,13 @@ export default function CreateSalesRun() {
     //     ownerProduct: ownerProducts
     //   })
     // })
-    if(!runName || !runDate || !runLocation ){
+    if(!runName ){
       if(!runName) setRunNameError(true);
       if (runName) setRunNameError(false);
-      if(!runDate) setRunDateError(true);
-      if (runDate) setRunDateError(false);
-      if(!runLocation) setRunLocationError(true);
-      if (runLocation) setRunLocationError(false);
+      // if(!runDate) setRunDateError(true);
+      // if (runDate) setRunDateError(false);
+      // if(!runLocation) setRunLocationError(true);
+      // if (runLocation) setRunLocationError(false);
       setError("Please fill in all required fields");
       return;
     }
@@ -178,6 +181,9 @@ export default function CreateSalesRun() {
 
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
 
+  useEffect(() => {
+    setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+  })
   return (
     <div className="min-h-screen bg-[#f7f8fc] pb-20 font-sans text-[#111747]">
       
@@ -186,19 +192,19 @@ export default function CreateSalesRun() {
       
       <main className="mx-auto w-full max-w-[1280px] px-4 pt-[84px] sm:px-6 md:w-[85%] lg:px-8">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#111747]">Create Sales Run</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#111747]">{language === 'EN' ? 'Create Sales Run' : 'สร้างรายการขาย'}</h1>
           <span className="rounded-full border border-[#ded3ff] bg-[#f1edff] px-3 py-1.5 text-sm font-semibold text-[#7957ff]">
-            Step by step
+             {language === 'EN' ? 'Step by step' : 'ขั้นตอนโดยขั้นตอน'}
           </span>
         </div>
 
         <div className="mt-4 grid grid-cols-1 items-start gap-3 sm:grid-cols-[170px_minmax(0,1fr)]">
           <aside className="space-y-2 sm:sticky sm:top-[54px]">
             <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
-              <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]">Catalog Index</h2>
+              <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]"> {language === 'EN' ? 'Catalog Index' : 'ดัชนีแคตตาล็อก'}</h2>
               <div className="space-y-0.5">
                 <a href="#run-details" className="flex items-center gap-1.5 rounded-lg border border-[#ded3ff] bg-[#f1edff] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
-                  <Store className="h-2.5 w-2.5 text-[#7957ff]" /> Run Details
+                  <Store className="h-2.5 w-2.5 text-[#7957ff]" />  {language === 'EN' ? 'Run Details' : 'รายละเอียด'}
                 </a>
                 {sections.map((section) => (
                   <a key={section.id} href={`#${section.id}`} className="flex items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-xs text-[#4c526a] hover:bg-[#f7f5ff]">
@@ -231,13 +237,13 @@ export default function CreateSalesRun() {
                   </form>
                 ) : (
                   <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-xs font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
-                    <UsersRound className="h-2.5 w-2.5" /> + Add Supplier
+                    <UsersRound className="h-2.5 w-2.5" /> + {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
                   </button>
                 )}
               </div>
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
                 <a href="#booth-expenses" className="flex items-center justify-between rounded-lg bg-[#fff4ef] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
-                  <span className="flex items-center gap-1.5"><Receipt className="h-2.5 w-2.5 text-[#f15a24]" /> Booth Expenses</span>
+                  <span className="flex items-center gap-1.5"><Receipt className="h-2.5 w-2.5 text-[#f15a24]" /> {language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่าย'}</span>
                   <ChevronRight className="h-2.5 w-2.5 text-[#858ba0]" />
                 </a>
               </div>
@@ -248,8 +254,8 @@ export default function CreateSalesRun() {
                 <Lightbulb className="h-3 w-3" />
               </span>
               <div>
-                <h3 className="text-xs font-bold">Quick Tip</h3>
-                <p className="mt-0.5 text-xs leading-[1.45] text-[#858ba0]">Click supplier tab to jump directly to items. Click action button to register immediate sales.</p>
+                <h3 className="text-xs font-bold">{language === 'EN' ? 'Quick Tip' : 'คำแนะนำ'}</h3>
+                <p className="mt-0.5 text-xs leading-[1.45] text-[#858ba0]">{language === 'EN' ? 'Click supplier tab to jump directly to items. Click action button to register immediate sales.' : 'คลิกแท็บซัพพลายเออร์เพื่อไปยังรายการโดยตรง คลิกปุ่มดำเนินการเพื่อลงทะเบียนการขายทันที.'}</p>
               </div>
             </div>
           </aside>
@@ -258,28 +264,28 @@ export default function CreateSalesRun() {
             <section id="run-details" className="overflow-hidden rounded-xl border border-[#d9ceff] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
               <div className="h-[3px] bg-gradient-to-r from-[#7957ff] via-[#ed72bd] to-[#ffb84d]" />
               <div className="p-2.5">
-                <h2 className="rounded-md bg-gradient-to-r from-[#ffdb9c] via-[#f5b4cc] to-[#efa2dc] px-3 py-1.5 text-lg font-extrabold leading-tight">Run’s Information</h2>
+                <h2 className="rounded-md bg-gradient-to-r from-[#ffdb9c] via-[#f5b4cc] to-[#efa2dc] px-3 py-1.5 text-lg font-extrabold leading-tight"> {language === 'EN' ? 'Run’s Information' : 'ข้อมูลรายการขาย'}</h2>
                 <div className="mt-2.5 space-y-2.5">
                   <label className="block text-xs font-bold">
-                    Run Name <span className="text-[#f15a24]">*</span>
+                     {language === 'EN' ? 'Run Name' : 'ชื่อรายการขาย'} <span className="text-[#f15a24]">*</span>
                     <span className="relative mt-1 block">
                       <Store className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runNameError ? 'text-[#f15a24]':' text-[#7957ff]'}`} />
-                      <input required placeholder="Enter run name Ex: MFU Outside Night Market (MON14)" onChange={(e) => setRunName(e.target.value)} className={`${inputClass} ${runNameError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6 font-semibold`} />
+                      <input required placeholder={language === 'EN' ? 'Enter run name Ex: MFU Outside Night Market (MON14)' : 'ป้อนชื่อรายการขาย Ex: MFU Outside Night Market (MON14)'} onChange={(e) => setRunName(e.target.value)} className={`${inputClass} ${runNameError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6 font-semibold`} />
                     </span>
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                     <label className="block text-xs font-bold">
-                      Run Date / Period
+                      {language === 'EN' ? 'Run Date' : 'วันที่รายการ'} / {language === 'EN' ? 'Period' : 'ระยะเวลา'}
                       <span className="relative mt-1 block">
                         <CalendarDays className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runDateError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
                         <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} ${runDateError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                     <label className="block text-xs font-bold">
-                      Booth Location
+                       {language === 'EN' ? 'Booth Location' : 'สถานที่'}
                       <span className="relative mt-1 block">
                         <MapPin className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runLocationError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
-                        <input placeholder="Mae Fah Luang University" onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} ${runLocationError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
+                        <input placeholder={language === 'EN' ? 'Mae Fah Luang University' : 'มหาวิทยาลัยแม่ฟ้าหลวง'} onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} ${runLocationError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                   </div>
@@ -300,6 +306,7 @@ export default function CreateSalesRun() {
                   ...current,
                   products: current.products.filter((product) => product.id !== productId),
                 }))}
+                language={language}
               />
             ))}
 
@@ -308,22 +315,22 @@ export default function CreateSalesRun() {
                 <div className="flex items-center gap-1.5">
                   <span className="flex h-4 w-4 items-center justify-center rounded-md bg-[#f15a24] text-white"><Receipt className="h-2.5 w-2.5" /></span>
                   <div>
-                    <h2 className="text-base font-bold">Booth Expenses</h2>
-                    <p className="text-xs text-[#858ba0]">Shared expenses</p>
+                    <h2 className="text-base font-bold">{language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่าย'}</h2>
+                    <p className="text-xs text-[#858ba0]"> {language === 'EN' ? 'Shared expenses' : 'ค่าใช้จ่ายที่แบ่งปัน'}</p>
                   </div>
                 </div>
                 <span className="rounded-full border border-[#ffd3c5] bg-[#ffe7dc] px-2 py-1 text-xs text-[#e34d1b]">
-                  Total Overhead: <strong className="ml-1">฿{totalExpenses.toLocaleString()}</strong>
+                  {language === 'EN' ? 'Total Overhead' : 'ค่าใช้จ่ายรวม'}: <strong className="ml-1">฿{totalExpenses.toLocaleString()}</strong>
                 </span>
               </div>
               <div className="mx-2.5 overflow-x-auto rounded-lg border border-[#e7e9f1] bg-white">
                 <table className="w-full min-w-[360px] text-left">
                   <thead className="bg-[#f7f8fc] text-xs font-bold uppercase text-[#111747]">
                     <tr>
-                      <th className="px-2 py-1.5">Expense Item</th>
-                      <th className="px-2 py-1.5">Category</th>
-                      <th className="px-2 py-1.5 text-right">Cost (฿)</th>
-                      <th className="w-8 px-2 py-1.5 text-center">Remove</th>
+                      <th className="px-2 py-1.5">{language === 'EN' ? 'Expense Item' : 'รายการค่าใช้จ่าย'}</th>
+                      <th className="px-2 py-1.5">{language === 'EN' ? 'Category' : 'หมวดหมู่'}</th>
+                      <th className="px-2 py-1.5 text-right">{language === 'EN' ? 'Cost (฿)' : 'ค่าใช้จ่าย (฿)'}</th>
+                      <th className="w-8 px-2 py-1.5 text-center">{language === 'EN' ? 'Remove' : 'ลบ'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#eff0f5]">
@@ -340,21 +347,21 @@ export default function CreateSalesRun() {
                       </tr>
                     ))}
                     {expenses.length === 0 && (
-                      <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]">No expenses added yet</td></tr>
+                      <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]"> {language === 'EN' ? 'No expenses added yet' : 'ยังไม่มีค่าใช้จ่ายที่เพิ่มเข้ามา'}</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
               <form onSubmit={addExpense} className="m-2.5 flex flex-wrap gap-1.5 rounded-lg border border-[#f0e7e4] bg-white p-1.5">
-                <input required value={newExpense.name} onChange={(event) => setNewExpense({ ...newExpense, name: event.target.value })} placeholder="Expense description (e.g. Folding Table Rental)" className={`${inputClass} ${inputClass2} flex-[2_1_130px]`} />
+                <input required value={newExpense.name} onChange={(event) => setNewExpense({ ...newExpense, name: event.target.value })} placeholder={language === 'EN' ? 'Expense description (e.g. Folding Table Rental)' : 'รายละเอียดค่าใช้จ่าย (เช่น ค่าเช่าโต๊ะพกพา)'} className={`${inputClass} ${inputClass2} flex-[2_1_130px]`} />
                 <select value={newExpense.category} onChange={(event) => setNewExpense({ ...newExpense, category: event.target.value })} className={`${inputClass} ${inputClass2} flex-[1_1_75px]`}>
-                  <option>Booth Fee</option>
-                  <option>Stall Supplies</option>
-                  <option>Travel</option>
+                  <option>{language === 'EN' ? 'Booth Fee' : 'ค่าเช่า Booth'}</option>
+                  <option>{language === 'EN' ? 'Stall Supplies' : 'อุปกรณ์สต๊อก'}</option>
+                  <option>{language === 'EN' ? 'Travel' : 'การเดินทาง'}</option>
                 </select>
-                <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder="Amount ฿" className={`${inputClass} ${inputClass2} flex-[1_1_55px]`} />
+                <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder={language === 'EN' ? 'Amount ฿' : 'จำนวน ฿'} className={`${inputClass} ${inputClass2} flex-[1_1_55px]`} />
                 <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#df4e1c]">
-                  <Plus className="h-2.5 w-2.5" /> Add Expense
+                  <Plus className="h-2.5 w-2.5" /> {language === 'EN' ? 'Add Expense' : 'เพิ่มค่าใช้จ่าย'}
                 </button>
               </form>
             </section>
@@ -369,16 +376,16 @@ export default function CreateSalesRun() {
         <div className="mx-auto flex min-h-[38px] w-full max-w-[1280px] items-center justify-between gap-2 px-[18px] py-1.5 md:w-[85%]">
           <div className="flex min-w-0 items-center gap-2 text-xs">
             <span className="flex shrink-0 items-center gap-1 font-semibold text-[#7957ff]">
-              <Check className="h-2.5 w-2.5" /> All changes saved
+              <Check className="h-2.5 w-2.5" /> {language === 'EN' ? 'All changes saved' : 'บันทึกการเปลี่ยนแปลงแล้ว'}
             </span>
             <span className="text-[#d5d7df]">•</span>
-            <span className="hidden truncate text-[#858ba0] sm:inline">Ready for sales at MFU Outside Night Market</span>
-            {launched && <span role="status" className="truncate font-semibold text-[#159a68]">Run launched</span>}
+            <span className="hidden truncate text-[#858ba0] sm:inline">{language === 'EN' ? 'Ready for sales at MFU Outside Night Market' : 'พร้อมสำหรับการขายที่ตลาดกลางคืน MFU'}</span>
+            {launched && <span role="status" className="truncate font-semibold text-[#159a68]">{language === 'EN' ? 'Run launched' : 'เริ่มต้นแล้ว'}</span>}
           </div>
           <div className="flex shrink-0 gap-1.5">
-            <button type="button" className="rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-[10px] font-semibold text-[#e34d55] hover:bg-[#ffebeb]">Cancel</button>
+            <button type="button" className="rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-[10px] font-semibold text-[#e34d55] hover:bg-[#ffebeb]">{language === 'EN' ? 'Cancel' : 'ยกเลิก'}</button>
             <button type="button" onClick={() => hamdleSubmit()} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm hover:brightness-105">
-              <Rocket className="h-2.5 w-2.5" /> {launched ? "Launched" : "Launch Run"}
+              <Rocket className="h-2.5 w-2.5" /> {launched ? language === 'EN' ? 'Launched' : 'เริ่มต้นแล้ว' : language === 'EN' ? 'Launch Run' : 'เริ่มต้นการขาย'}
             </button>
           </div>
         </div>
@@ -394,11 +401,13 @@ function ProductSection({
   index,
   onAdd,
   onRemove,
+  language
 }: {
   section: SupplierSection;
   index: number;
   onAdd: (product: Omit<Product, "id">) => void;
   onRemove: (productId: number) => void;
+  language: 'EN' | 'TH';
 }) {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -432,10 +441,10 @@ function ProductSection({
         <table className="w-full min-w-[360px] text-left">
           <thead className="bg-[#f7f8fc] text-xs font-bold uppercase text-[#111747]">
             <tr>
-              <th className="px-2 py-1.5">Product Name</th>
-              <th className="w-[13%] px-2 py-1.5 text-center">Qty</th>
-              <th className="w-[19%] px-2 py-1.5 text-right">Price (฿)</th>
-              <th className="w-[12%] px-2 py-1.5 text-center">Remove</th>
+              <th className="px-2 py-1.5">{language === 'EN' ? 'Product Name' : 'ชื่อสินค้า'}</th>
+              <th className="w-[13%] px-2 py-1.5 text-center">{language === 'EN' ? 'Qty' : 'จำนวน'}</th>
+              <th className="w-[19%] px-2 py-1.5 text-right"> {language === 'EN' ? 'Price (฿)' : 'ราคา (฿)'}</th>
+              <th className="w-[12%] px-2 py-1.5 text-center">{language === 'EN' ? 'Remove' : 'ลบ'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#eff0f5]">
@@ -457,18 +466,18 @@ function ProductSection({
               </tr>
             ))}
             {section.products.length === 0 && (
-              <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]">No products added yet</td></tr>
+              <tr><td colSpan={4} className="px-2 py-3 text-center text-sm text-[#858ba0]"> {language === 'EN' ? 'Add some products to get started' : 'เพิ่มสินค้าเพื่อเริ่มต้น'}</td></tr>
             )}
           </tbody>
         </table>
       </div>
       <form onSubmit={addProduct} className="m-2.5 flex flex-wrap gap-1.5 rounded-lg border border-[#eff0f5] bg-[#fafbfe] p-1.5">
-        <input required value={name} onChange={(event) => setName(event.target.value)} placeholder={section.placeholder} className={`${inputClass} ${inputClass2} flex-[2_1_120px]`} />
-        <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder="Qty" className={`${inputClass} ${inputClass2} flex-[1_1_42px]`} />
-        <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="Price ฿" className={`${inputClass} ${inputClass2} flex-[1_1_52px]`} />
+        <input required value={name} onChange={(event) => setName(event.target.value)} placeholder={language === 'EN' ? 'Item Name (e.g. Linen Coaster Set)' : 'ชื่อสินค้า (เช่น ชุดโต๊ะกินข้าว)'} className={`${inputClass} ${inputClass2} flex-[2_1_120px]`} />
+        <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder={language === 'EN' ? 'Qty' : 'จำนวน'} className={`${inputClass} ${inputClass2} flex-[1_1_42px]`} />
+        <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder={language === 'EN' ? 'Price ฿' : 'ราคา (฿)'} className={`${inputClass} ${inputClass2} flex-[1_1_52px]`} />
         <input hidden value={section.id} onChange={(e)=>setOwnerP(e.target.value)}/>
         <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#6642ed]">
-          <Plus className="h-2.5 w-2.5" /> Add Product
+          <Plus className="h-2.5 w-2.5" /> {language === 'EN' ? 'Add Product' : 'เพิ่มสินค้า'}
         </button>
       </form>
     </section>

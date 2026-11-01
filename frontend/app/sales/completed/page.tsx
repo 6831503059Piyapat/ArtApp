@@ -1,7 +1,7 @@
 'use client';
 import Navbar from '@/app/components/navbar';
 import Footer from '@/app/components/footer';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo,useEffect } from 'react';
 import Link from 'next/link';
 import { BadgeCheck, Banknote, Clock3, ShoppingBag } from 'lucide-react';
 
@@ -41,7 +41,7 @@ const INITIAL_RUNS = [
 
 export default function CompletedRunsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); // Default to English
   // Filter Logic
   const filteredRuns = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -53,7 +53,9 @@ export default function CompletedRunsPage() {
       run.rawDate.includes(query)
     );
   }, [searchQuery]);
-
+useEffect(() => {
+  setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+},[])
   return (
     <div className="flex min-h-screen flex-col bg-creatory-canvas text-creatory-navy font-sans antialiased">
       {/* Header Navigation */}
@@ -68,8 +70,8 @@ export default function CompletedRunsPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="flex flex-col gap-1">
                 <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight leading-7">
-                  Completed Sales Runs
-                  <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary">3 Archived</span>
+                  {language === 'EN' ? 'Completed Sales Runs' : 'การขายที่เสร็จสิ้น'}
+                  <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary">3 {language === 'EN' ? 'Archived' : 'การขาย'}</span>
                 </h1>
               </div>
             </div>
@@ -78,7 +80,7 @@ export default function CompletedRunsPage() {
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
               <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-primary/30">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">Settled Runs</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">{language === 'EN' ? 'Settled Runs' : 'การขายที่เสร็จสิ้น'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-creatory-lavender text-primary">
                     <BadgeCheck className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
@@ -86,31 +88,31 @@ export default function CompletedRunsPage() {
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
                     <span className="text-lg font-extrabold leading-5 md:text-xl">3</span>
-                    <span className="rounded-full bg-creatory-lavender px-1.5 py-0.5 text-[9px] font-bold text-primary">Completed</span>
+                    <span className="rounded-full bg-creatory-lavender px-1.5 py-0.5 text-[9px] font-bold text-primary"> {language === 'EN' ? 'Completed' : 'เสร็จสิ้น'}</span>
                   </div>
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">100% reconciled across all artists</p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]"> {language === 'EN' ? '100% reconciled across all artists' : '100% ตรวจสอบแล้ว across all artists'}</p>
                 </div>
               </div>
               
               <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-pink/30">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">AVG RUN TIME</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">{language === 'EN' ? 'AVG RUN TIME' : 'เวลาเฉลี่ยต่อการขาย'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-pink-50 text-creatory-pink">
                     <Clock3 className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
                 </div>
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
-                    <span className="text-lg font-extrabold leading-5 md:text-xl">6h 10m</span>
-                    <span className="text-[9px] font-semibold text-creatory-gray">Avg / run</span>
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">6{language === 'EN' ? 'h' : 'ชม'} 10{language === 'EN' ? 'm' : 'นาที'}</span>
+                    <span className="text-[9px] font-semibold text-creatory-gray"> {language === 'EN' ? 'Avg / run' : 'เฉลี่ยต่อการรัน'}</span>
                   </div>
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18h 30m Total duration recorded</p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18{language === 'EN' ? 'h' : 'ชม'} 30{language === 'EN' ? 'm' : 'นาที'} {language === 'EN' ? 'Total duration' : ''} </p>
                 </div>
               </div>
 
               <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-orange/40">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">Total Items Sold</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]"> {language === 'EN' ? 'Total Items Sold' : 'จำนวนการขาย'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-creatory-orange">
                     <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
                   </div>
@@ -118,15 +120,15 @@ export default function CompletedRunsPage() {
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
                     <span className="text-lg font-extrabold leading-5 md:text-xl">195</span>
-                    <span className="text-[9px] font-semibold text-creatory-gray">Items</span>
+                    <span className="text-[9px] font-semibold text-creatory-gray">{language === 'EN' ? 'Items' : 'รายการ'}</span>
                   </div>
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">Clearance Rate: <strong className="font-semibold text-creatory-navy">85%</strong></p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{language === 'EN' ? 'Clearance Rate' : 'อัตราการขาย'}: <strong className="font-semibold text-creatory-navy">85%</strong></p>
                 </div>
               </div>
 
               <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-pink/40 bg-gradient-to-br from-creatory-lavender to-white p-2.5 shadow-[0_4px_20px_rgba(124,92,255,0.08)]">
                 <div className="flex items-center justify-between text-creatory-gray">
-                  <span className="text-[9px] font-bold uppercase tracking-wide text-creatory-navy md:text-[10px]">Total Revenue</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wide text-creatory-navy md:text-[10px]"> {language === 'EN' ? 'Total Revenue' : 'รายได้รวม'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-creatory-pink to-creatory-orange text-white shadow-sm">
                     <Banknote className="h-6 w-6" aria-hidden="true" />
                   </div>
@@ -135,7 +137,7 @@ export default function CompletedRunsPage() {
                   <div className="-translate-y-1 flex items-baseline gap-1.5">
                     <span className="text-lg font-extrabold leading-5 tracking-tight md:text-xl">฿20,770</span>
                   </div>
-                  <p className="text-[9px] font-semibold leading-3 text-primary md:text-[10px]">Avg ฿6,923 / run intake</p>
+                  <p className="text-[9px] font-semibold leading-3 text-primary md:text-[10px]"> {language === 'EN' ? 'Avg' : 'เฉลี่ย'} ฿6,923 / {language === 'EN' ? 'run intake' : 'รัน'}</p>
                 </div>
               </div>
             </div>
@@ -143,17 +145,17 @@ export default function CompletedRunsPage() {
             {/* Search */}
             <div className="h-[46px] p-[7px] rounded-[14px] bg-white border border-creatory-border shadow-sm">
               <div className="h-full flex items-center gap-2 bg-creatory-canvas border border-creatory-border rounded-[10px] px-2 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
-                <span className="material-symbols-outlined text-creatory-gray text-[14px]">search</span>
+                <span className="material-symbols-outlined text-creatory-gray text-[14px]">search </span>
                 <input
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search completed runs by name, location, or date..." 
+                  placeholder={language === 'EN' ? 'Search completed runs by name, location, or date...' : 'ค้นหาการรันที่เสร็จสิ้นโดยชื่อ, สถานที่, หรือวันที่...'} 
                   className="w-full bg-transparent text-xs font-medium text-creatory-navy placeholder-creatory-gray focus:outline-none"
                 />
                 {searchQuery && (
                   <button aria-label="Clear search" onClick={() => setSearchQuery('')} className="text-creatory-gray hover:text-creatory-navy">
-                    <span className="material-symbols-outlined text-[14px]">cancel</span>
+                    <span className="material-symbols-outlined text-[14px]"> {language === 'EN' ? 'cancel' : 'cancel'}</span>
                   </button>
                 )}
               </div>
@@ -163,11 +165,11 @@ export default function CompletedRunsPage() {
             <div className="flex items-center justify-between px-0.5 text-[10px] font-semibold leading-4 text-creatory-gray">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[12px] text-primary">folder_special</span>
-                <span>Archived Runs</span>
+                <span>{language === 'EN' ? 'Archived Runs' : 'รันที่ถูกเก็บรักษา'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>Sorted by</span>
-                <span className="text-creatory-navy font-bold">Most Recent Close</span>
+                <span> {language === 'EN' ? 'Sorted by' : 'เรียงตาม'}</span>
+                <span className="text-creatory-navy font-bold">{language === 'EN' ? 'Most Recent Close' : 'การปิดล่าสุด'}</span>
               </div>
             </div>
 
@@ -181,7 +183,7 @@ export default function CompletedRunsPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary/20 bg-creatory-lavender px-1.5 py-0.5 text-[10px] font-bold text-primary">
                           <span className="w-1 h-1 rounded-full bg-primary"></span>
-                          Settled & Closed
+                          {language === 'EN' ? 'Settled & Closed' : 'ปิดแล้ว'}
                         </span>
                       </div>
                       <h2 className="mt-0.5 text-sm font-bold leading-5 tracking-tight sm:text-base">{run.title} ({run.shortDay})</h2>
@@ -191,20 +193,20 @@ export default function CompletedRunsPage() {
                     <div className="flex flex-wrap items-center gap-4 md:self-center md:ml-auto">
                       <div className="flex items-center gap-4">
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray">Total Sold</span>
-                          <span className="text-xs font-bold">{run.sold} items</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray"> {language === 'EN' ? 'Total Sold' : 'ขายรวม'}</span>
+                          <span className="text-xs font-bold">{run.sold} {language === 'EN' ? 'items' : 'ชิ้น'}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray">Gross</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray"> {language === 'EN' ? 'Gross' : 'รวม'}</span>
                           <span className="text-xs font-bold">{run.gross}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Net Intake</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary"> {language === 'EN' ? 'Net Intake' : 'รายได้สุทธิ'}</span>
                           <span className="text-xs font-extrabold text-primary">{run.net}</span>
                         </div>
                       </div>
                       <Link href={`/sales/completed/${run.id}`} className="ml-auto inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-gradient-to-r from-primary to-[#6842FF] px-[10px] py-1.5 text-[10px] font-bold text-white transition-all shadow-sm shadow-primary/30 hover:from-[#6A47F2] hover:to-[#5730EA] md:ml-0">
-                        <span>View Run Breakdown</span>
+                        <span> {language === 'EN' ? 'View Run Breakdown' : 'รายละเอียดการขาย'}</span>
                         <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
                       </Link>
                     </div>
@@ -218,14 +220,14 @@ export default function CompletedRunsPage() {
                     <span className="material-symbols-outlined text-[30px]">manage_search</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-base font-bold">No completed runs match your query</h3>
-                    <p className="text-xs text-creatory-gray">Try searching with a different market name or switch your date filter range.</p>
+                    <h3 className="text-base font-bold">{language === 'EN' ? 'No completed runs match your query' : 'ไม่มีการขายที่เสร็จสมบูรณ์ตรงกับการค้นหาของคุณ'}</h3>
+                    <p className="text-xs text-creatory-gray"> {language === 'EN' ? 'Try searching with a different market name or switch your date filter range.' : 'ลองค้นหาด้วยชื่อตลาดอื่นหรือเปลี่ยนช่วงเวลาในการกรอง'}</p>
                   </div>
                   <button 
                     onClick={() => setSearchQuery('')}
                     className="px-4 py-2 rounded-xl bg-creatory-lavender text-primary font-bold text-xs hover:bg-primary hover:text-white transition-all shadow-sm"
                   >
-                    Clear Search & Filters
+                     {language === 'EN' ? 'Clear Search & Filters' : 'ล้างการค้นหาและตัวกรอง'}
                   </button>
                 </div>
               )}
