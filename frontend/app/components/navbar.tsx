@@ -73,7 +73,9 @@ async function logout() {
   <span className="text-[11px] font-semibold">
     {DisplayName}
   </span>
-
+    <button onClick={()=> logout()} className="text-[11px] font-semibold text-red-500 hover:text-red-700 transition-colors">
+      Logout
+    </button>
   <div
     className="w-8 h-8 shrink-0 overflow-hidden rounded-full
       bg-gradient-to-tr from-primary via-creatory-pink

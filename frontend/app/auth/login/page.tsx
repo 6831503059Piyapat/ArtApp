@@ -19,10 +19,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currency, setCurrency] = useState('THB');
   const [formMessage, setFormMessage] = useState('');
-
+  const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
   const isCreatingAccount = activeTab === 'create-account';
- 
+  
+
+
 const LoginWithGoogle = async () => {
   try {
     setIsLoading(true);
@@ -66,7 +69,7 @@ const LoginWithGoogle = async () => {
 
 useEffect(() => {
   let cancelled = false;
-
+  setLanguage(localStorage.getItem('language') as 'EN' | 'TH' || 'TH');
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
     console.log('Firebase user:', user);
     console.log('UID:', user?.uid);
@@ -141,7 +144,7 @@ useEffect(() => {
             Consign<span className="text-primary">Desk</span>
           </h1>
           <p className="mx-auto mt-1 max-w-[280px] text-xs leading-5 text-slate-500">
-            Art booths and pop-up market consignment
+            {language === 'EN' ? 'Art booths and pop-up market consignment' : 'บูธศิลปะและการฝากวางจำหน่ายสินค้าในตลาดชั่วคราว'}
           </p>
         </header>
 

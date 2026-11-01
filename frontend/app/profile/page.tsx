@@ -16,9 +16,10 @@ export default function ProfilePage() {
   const [showToast, setShowToast] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  function handleLanuageChange(lang: 'EN' | 'TH', currency: string) {
+  function handleLanguageChange(lang: 'EN' | 'TH') {
+    setLanguage(lang);
     localStorage.setItem('language', lang);
-    localStorage.setItem('Currency', currency.toString());
+    
   }
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -26,6 +27,7 @@ export default function ProfilePage() {
     setCurrency(val);
     const symbols: Record<string, string> = { THB: '฿', USD: '$', EUR: '€', JPY: '¥' };
     setCurrencySymbol(symbols[val] || '฿');
+    localStorage.setItem('Currency', currency.toString());
   };
 
   const handleSave = () => {
@@ -112,8 +114,8 @@ export default function ProfilePage() {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Display Language</label>
                 <div className="bg-white p-1 rounded-xl border border-slate-200 flex shadow-sm">
-                  <button type="button" onClick={() => setLanguage('EN')} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold ${language === 'EN' ? 'bg-[#7C5CFF] text-white' : 'text-slate-500'}`}>✓ English (EN)</button>
-                  <button type="button" onClick={() => setLanguage('TH')} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold ${language === 'TH' ? 'bg-[#7C5CFF] text-white' : 'text-slate-500'}`}>ภาษาไทย (TH)</button>
+                  <button type="button" onClick={() => handleLanguageChange('EN')} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold ${language === 'EN' ? 'bg-[#7C5CFF] text-white' : 'text-slate-500'}`}>✓ English (EN)</button>
+                  <button type="button" onClick={() => handleLanguageChange('TH')} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold ${language === 'TH' ? 'bg-[#7C5CFF] text-white' : 'text-slate-500'}`}>ภาษาไทย (TH)</button>
                 </div>
               </div>
               <div className="space-y-2">
