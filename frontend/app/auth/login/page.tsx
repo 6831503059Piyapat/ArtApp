@@ -162,7 +162,7 @@ useEffect(() => {
                 : 'text-slate-500 hover:text-[#0B0F4F]'
             }`}
           >
-            Sign In
+            {language === 'EN' ? ' Sign In' : ' ลงชื่อเข้าใช้'}
           </button>
           <button
             id="create-account-tab"
@@ -177,7 +177,7 @@ useEffect(() => {
                 : 'text-slate-500 hover:text-[#0B0F4F]'
             }`}
           >
-            Create Account
+            {language === 'EN' ? 'Create Account' : 'สร้างบัญชี'}
           </button>
         </div>
 
@@ -190,7 +190,7 @@ useEffect(() => {
             {isCreatingAccount && (
               <div>
                 <label htmlFor="username" className="mb-1 block text-xs font-semibold text-[#0B0F4F]">
-                  Username
+                  {language === 'EN' ? 'Username' : 'ชื่อผู้ใช้'}
                 </label>
                 <div className="relative">
                   <UserRound size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -199,7 +199,7 @@ useEffect(() => {
                     type="text"
                     autoComplete="username"
                     required
-                    placeholder="Your booth or artist name"
+                    placeholder={language === 'EN' ? 'Your booth or artist name' : 'ชื่อบูธหรือบัญชีของคุณ'}
                     value={username}
                     onChange={(event) => setUsername(event.target.value)}
                     className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 text-xs text-[#0B0F4F] outline-none transition placeholder:text-slate-400 focus:border-[#7C5CFF]/60 focus:ring-4 focus:ring-[#7C5CFF]/10"
@@ -208,10 +208,11 @@ useEffect(() => {
               </div>
             )}
 
+{/* Login */}
             <div>
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <label htmlFor="email" className="text-xs font-semibold text-[#0B0F4F]">
-                  {isCreatingAccount ? 'Email' : 'Username or Email'}
+                  {language === 'EN' ? 'Email' : 'อีเมล'}
                 </label>
               </div>
               <div className="relative">
@@ -232,11 +233,11 @@ useEffect(() => {
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <label htmlFor="password" className="text-xs font-semibold text-[#0B0F4F]">
-                  Password
+                  {language === 'EN' ? 'Password' : ' รหัสผ่าน'}
                 </label>
                 {!isCreatingAccount && (
                   <Link href="/forgot-password" className="text-xs font-bold text-[#7C5CFF] hover:text-[#6847E8]">
-                    Forgot?
+                    {language === 'EN' ? 'Forgot password?' : 'ลืมรหัสผ่าน?'}
                   </Link>
                 )}
               </div>
@@ -248,7 +249,7 @@ useEffect(() => {
                   autoComplete={isCreatingAccount ? 'new-password' : 'current-password'}
                   minLength={isCreatingAccount ? 8 : undefined}
                   required
-                  placeholder={isCreatingAccount ? 'At least 8 characters' : 'Enter your password'}
+                  placeholder={isCreatingAccount ? language === 'EN' ? 'At least 8 characters' : 'อย่างน้อย 8 ตัวอักษร' : language === 'EN' ? 'Enter your password' : 'ป้อนรหัสผ่านของคุณ'}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-11 text-xs text-[#0B0F4F] outline-none transition placeholder:text-slate-400 focus:border-[#7C5CFF]/60 focus:ring-4 focus:ring-[#7C5CFF]/10"
@@ -271,7 +272,7 @@ useEffect(() => {
                     type="checkbox"
                     className="h-3.5 w-3.5 rounded accent-[#7C5CFF] focus:ring-[#7C5CFF]"
                   />
-                  Remember booth on this device
+                  {language === 'EN' ? 'Remember booth on this device)' : 'จดจำอุปกรณ์นี้'}
                 </label>
               </div>
             )}
@@ -283,8 +284,8 @@ useEffect(() => {
               className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-[#FFB24C] px-4 text-xs font-bold text-[#0B0F4F] shadow-[0_4px_10px_rgba(255,178,76,0.25)] transition hover:bg-[#F4A62F] focus:outline-none focus:ring-4 focus:ring-[#FFB24C]/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading
-                ? (isCreatingAccount ? 'Creating account...' : 'Signing in...')
-                : (isCreatingAccount ? 'Create Account' : 'Sign In')}
+                ? (isCreatingAccount ? language === 'EN' ? 'Creating account...' : 'กำลังสร้างบัญชี...' : language === 'EN' ? 'Signing in...' : 'กำลังลงชื่อเข้าใช้...')
+                : (isCreatingAccount ? language === 'EN' ? 'Create Account' : 'สร้างบัญชี' : language === 'EN' ? 'Sign In' : 'ลงชื่อเข้าใช้')}
             </button>
             <p role="status" aria-live="polite" className="sr-only">
               {formMessage}
@@ -294,7 +295,7 @@ useEffect(() => {
           <div className="my-3 flex items-center gap-2">
             <span className="h-px flex-1 bg-slate-100" />
             <span className="text-[9px] font-semibold tracking-wide text-slate-500">
-              {isCreatingAccount ? 'OR SIGN UP WITH' : 'OR SIGN IN WITH'}
+              {isCreatingAccount ? language === 'EN' ? 'OR SIGN UP WITH' : 'หรือลงชื่อเข้าใช้ด้วย' : language === 'EN' ? 'OR SIGN IN WITH' : 'หรือลงชื่อเข้าใช้ด้วย'}
             </span>
             <span className="h-px flex-1 bg-slate-100" />
           </div>
@@ -310,7 +311,7 @@ useEffect(() => {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18A11 11 0 001 12c0 1.78.43 3.45 1.18 4.94l2.85-2.22z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
             </svg>
-            Continue with Google
+            {language === 'EN' ? 'Continue with Google' : 'ดำเนินการต่อด้วย Google'}
           </button>
         </div>
 

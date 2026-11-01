@@ -94,6 +94,9 @@ const auditData = [
 
 export default function ConsignDeskDashboard() {
   const [activeTab, setActiveTab] = useState('payouts');
+  const [language] = useState<'EN' | 'TH'>(() =>
+    typeof window !== 'undefined' && localStorage.getItem('language') === 'EN' ? 'EN' : 'TH'
+  );
   //const [activeTab, setActiveTab] = useState('sales'); 
   // 1. เพิ่ม State เก็บข้อความที่พิมพ์ค้นหา
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,7 +107,6 @@ export default function ConsignDeskDashboard() {
   // 1. เพิ่ม State สำหรับ Dropdown Staff
   const [selectedStaff, setSelectedStaff] = useState('All Staff');
   const [isStaffDropdownOpen, setIsStaffDropdownOpen] = useState(false);
-
 
 
   // 2. ฟังก์ชันกรองข้อมูล: ถ้าคำที่ค้นหาตรงกับชื่อสินค้า, คนขาย, หรือซัพพลายเออร์ ให้แสดงผล
@@ -160,32 +162,32 @@ export default function ConsignDeskDashboard() {
               </h1>
               <span className="inline-flex items-center gap-1 rounded-md bg-[#7C5CFF]/10 px-2 py-1 text-[10px] font-semibold text-[#7C5CFF]">
                 <Lock size={11} aria-hidden="true" />
-                Archived • Settled
+                {language === 'EN' ? 'Archived • Settled' : 'เก็บถาวร • ชำระเงินแล้ว'}
               </span>
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-[#ED571B]" aria-hidden="true" />
-                  Closed on 14/09/2026 at 22:30
+                  {language === 'EN' ? 'Closed on 14/09/2026 at 22:30' : 'ปิดการขายเมื่อ 14/09/2026 เวลา 22:30'}
                 </span>
                 <span className="flex items-center gap-1">
                   <User size={13} className="text-[#7C5CFF]" aria-hidden="true" />
-                  Host: <strong className="text-[#0B0F4F]">Alex Chen</strong>
+                  {language === 'EN' ? 'Host:' : 'เจ้าของร้าน:'} <strong className="text-[#0B0F4F]">Alex Chen</strong>
                 </span>
                 <span className="flex items-center gap-1">
                   <Users size={13} className="text-[#7C5CFF]" aria-hidden="true" />
-                  Assistant: <strong className="text-[#0B0F4F]">Ploy W.</strong>
+                  {language === 'EN' ? 'Assistant:' : 'ผู้ช่วย:'} <strong className="text-[#0B0F4F]">Ploy W.</strong>
                 </span>
               </div>
             </div>
             <div className="relative flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
               <button className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-[10px] font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
-                <FileSpreadsheet size={13} className="text-blue-500" /> Download Excel (.xlsx)
+                <FileSpreadsheet size={13} className="text-blue-500" /> {language === 'EN' ? 'Download Excel (.xlsx)' : 'ดาวน์โหลด Excel (.xlsx)'}
               </button>
               <button className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-[10px] font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
-                <FileText size={13} className="text-[#F062C0]" /> PDF Statement
+                <FileText size={13} className="text-[#F062C0]" /> {language === 'EN' ? 'PDF Statement' : 'เอกสารสรุป PDF'}
               </button>
               <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ED571B] to-[#F062C0] px-3 py-2 text-[10px] font-medium text-white shadow-sm transition hover:opacity-90 whitespace-nowrap">
-                <Share2 size={13} /> Share PDF File
+                <Share2 size={13} /> {language === 'EN' ? 'Share PDF File' : 'แชร์ไฟล์ PDF'}
               </button>
             </div>
           </div>
@@ -196,13 +198,13 @@ export default function ConsignDeskDashboard() {
           {/* Card 1 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase">Gross Sales</span>
+              <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Gross Sales' : 'ยอดขายรวม'}</span>
               <div className="bg-[#7C5CFF]/10 p-1.5 rounded-md"><Wallet size={16} className="text-[#7C5CFF]" /></div>
             </div>
             <div className="text-2xl font-bold text-[#7C5CFF] mb-3">฿8,490.00</div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>Units: 88 sold / 96 initial</span>
-              <span className="text-[#7C5CFF] font-medium">91.6% sellout</span>
+              <span>{language === 'EN' ? 'Units: 88 sold / 96 initial' : 'จำนวน: ขายแล้ว 88 / เริ่มต้น 96'}</span>
+              <span className="text-[#7C5CFF] font-medium">{language === 'EN' ? '91.6% sellout' : 'ขายได้ 91.6%'}</span>
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] h-1.5 rounded-full" style={{ width: '91.6%' }}></div>
@@ -212,13 +214,13 @@ export default function ConsignDeskDashboard() {
           {/* Card 2 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase">Total Deductions</span>
+              <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Total Deductions' : 'ยอดหักรวม'}</span>
               <div className="bg-[#FEF0EA] p-1.5 rounded-md"><Receipt size={16} className="text-[#ED571B]" /></div>
             </div>
             <div className="text-2xl font-bold text-[#ED571B] mb-3">฿70.00</div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>1 Stall Expense logged</span>
-              <span className="text-[#ED571B] font-medium">Booth Rent</span>
+              <span>{language === 'EN' ? '1 Stall Expense logged' : 'บันทึกค่าใช้จ่ายร้านค้า 1 รายการ'}</span>
+              <span className="text-[#ED571B] font-medium">{language === 'EN' ? 'Booth Rent' : 'ค่าเช่าบูธ'}</span>
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-[#ED571B] h-1.5 rounded-full" style={{ width: `${(70 / 8490) * 100}%` }}></div>
@@ -228,12 +230,12 @@ export default function ConsignDeskDashboard() {
           {/* Card 3 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase">Net Total</span>
+              <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Net Total' : 'ยอดสุทธิ'}</span>
               <div className="bg-[#ECFDF5] p-1.5 rounded-md"><DollarSign size={16} className="text-[#059669]" /></div>
             </div>
             <div className="text-2xl font-bold text-[#0B0F4F] mb-3">฿8,420.00</div>
             <div className="flex justify-end text-xs text-[#059669] font-medium mb-1">
-              99.18% gained from gross sales
+              {language === 'EN' ? '99.18% gained from gross sales' : 'คิดเป็น 99.18% จากยอดขายรวม'}
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-[#059669] h-1.5 rounded-full" style={{ width: '99.18%' }}></div>
@@ -243,9 +245,9 @@ export default function ConsignDeskDashboard() {
           {/* Card 4 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-gray-400 uppercase">Suppliers Payout</span>
+              <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Suppliers Payout' : 'ยอดจ่ายซัพพลายเออร์'}</span>
               <div className="flex items-center text-xs text-[#7C5CFF] font-medium bg-[#7C5CFF]/10 px-2 py-0.5 rounded-full">
-                <CheckCircle2 size={12} className="mr-1" /> Ready
+                <CheckCircle2 size={12} className="mr-1" /> {language === 'EN' ? 'Ready' : 'พร้อมจ่าย'}
               </div>
             </div>
             <div className="mt-2 h-[56px] overflow-y-auto text-xs">
@@ -279,7 +281,7 @@ export default function ConsignDeskDashboard() {
               activeTab === 'sales' ? 'text-[#7C5CFF] bg-[#7C5CFF]/10 border-b-2 border-[#7C5CFF]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
-            <List size={16} /> Sales Log
+            <List size={16} /> {language === 'EN' ? 'Sales Log' : 'รายการขาย'}
             <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">88</span>
           </button>
           
@@ -288,7 +290,7 @@ export default function ConsignDeskDashboard() {
               activeTab === 'expenses' ? 'text-[#ED571B] bg-[#FEF0EA]/70 border-b-2 border-[#ED571B]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
-            <Receipt size={16} className={activeTab === 'expenses' ? '' : 'text-[#ED571B]'} /> Expenses Log
+            <Receipt size={16} className={activeTab === 'expenses' ? '' : 'text-[#ED571B]'} /> {language === 'EN' ? 'Expenses Log' : 'รายการค่าใช้จ่าย'}
             <span className="bg-[#FEF0EA] text-[#ED571B] text-xs px-1.5 py-0.5 rounded-md">1</span>
           </button>
 
@@ -297,7 +299,7 @@ export default function ConsignDeskDashboard() {
               activeTab === 'changes' ? 'text-[#F062C0] bg-[#F062C0]/10 border-b-2 border-[#F062C0]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
-            <History size={16} className="text-[#F062C0]" /> Changes Made
+            <History size={16} className="text-[#F062C0]" /> {language === 'EN' ? 'Changes Made' : 'รายการเปลี่ยนแปลง'}
             <span className={`${activeTab === 'changes' ? 'bg-[#F062C0]/15 text-[#F062C0]' : 'bg-[#F062C0]/10 text-[#F062C0]'} text-xs px-1.5 py-0.5 rounded-md`}>4</span>
           </button>
 
@@ -306,7 +308,7 @@ export default function ConsignDeskDashboard() {
               activeTab === 'payouts' ? 'text-[#7C5CFF] bg-[#7C5CFF]/10 border-b-2 border-[#7C5CFF]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
-            <Users size={16} /> Payout Summaries
+            <Users size={16} /> {language === 'EN' ? 'Payout Summaries' : 'สรุปการจ่ายเงิน'}
             <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">3</span>
           </button>
         </div>
@@ -327,20 +329,20 @@ export default function ConsignDeskDashboard() {
                     type="text" 
                     value={searchQuery} // <-- เพิ่มตรงนี้
                     onChange={(e) => setSearchQuery(e.target.value)} // <-- เพิ่มตรงนี้ให้รับค่าจากคีย์บอร์ด
-                    placeholder="Filter by product, supplier, or cashier..." 
+                    placeholder={language === 'EN' ? 'Filter by product, supplier, or cashier...' : 'กรองตามสินค้า ซัพพลายเออร์ หรือแคชเชียร์...'} 
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]/20 focus:border-[#7C5CFF] transition-all"
                   />
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   {/* ปุ่ม Supplier Dropdown */}
                   <div className="flex items-center gap-2 relative">
-                    <span className="text-gray-500">Supplier:</span>
+                    <span className="text-gray-500">{language === 'EN' ? 'Supplier:' : 'ซัพพลายเออร์:'}</span>
                     <div className="relative">
                       <button 
                         onClick={() => setIsSupplierDropdownOpen(!isSupplierDropdownOpen)}
                         className="flex items-center justify-between min-w-[150px] font-medium bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-100"
                       >
-                        {selectedSupplier} <ChevronDown size={14} className={`transition-transform ${isSupplierDropdownOpen ? 'rotate-180' : ''}`} />
+                        {selectedSupplier === 'All Suppliers' ? (language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด') : selectedSupplier} <ChevronDown size={14} className={`transition-transform ${isSupplierDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       
                       {/* เมนู Dropdown ที่จะโชว์ตอนกด */}
@@ -350,7 +352,7 @@ export default function ConsignDeskDashboard() {
                             onClick={() => { setSelectedSupplier('All Suppliers'); setIsSupplierDropdownOpen(false); }}
                             className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
-                            All Suppliers
+                            {language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด'}
                           </button>
                           <button 
                             onClick={() => { setSelectedSupplier('Host (Alex Chen)'); setIsSupplierDropdownOpen(false); }}
@@ -378,13 +380,13 @@ export default function ConsignDeskDashboard() {
                
                   {/* ปุ่ม Staff Dropdown */}
                   <div className="flex items-center gap-2 relative">
-                    <span className="text-gray-500">Staff:</span>
+                    <span className="text-gray-500">{language === 'EN' ? 'Staff:' : 'พนักงาน:'}</span>
                     <div className="relative">
                       <button 
                         onClick={() => setIsStaffDropdownOpen(!isStaffDropdownOpen)}
                         className="flex items-center justify-between min-w-[120px] font-medium bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-100"
                       >
-                        {selectedStaff} <ChevronDown size={14} className={`transition-transform ${isStaffDropdownOpen ? 'rotate-180' : ''}`} />
+                        {selectedStaff === 'All Staff' ? (language === 'EN' ? 'All Staff' : 'พนักงานทั้งหมด') : selectedStaff} <ChevronDown size={14} className={`transition-transform ${isStaffDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       
                       {/* เมนู Dropdown ที่จะโชว์ตอนกด */}
@@ -394,7 +396,7 @@ export default function ConsignDeskDashboard() {
                             onClick={() => { setSelectedStaff('All Staff'); setIsStaffDropdownOpen(false); }}
                             className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
-                            All Staff
+                            {language === 'EN' ? 'All Staff' : 'พนักงานทั้งหมด'}
                           </button>
                           <button 
                             onClick={() => { setSelectedStaff('Ploy W.'); setIsStaffDropdownOpen(false); }}
@@ -412,7 +414,7 @@ export default function ConsignDeskDashboard() {
                       )}
                     </div>
                   </div>
-                  <span className="text-gray-400 pl-2">Showing {filteredSales.length} of {salesData.length} receipts</span>
+                  <span className="text-gray-400 pl-2">{language === 'EN' ? `Showing ${filteredSales.length} of ${salesData.length} receipts` : `แสดง ${filteredSales.length} จาก ${salesData.length} รายการ`}</span>
                 </div>
               </div>
 
@@ -421,13 +423,13 @@ export default function ConsignDeskDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-400 uppercase bg-gray-50/30">
-                      <th className="p-4 font-semibold"># / TIME SOLD</th>
-                      <th className="p-4 font-semibold">PRODUCT NAME</th>
-                      <th className="p-4 font-semibold">SUPPLIER</th>
-                      <th className="p-4 font-semibold text-center">QTY</th>
-                      <th className="p-4 font-semibold text-right">UNIT PRICE</th>
-                      <th className="p-4 font-semibold text-right">TOTAL (฿)</th>
-                      <th className="p-4 font-semibold text-right">SOLD BY</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? '# / TIME SOLD' : '# / เวลาขาย'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'PRODUCT NAME' : 'ชื่อสินค้า'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'SUPPLIER' : 'ซัพพลายเออร์'}</th>
+                      <th className="p-4 font-semibold text-center">{language === 'EN' ? 'QTY' : 'จำนวน'}</th>
+                      <th className="p-4 font-semibold text-right">{language === 'EN' ? 'UNIT PRICE' : 'ราคาต่อหน่วย'}</th>
+                      <th className="p-4 font-semibold text-right">{language === 'EN' ? 'TOTAL (฿)' : 'รวม (฿)'}</th>
+                      <th className="p-4 font-semibold text-right">{language === 'EN' ? 'SOLD BY' : 'ผู้ขาย'}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm text-[#0B0F4F]">
@@ -469,7 +471,7 @@ export default function ConsignDeskDashboard() {
                     ) : (
                       <tr>
                         <td colSpan={7} className="p-10 text-center text-gray-400">
-                         {`ไม่พบข้อมูลที่ค้นหา "${searchQuery}"`}
+                         {language === 'EN' ? `No results found for "${searchQuery}"` : `ไม่พบข้อมูลที่ค้นหา "${searchQuery}"`}
                         </td>
                       </tr>
                     )}
@@ -480,7 +482,7 @@ export default function ConsignDeskDashboard() {
 
               {/* Pagination / Footer */}
               <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm">
-                <span className="text-gray-500">Showing {filteredSales.length} of {salesData.length} completed transactions</span>
+                <span className="text-gray-500">{language === 'EN' ? `Showing ${filteredSales.length} of ${salesData.length} completed transactions` : `แสดง ${filteredSales.length} จาก ${salesData.length} ธุรกรรมที่เสร็จสิ้น`}</span>
                 <div className="flex items-center gap-1">
                   <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:bg-gray-50">
                     <ChevronLeft size={16} />
@@ -506,11 +508,11 @@ export default function ConsignDeskDashboard() {
               {/* Header */}
               <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-bold text-[#0B0F4F]">Expenses Log (Booth & Stall Deductions)</h2>
-                  <p className="text-sm text-gray-500 mt-1">Recorded market fees, electrical charges, or shared booth amenities.</p>
+                  <h2 className="text-lg font-bold text-[#0B0F4F]">{language === 'EN' ? 'Expenses Log (Booth & Stall Deductions)' : 'รายการค่าใช้จ่าย (ค่าเช่าบูธและร้านค้า)'}</h2>
+                  <p className="text-sm text-gray-500 mt-1">{language === 'EN' ? 'Recorded market fees, electrical charges, or shared booth amenities.' : 'บันทึกค่าตลาด ค่าไฟ หรือสิ่งอำนวยความสะดวกร่วมของบูธ'}</p>
                 </div>
                 <div className="bg-[#FEF0EA]/30 border border-[#FEF0EA] px-4 py-2 rounded-full flex items-center gap-2">
-                  <span className="text-sm text-[#0B0F4F] font-medium">Total Recorded:</span>
+                  <span className="text-sm text-[#0B0F4F] font-medium">{language === 'EN' ? 'Total Recorded:' : 'บันทึกรวม:'}</span>
                   <span className="text-sm font-bold text-[#ED571B]">฿70.00</span>
                 </div>
               </div>
@@ -521,12 +523,12 @@ export default function ConsignDeskDashboard() {
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase bg-gray-50/50">
                       <th className="p-4 font-semibold">#</th>
-                      <th className="p-4 font-semibold">TIMESTAMP</th>
-                      <th className="p-4 font-semibold">DESCRIPTION</th>
-                      <th className="p-4 font-semibold text-center">CATEGORY</th>
-                      <th className="p-4 font-semibold text-right">AMOUNT (฿)</th>
-                      <th className="p-4 font-semibold">PAID BY / INPUTTED BY</th>
-                      <th className="p-4 font-semibold">RECEIPT / NOTE</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'TIMESTAMP' : 'เวลา'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'DESCRIPTION' : 'รายละเอียด'}</th>
+                      <th className="p-4 font-semibold text-center">{language === 'EN' ? 'CATEGORY' : 'หมวดหมู่'}</th>
+                      <th className="p-4 font-semibold text-right">{language === 'EN' ? 'AMOUNT (฿)' : 'จำนวนเงิน (฿)'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'PAID BY / INPUTTED BY' : 'ผู้จ่าย / ผู้บันทึก'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'RECEIPT / NOTE' : 'ใบเสร็จ / หมายเหตุ'}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm text-[#0B0F4F]">
@@ -564,8 +566,8 @@ export default function ConsignDeskDashboard() {
               
               {/* Header */}
               <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-[#0B0F4F]">Changes Made & Audit Trail</h2>
-                <p className="text-sm text-gray-400 mt-1">Immutable record of run configuration adjustments, price updates, and staff additions.</p>
+                <h2 className="text-lg font-bold text-[#0B0F4F]">{language === 'EN' ? 'Changes Made & Audit Trail' : 'รายการเปลี่ยนแปลงและประวัติการตรวจสอบ'}</h2>
+                <p className="text-sm text-gray-400 mt-1">{language === 'EN' ? 'Immutable record of run configuration adjustments, price updates, and staff additions.' : 'บันทึกถาวรของการตั้งค่าการขาย การปรับราคา และการเพิ่มพนักงาน'}</p>
               </div>
 
               {/* Table */}
@@ -573,11 +575,11 @@ export default function ConsignDeskDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase bg-gray-50/30">
-                      <th className="p-4 pl-6">TIMESTAMP</th>
-                      <th className="p-4">ACTION / CHANGE TYPE</th>
-                      <th className="p-4">ITEM / ENTITY</th>
-                      <th className="p-4">DETAILS</th>
-                      <th className="p-4 pr-6 text-right">CHANGED BY</th>
+                      <th className="p-4 pl-6">{language === 'EN' ? 'TIMESTAMP' : 'เวลา'}</th>
+                      <th className="p-4">{language === 'EN' ? 'ACTION / CHANGE TYPE' : 'การดำเนินการ / ประเภทการเปลี่ยนแปลง'}</th>
+                      <th className="p-4">{language === 'EN' ? 'ITEM / ENTITY' : 'รายการ / หน่วยงาน'}</th>
+                      <th className="p-4">{language === 'EN' ? 'DETAILS' : 'รายละเอียด'}</th>
+                      <th className="p-4 pr-6 text-right">{language === 'EN' ? 'CHANGED BY' : 'เปลี่ยนแปลงโดย'}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm text-gray-600">
@@ -590,11 +592,23 @@ export default function ConsignDeskDashboard() {
                           <td className="p-4">
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${item.tagColor}`}>
                               <IconComponent size={12} strokeWidth={2.5} />
-                              {item.action}
+                              {language === 'EN' ? item.action : ({
+                                'End Run Verified': 'ยืนยันการปิดการขาย',
+                                'Price Update': 'อัปเดตราคา',
+                                'Assistant Joined': 'ผู้ช่วยเข้าร่วม',
+                                'Restock / Stock Adjustment': 'เติมสต็อก / ปรับสต็อก',
+                              }[item.action] || item.action)}
                             </span>
                           </td>
                           <td className="p-4 font-bold text-[#0B0F4F]">{item.entity}</td>
-                          <td className="p-4 text-gray-500">{item.details}</td>
+                          <td className="p-4 text-gray-500">
+                            {language === 'EN' ? item.details : ({
+                              'End Run Verified': 'ปิดเซสชันและล็อกสต็อกแล้ว',
+                              'Price Update': <>ปรับราคาจาก <span className="line-through text-gray-400">฿380</span> เป็น <strong className="text-[#7C5CFF]">฿350</strong></>,
+                              'Assistant Joined': 'Ploy W. เข้าร่วมเป็นแคชเชียร์ (ขายสินค้าเท่านั้น)',
+                              'Restock / Stock Adjustment': <>ปรับสต็อก <strong className="text-[#7C5CFF]">+10 ชิ้น</strong> (เติมระหว่างการขาย)</>,
+                            }[item.action] || item.details)}
+                          </td>
                           <td className="p-4 pr-6 text-right">
                             <span className="inline-flex items-center justify-end gap-1.5 text-indigo-700 text-xs font-medium w-full">
                               <User size={14} className="text-indigo-600" /> {item.changedBy}
@@ -618,23 +632,23 @@ export default function ConsignDeskDashboard() {
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#7C5CFF]/25 via-[#7C5CFF]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="inline-flex w-20 justify-center bg-[#7C5CFF]/10 text-[#7C5CFF] text-xs font-semibold px-2 py-1 rounded-md">Host</span>
-                    <span className="text-xs text-gray-400 font-medium">54.0% of stall</span>
+                    <span className="inline-flex w-20 justify-center bg-[#7C5CFF]/10 text-[#7C5CFF] text-xs font-semibold px-2 py-1 rounded-md">{language === 'EN' ? 'Host' : 'เจ้าของร้าน'}</span>
+                    <span className="text-xs text-gray-400 font-medium">54.0% {language === 'EN' ? 'of stall' : 'ของร้าน'}</span>
                   </div>
                   <h3 className="text-lg font-bold text-[#0B0F4F]">Alex Chen (Host)</h3>
                   <hr className="my-3 border-gray-300" />
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Gross Sales' : 'ยอดขายรวม'}</span>
                       <span className="font-semibold text-[#0B0F4F] font-mono">฿4,570.00</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Shared expense</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Shared expense' : 'ค่าใช้จ่ายร่วม'}</span>
                       <span className="font-semibold text-[#ED571B] font-mono">-฿23.34</span>
                     </div>
                     <div className="pt-2 border-t border-gray-100 flex justify-between">
-                      <span className="font-semibold text-[#0B0F4F]">Net Payout:</span>
+                      <span className="font-semibold text-[#0B0F4F]">{language === 'EN' ? 'Net Payout:' : 'ยอดจ่ายสุทธิ:'}</span>
                       <span className="font-bold text-[#7C5CFF] font-mono">฿4,546.66</span>
                     </div>
                   </div>
@@ -644,7 +658,7 @@ export default function ConsignDeskDashboard() {
                     <div className="w-4 h-4 bg-[#7C5CFF] rounded-sm flex items-center justify-center">
                       <Check size={12} className="text-white" />
                     </div>
-                    Host Withdrawn & Reconciled
+                    {language === 'EN' ? 'Host Withdrawn & Reconciled' : 'เจ้าของร้านถอนเงินและกระทบยอดแล้ว'}
                   </div>
                 </div>
               </div>
@@ -654,23 +668,23 @@ export default function ConsignDeskDashboard() {
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#F062C0]/25 via-[#F062C0]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="inline-flex w-20 justify-center bg-[#F062C0]/10 text-[#F062C0] text-xs font-semibold px-2 py-1 rounded-md">Suppliers</span>
-                    <span className="text-xs text-gray-400 font-medium">28.8% of stall</span>
+                    <span className="inline-flex w-20 justify-center bg-[#F062C0]/10 text-[#F062C0] text-xs font-semibold px-2 py-1 rounded-md">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
+                    <span className="text-xs text-gray-400 font-medium">28.8% {language === 'EN' ? 'of stall' : 'ของร้าน'}</span>
                   </div>
                   <h3 className="text-lg font-bold text-[#0B0F4F]">P&apos; Kaimook</h3>
                   <hr className="my-3 border-gray-300" />
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Gross Sales' : 'ยอดขายรวม'}</span>
                       <span className="font-semibold text-[#0B0F4F] font-mono">฿2,450.00</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Shared expense</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Shared expense' : 'ค่าใช้จ่ายร่วม'}</span>
                       <span className="font-semibold text-[#ED571B] font-mono">-฿23.33</span>
                     </div>
                     <div className="pt-2 border-t border-gray-100 flex justify-between">
-                      <span className="font-semibold text-[#0B0F4F]">Net Payout:</span>
+                      <span className="font-semibold text-[#0B0F4F]">{language === 'EN' ? 'Net Payout:' : 'ยอดจ่ายสุทธิ:'}</span>
                       <span className="font-bold text-[#7C5CFF] font-mono">฿2,426.67</span>
                     </div>
                   </div>
@@ -678,7 +692,7 @@ export default function ConsignDeskDashboard() {
                 <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
                   <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
                     <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
-                    Supplier&apos;s payout settled
+                    {language === 'EN' ? "Supplier's payout settled" : 'ชำระยอดจ่ายซัพพลายเออร์แล้ว'}
                   </div>
                 </div>
               </div>
@@ -688,23 +702,23 @@ export default function ConsignDeskDashboard() {
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#FFB24C]/30 via-[#FFB24C]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="inline-flex w-20 justify-center bg-[#FFB24C]/15 text-[#FFB24C] text-xs font-semibold px-2 py-1 rounded-md">Suppliers</span>
-                    <span className="text-xs text-gray-400 font-medium">17.2% of stall</span>
+                    <span className="inline-flex w-20 justify-center bg-[#FFB24C]/15 text-[#FFB24C] text-xs font-semibold px-2 py-1 rounded-md">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
+                    <span className="text-xs text-gray-400 font-medium">17.2% {language === 'EN' ? 'of stall' : 'ของร้าน'}</span>
                   </div>
                   <h3 className="text-lg font-bold text-[#0B0F4F]">Nong&apos; Japan</h3>
                   <hr className="my-3 border-gray-300" />
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Gross Sales</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Gross Sales' : 'ยอดขายรวม'}</span>
                       <span className="font-semibold text-[#0B0F4F] font-mono">฿1,470.00</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Shared expense</span>
+                      <span className="text-gray-500">{language === 'EN' ? 'Shared expense' : 'ค่าใช้จ่ายร่วม'}</span>
                       <span className="font-semibold text-[#ED571B] font-mono">-฿23.33</span>
                     </div>
                     <div className="pt-2 border-t border-gray-100 flex justify-between">
-                      <span className="font-semibold text-[#0B0F4F]">Net Payout:</span>
+                      <span className="font-semibold text-[#0B0F4F]">{language === 'EN' ? 'Net Payout:' : 'ยอดจ่ายสุทธิ:'}</span>
                       <span className="font-bold text-[#7C5CFF] font-mono">฿1,446.67</span>
                     </div>
                   </div>
@@ -712,7 +726,7 @@ export default function ConsignDeskDashboard() {
                 <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-center items-center">
                   <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg w-full justify-center shadow-sm cursor-pointer hover:bg-gray-50 transition">
                     <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
-                    Supplier&apos;s payout settled
+                    {language === 'EN' ? "Supplier's payout settled" : 'ชำระยอดจ่ายซัพพลายเออร์แล้ว'}
                   </div>
                 </div>
               </div>

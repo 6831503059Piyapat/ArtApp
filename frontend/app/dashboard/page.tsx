@@ -34,11 +34,13 @@ export default function DashboardPage() {
   const showOngoing = sessionFilter !== 'Completed';
   const showCompleted = sessionFilter !== 'Active';
   const [displayName, setDisplayName] = useState('');
+  const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
 const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 const [runCode, setRunCode] = useState('');
 
 const router = useRouter();
 useEffect(() => {
+  setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     const emailName = user?.email?.split('@')[0];
     setDisplayName(user?.displayName?.trim() || emailName || '');
@@ -70,10 +72,10 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           <section className="mb-12 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h1 className="flex flex-wrap gap-x-2 text-3xl font-bold tracking-tight sm:text-4xl">
-              <span>Welcome back{displayName && `, ${displayName}`}</span>
-              <span className="basis-full whitespace-nowrap bg-gradient-to-r from-[#7C5CFF] to-pink-500 bg-clip-text pl-2 text-xl text-transparent sm:basis-auto sm:text-3xl lg:text-4xl">— Ready for the next market?</span>
+              <span>{language === 'EN' ? 'Welcome back' : 'ยินดีต้อนรับ'} {displayName && `, ${displayName}`}</span>
+              <span className="basis-full whitespace-nowrap bg-gradient-to-r from-[#7C5CFF] to-pink-500 bg-clip-text pl-2 text-xl text-transparent sm:basis-auto sm:text-3xl lg:text-4xl">— {language === 'EN' ? 'Ready for the next market?' : 'พร้อมสำหรับตลาดถัดไปแล้วหรือยัง?'}</span>
             </h1>
-            <p className="mt-1 text-sm text-[#858ba0]">Here&apos;s your stall overview and live consignment performance today.</p>
+            <p className="mt-1 text-sm text-[#858ba0]">{}{language === 'EN' ? 'Here&apos;s your stall overview and live consignment performance today.' : 'นี่คือภาพรวมของสถานีของคุณและประสิทธิภาพการขายแบบสดในวันนี้.'}</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
            <button
@@ -84,14 +86,14 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             text-xs font-extrabold shadow-sm transition
             hover:border-[#7C5CFF]/30 hover:bg-[#7C5CFF]/5" >
   <Users size={15} className="text-[#7C5CFF]" />
-  Join Run
+  {language === 'EN' ? 'Join Run' : 'เข้าร่วมการขาย'}
 </button>
             <Link
               href="/SaleRun"
               className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-3 text-xs font-extrabold text-[#0B0F4F] shadow-[0_4px_12px_rgba(255,184,77,0.24)] transition hover:bg-[#ffad32]"
             >
               <Plus size={16} />
-              Create New Run
+              {language === 'EN' ? 'Create New Run' : 'สร้างการขายใหม่'}
             </Link>
           </div>
           </section>
@@ -101,9 +103,9 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 z-0 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(124,92,255,0.2)_0%,rgba(124,92,255,0.08)_45%,transparent_72%)] blur-2xl" />
             <div className="relative z-10">
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#858ba0]">Latest active run</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-[#858ba0]"> {language === 'EN' ? 'Latest active run' : 'รันบูทล่าสุด'}</p>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#7C5CFF]/5 px-2.5 py-1 text-[11px] font-semibold text-[#7C5CFF]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> Active Now
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> {language === 'EN' ? 'Active Now' : 'กำลังใช้งาน'}
                 </span>
               </div>
               <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
@@ -112,59 +114,59 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             </div>
             <div className="relative z-10 my-3 rounded-xl border border-[#f0f1f6] bg-[#f8f9fc] p-2">
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-semibold">Stock Cleared</span>
-                <span className="font-bold text-[#7C5CFF]">5.8% Cleared</span>
+                <span className="font-semibold">{language === 'EN' ? 'Stock Cleared' : 'สต๊อกที่เคลียร์แล้ว'}</span>
+                <span className="font-bold text-[#7C5CFF]">5.8% {language === 'EN' ? 'Cleared' : 'เคลียร์แล้ว'}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-[#e9ebf3]">
                 <div className="h-full w-[5.8%] rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400" />
               </div>
               <div className="mt-2 flex items-center justify-between text-[11px] text-[#858ba0]">
-                <span className="font-semibold text-[#0B0F4F]">6/103 items cleared</span>
-                <span>Run created: 14/09/2026</span>
+                <span className="font-semibold text-[#0B0F4F]">6/103 {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
+                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} 14/09/2026</span>
               </div>
             </div>
             <div className="relative z-10 mt-auto flex items-end justify-between gap-3 pt-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#858ba0]">Live booth revenue</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#858ba0]"> {language === 'EN' ? 'Live booth revenue' : 'กำไรขณะปัจจุบัน'}</p>
                 <p className="mt-0.5 text-2xl font-extrabold tracking-tight">฿980</p>
               </div>
               <Link
                 href="/sales/OnGoing"
                 className="inline-flex items-center gap-1 rounded-full bg-[#eee9ff] px-3 py-1.5 text-[11px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10"
               >
-                <Wallet size={13} /> Resume Selling
+                <Wallet size={13} />  {language === 'EN' ? 'Run Selling' : 'ดำเนินการขายต่อ'}
               </Link>
             </div>
           </article>
 
           <article className="flex h-full flex-col gap-2 rounded-xl border border-[#eceef5] bg-white/90 px-3 py-4 shadow-[0_5px_22px_rgba(17,23,71,0.04)] md:px-4 md:py-5">
             <div className="mb-2 flex items-center gap-2">
-              <h2 className="text-3xl font-bold tracking-tight">Personal records</h2>
+              <h2 className="text-3xl font-bold tracking-tight">{language === 'EN' ? 'Personal records' : 'บันทึกส่วนตัว'}</h2>
               <span className="inline-flex items-center gap-1 rounded-full border border-[#FFE0B7] bg-[#FFF4E4] px-2 py-1 text-[10px] font-semibold text-[#9E5D00]">
-                <Trophy size={11} className="text-[#FFB24C]" /> All-time
+                <Trophy size={11} className="text-[#FFB24C]" /> {language === 'EN' ? 'All-time' : 'ทั้งหมด'}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] px-2 py-1.5">
-                <p className="text-xs text-[#858ba0]">Created</p>
-                <p className="text-lg font-bold">14 Total</p>
+                <p className="text-xs text-[#858ba0]"> {language === 'EN'? 'Created' : 'สร้างแล้ว'}</p>
+                <p className="text-lg font-bold"> 14{language === 'EN' ? ' Total' : ' รายการ'}</p>
               </div>
               <div className="rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-1.5">
-                <p className="text-xs text-[#7C5CFF]">Completed</p>
-                <p className="text-lg font-bold text-[#7C5CFF]">12 Runs</p>
+                <p className="text-xs text-[#7C5CFF]"> {language === 'EN' ? 'Completed' : 'สำเร็จแล้ว'}</p>
+                <p className="text-lg font-bold text-[#7C5CFF]">12 {language === 'EN' ? 'Runs' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-pink-100 bg-pink-50/80 px-2 py-1.5">
-                <p className="text-xs text-pink-500">Active</p>
-                <p className="text-lg font-bold text-pink-500">1 Run</p>
+                <p className="text-xs text-pink-500"> {language === 'EN' ? 'Active' : 'กำลังดำเนินการ'}</p>
+                <p className="text-lg font-bold text-pink-500">1 {language === 'EN' ? 'Run' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-[#FFE7C0] bg-[#FFFDF1] px-2 py-1.5">
-                <p className="text-xs text-[#FFB24C]">Products Sold</p>
-                <p className="text-lg font-bold text-[#FFB24C]">88 items sold</p>
+                <p className="text-xs text-[#FFB24C]"> {language === 'EN' ? 'Products Sold' : 'รายการขายแล้ว'}</p>
+                <p className="text-lg font-bold text-[#FFB24C]">88 {language === 'EN' ? 'items sold' : 'รายการขายแล้ว'}</p>
               </div>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2.5">
               <span className="flex items-center gap-2 bg-gradient-to-r from-[#F062C0] to-[#7C5CFF] bg-clip-text text-sm font-extrabold text-transparent">
-                <Star size={15} className="fill-[#F062C0] text-[#F062C0]" /> Best Run Revenue
+                <Star size={15} className="fill-[#F062C0] text-[#F062C0]" /> {language === 'EN' ? 'Best Run Revenue' : 'กำไรสูงสุดจากการขาย'}:
               </span>
               <span className="text-lg font-extrabold text-[#0B0F4F]">฿4,250</span>
             </div>
@@ -175,8 +177,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
         <section className="relative z-10 mx-auto w-[96%] rounded-2xl border border-[#eceef5] bg-white/80 p-4 shadow-[0_5px_22px_rgba(17,23,71,0.035)] sm:p-5">
           <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <h2 className="text-xl font-extrabold tracking-tight">Market Runs Management</h2>
-              <p className="text-xs text-[#858ba0]">Track, edit, and access live consignment registers.</p>
+              <h2 className="text-xl font-extrabold tracking-tight"> {language === 'EN' ? 'Market Runs Management' : 'การจัดการรายการขาย'}</h2>
+              <p className="text-xs text-[#858ba0]">{language === 'EN' ? 'Track,edit,and manage your live consignment registers.' : 'จัดการรายการขายของคุณอย่างมีประสิทธิภาพ.'}</p>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2 self-start rounded-full border border-[#e9ebf3] bg-white p-1 sm:mt-2 sm:self-auto">
               {(['All Sessions', 'Active', 'Completed'] as SessionFilter[]).map((filter) => (
@@ -242,15 +244,15 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           {showCompleted && (
             <div className="mt-6">
               <div className="mb-1.5 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[#7C5CFF]">Past Completed Runs</h3>
-                <span className="text-[10px] text-[#858ba0]">2 settled markets archived</span>
+                <h3 className="text-sm font-bold text-[#7C5CFF]"> {language === 'EN' ? 'Past Completed Runs' : 'รายการขายที่เสร็จสิ้นแล้ว'}</h3>
+                <span className="text-[10px] text-[#858ba0]">2 {language === 'EN' ? 'settled markets archived' : 'รายการขายที่เสร็จสิ้นแล้ว'}</span>
               </div>
               <div className="overflow-hidden rounded-2xl border border-[#eceef5] bg-white shadow-[0_5px_22px_rgba(17,23,71,0.04)]">
                 <div className="hidden grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] bg-[#7C5CFF]/5 px-4 py-2.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0F4F] sm:grid sm:px-5">
-                  <span>Market event &amp; location</span>
-                  <span>Date closed</span>
-                  <span>Total revenue</span>
-                  <span className="text-right">Settlement summary</span>
+                  <span> {language === 'EN' ? 'Market event & location' : 'เหตุการณ์และสถานที่'}</span>
+                  <span>{language === 'EN' ? 'Date closed' : 'วันที่ปิดรายการ'}</span>
+                  <span>{language === 'EN' ? 'Total revenue' : 'รายได้รวม'}</span>
+                  <span className="text-right ">{language === 'EN' ? 'Settlement summary' : 'สรุปการชำระเงิน'}</span>
                 </div>
                 {completedRuns.map((run) => (
                   <div key={run.name} className="grid gap-2 border-t border-[#f0f1f6] px-4 py-2.5 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5">
@@ -261,7 +263,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                     <span className="text-[#858ba0]">{run.date}</span>
                     <span className="text-sm font-extrabold">{run.revenue}</span>
                     <Link href="/sales/completed" className="inline-flex items-center justify-center gap-1.5 justify-self-start rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:justify-self-end">
-                      View Summary <ChevronRight size={12} />
+                       {language === 'EN' ? 'View Summary' : 'ดูสรุป'} <ChevronRight size={12} />
                     </Link>
                   </div>
                 ))}
@@ -301,14 +303,14 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 className="text-2xl font-extrabold tracking-tight
                   text-[#0B0F4F] sm:text-3xl"
               >
-                Join Sales Run
+                 {language === 'EN' ? 'Join Sales Run' : 'เข้าร่วมรายการขาย'}
               </h2>
             </div>
 
             <p className="mt-2 text-sm leading-6 text-[#858ba0]
               sm:text-base">
-              Enter the 6 or 8-digit run code or PIN shared
-              by the booth host
+              {language === 'EN' ? 'Enter the 6 or 8-digit run code or PIN shared by the booth host' : 'ป้อนรหัสรายการขาย 6 หรือ 8 หลัก หรือ PIN ที่ถูกแชร์โดยเจ้าของ Booth'}
+              {language === 'EN' ? ' to join the sales run.' : ' เพื่อเข้าร่วมรายการขาย'}
             </p>
           </div>
 
@@ -331,7 +333,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           className="mb-2 block text-sm font-semibold
             text-[#0B0F4F] sm:text-base"
         >
-          RUN / ROOM CODE
+          {language === 'EN' ? 'RUN / ROOM CODE' : 'รหัสรายการ / ห้อง'}
         </label>
 
         <div className="flex h-16 items-center gap-3
@@ -358,7 +360,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
         </div>
 
         <p className="mt-3 text-sm text-[#858ba0]">
-          Your active host run code is{' '}
+          {language === 'EN' ? 'Your active host run code is' : 'รหัสรายการขายที่ใช้งานอยู่ของคุณคือ '}
           <span className="font-bold text-[#7C5CFF]">
             88X2-901
           </span>.
@@ -376,7 +378,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               px-7 text-sm font-semibold text-[#777b91]
               transition hover:bg-slate-50"
           >
-            Cancel
+            Cancel {language === 'EN' ? 'Cancel' : 'ยกเลิก'}
           </button>
 
           <button
@@ -388,7 +390,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               hover:bg-[#7C5CFF] active:scale-[0.98]"
           >
             <LogIn size={22} />
-            Join Run
+            {language === 'EN' ? 'Join Run' : 'เข้าร่วมรายการขาย'}
           </button>
         </div>
       </form>

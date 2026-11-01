@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 
 const viewerUrl = "https://consigndesk.app/ActBoard/2026";
 
-const BoothSyncTime = () => {
+const BoothSyncTime = ({ language }: { language: "EN" | "TH" }) => {
   const [time, setTime] = useState("00:00:00");
   useEffect(() => {
     const updateTime = () => {
@@ -44,7 +44,7 @@ const BoothSyncTime = () => {
       <div className="shrink-0 rounded-xl border border-[#eeeafd] bg-white/80 px-3 py-2 shadow-[0_3px_12px_rgba(93,76,166,0.04)] sm:px-4">
         <div className="mb-0.5 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-[#858ba0]">
           <span className="h-2 w-2 rounded-full bg-[#8a68ff]" />
-          Booth Sync Time
+          {language === "EN" ? "Booth Sync Time" : "เวลาซิงค์บูธ"}
         </div>
         <div className="flex items-baseline gap-1">
           {/* นำ State ของเวลามาแสดงตรงนี้ */}
@@ -128,6 +128,10 @@ const splitAllocation = [
 ];
 
 export default function ConsignDesk() {
+  const [language] = useState<"EN" | "TH">(() =>
+    typeof window !== "undefined" && localStorage.getItem("language") === "EN" ? "EN" : "TH"
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#111747]">
       <nav className="flex h-14 shrink-0 items-center justify-between border-b border-[#eeeafc] bg-white px-5">
@@ -139,7 +143,7 @@ export default function ConsignDesk() {
             ConsignDesk
             <span className="flex items-center gap-1 rounded-full bg-[#fff0f4] px-1.5 py-0.5 text-[9px] text-[#ed72a8]">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff7c9e]" />
-                Live
+                {language === "EN" ? "Live" : "กำลังใช้งาน"}
               </span>
           </Link>
           
@@ -153,26 +157,28 @@ export default function ConsignDesk() {
             <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="flex items-center gap-1.5 rounded-full bg-[#f0eaff] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-[#7957ff]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#7957ff]" />
-                Live Sales Run Active
+                {language === "EN" ? "Live Sales Run Active" : "กำลังเปิดการขาย"}
               </span>
               <span className="flex items-center gap-1 text-[10px] font-medium text-[#111747]">
                 <Store className="h-3 w-3 text-[#7957ff]" />
                 MFU Outside Night Market (Mon 14)
               </span>
             </div>
-            <h1 className="text-xl font-black leading-tight tracking-tight sm:text-2xl">SALES STATS MONDAY 14</h1>
+            <h1 className="text-xl font-black leading-tight tracking-tight sm:text-2xl">
+              {language === "EN" ? "SALES STATS MONDAY 14" : "สถิติการขาย วันจันทร์ที่ 14"}
+            </h1>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[9px] text-[#858ba0]">
               <span className="flex items-center gap-1">
                 <RefreshCcw className="h-2.5 w-2.5" />
-                Run created: <strong className="font-semibold text-[#111747]">14/9/26 11:48:30</strong>
+                {language === "EN" ? "Run created:" : "สร้างการขายเมื่อ:"} <strong className="font-semibold text-[#111747]">14/9/26 11:48:30</strong>
               </span>
               <span className="flex items-center gap-1">
                 <Activity className="h-2.5 w-2.5" />
-                Auto-refresh: <strong className="font-semibold text-[#7957ff]">3s polling</strong>
+                {language === "EN" ? "Auto-refresh:" : "รีเฟรชอัตโนมัติ:"} <strong className="font-semibold text-[#7957ff]">3s polling</strong>
               </span>
             </div>
           </div>
-          <BoothSyncTime />
+          <BoothSyncTime language={language} />
         </section>
 
         <section className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-[#eeeafd] bg-white px-3 py-2 shadow-[0_3px_12px_rgba(93,76,166,0.03)] sm:px-4">
@@ -181,7 +187,9 @@ export default function ConsignDesk() {
               <Share2 className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <div className="text-[8px] font-bold uppercase tracking-wide text-[#858ba0]">Public Real-Time Viewer URL</div>
+              <div className="text-[8px] font-bold uppercase tracking-wide text-[#858ba0]">
+                {language === "EN" ? "Public Real-Time Viewer URL" : "URL สำหรับดูแบบเรียลไทม์"}
+              </div>
               <a href={viewerUrl} className="flex items-center gap-1 truncate font-mono text-[10px] font-medium text-[#7957ff] hover:underline">
                 <span aria-hidden="true">↗</span>{viewerUrl}
               </a>
@@ -190,11 +198,11 @@ export default function ConsignDesk() {
           <div className="flex shrink-0 gap-1.5">
             <button type="button" className="flex items-center gap-1 rounded-lg bg-[#f0eaff] px-2.5 py-1.5 text-[9px] font-semibold text-[#7957ff] transition-colors hover:bg-[#e7ddff] sm:px-3">
               <Copy className="h-3 w-3" />
-              <span>Copy Link</span>
+              <span>{language === "EN" ? "Copy Link" : "คัดลอกลิงก์"}</span>
             </button>
             <button type="button" className="flex items-center gap-1 rounded-lg bg-[#f0eaff] px-2.5 py-1.5 text-[9px] font-semibold text-[#7957ff] transition-colors hover:bg-[#e7ddff] sm:px-3">
               <QrCode className="h-3 w-3" />
-              <span>QR View</span>
+              <span>{language === "EN" ? "QR View" : "ดูด้วย QR"}</span>
             </button>
           </div>
         </section>
@@ -206,9 +214,11 @@ export default function ConsignDesk() {
                 <span className="mr-1.5 flex h-5 w-5 items-center justify-center rounded-md bg-[#fff0e5] text-[#ff9f55]">
                   <Activity className="h-3.5 w-3.5" />
                 </span>
-                Supplier Performance &amp; Remaining Stock
+                {language === "EN" ? "Supplier Performance & Remaining Stock" : "ประสิทธิภาพซัพพลายเออร์และสต็อกคงเหลือ"}
               </h2>
-              <span className="shrink-0 text-[9px] text-[#858ba0]">3 Registered Consignors</span>
+              <span className="shrink-0 text-[9px] text-[#858ba0]">
+                {language === "EN" ? "3 Registered Consignors" : "ผู้ฝากขายที่ลงทะเบียน 3 ราย"}
+              </span>
             </div>
 
             {suppliers.map((supplier) => {
@@ -224,21 +234,31 @@ export default function ConsignDesk() {
                       </span>
                       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                         <h3 className="text-[11px] font-bold leading-tight">{supplier.name}</h3>
-                        <span className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${themeClasses.badge}`}>{supplier.kind}</span>
+                        <span className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${themeClasses.badge}`}>
+                          {language === "EN" ? supplier.kind : supplier.kind === "Host" ? "เจ้าของร้าน" : "ซัพพลายเออร์"}
+                        </span>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <div className="text-[8px] font-semibold uppercase tracking-wide text-[#858ba0]">Intake Value</div>
+                      <div className="text-[8px] font-semibold uppercase tracking-wide text-[#858ba0]">
+                        {language === "EN" ? "Intake Value" : "มูลค่ารับเข้า"}
+                      </div>
                       <div className="text-sm font-extrabold leading-tight">{supplier.intake}</div>
                     </div>
                   </div>
                   <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-medium text-[#858ba0]">
                     <span className="flex min-w-0 items-center gap-1">
                       <Store className="h-2.5 w-2.5 shrink-0 text-[#7957ff]" />
-                      <span className="truncate"><strong className="text-[#111747]">REMAINING STOCK</strong> • {supplier.stock} in booth storage</span>
+                      <span className="truncate">
+                        <strong className="text-[#111747]">{language === "EN" ? "REMAINING STOCK" : "สต็อกคงเหลือ"}</strong>
+                        {" • "}
+                        {supplier.stock} {language === "EN" ? "in booth storage" : "ในพื้นที่บูธ"}
+                      </span>
                     </span>
                     <span className="shrink-0 text-[8px]">
-                      <strong className="text-[11px] font-bold text-[#7957ff]">{supplier.sold}/{supplier.total}</strong> SOLD ({supplier.soldLabel})
+                      <strong className="text-[11px] font-bold text-[#7957ff]">{supplier.sold}/{supplier.total}</strong>
+                      {" "}
+                      {language === "EN" ? "SOLD" : "ขายแล้ว"} ({supplier.soldLabel})
                     </span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-[#eee9ff]">
@@ -255,7 +275,7 @@ export default function ConsignDesk() {
                 <span className="mr-1.5 flex h-5 w-5 items-center justify-center rounded-md bg-[#f0eaff] text-[#a35de0]">
                   <Activity className="h-3.5 w-3.5" />
                 </span>
-                Live Activity Stream
+                {language === "EN" ? "Live Activity Stream" : "กิจกรรมการขายแบบเรียลไทม์"}
               </h2>
             </div>
 
@@ -263,18 +283,20 @@ export default function ConsignDesk() {
               <div className="flex items-center justify-between gap-2 border-b border-[#f0eef7] bg-[#f8f6ff] px-3 py-2">
                 <div className="flex items-center gap-1.5 text-[9px] font-bold text-[#7957ff]">
                   <Zap className="h-3 w-3" />
-                  <span>Latest Checkout (Sale #05)</span>
+                  <span>{language === "EN" ? "Latest Checkout (Sale #05)" : "การชำระเงินล่าสุด (รายการขาย #05)"}</span>
                 </div>
-                <span className="rounded-full border border-[#f0eaff] bg-white px-2 py-0.5 text-[8px] font-medium text-[#7957ff]">1 min ago</span>
+                <span className="rounded-full border border-[#f0eaff] bg-white px-2 py-0.5 text-[8px] font-medium text-[#7957ff]">
+                  {language === "EN" ? "1 min ago" : "1 นาทีที่แล้ว"}
+                </span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[360px] table-fixed text-left">
                   <thead className="border-b border-[#f0eef7] bg-[#fbfaff] text-[8px] font-bold uppercase tracking-wide text-[#858ba0]">
                     <tr>
-                      <th scope="col" className="w-[14%] px-2.5 py-1.5">No.</th>
-                      <th scope="col" className="w-[42%] px-1.5 py-1.5">Product Name</th>
-                      <th scope="col" className="w-[15%] px-1.5 py-1.5 text-center">Sold</th>
-                      <th scope="col" className="w-[29%] px-2.5 py-1.5 text-right">Time Sold</th>
+                      <th scope="col" className="w-[14%] px-2.5 py-1.5">{language === "EN" ? "No." : "ลำดับ"}</th>
+                      <th scope="col" className="w-[42%] px-1.5 py-1.5">{language === "EN" ? "Product Name" : "ชื่อสินค้า"}</th>
+                      <th scope="col" className="w-[15%] px-1.5 py-1.5 text-center">{language === "EN" ? "Sold" : "ขายแล้ว"}</th>
+                      <th scope="col" className="w-[29%] px-2.5 py-1.5 text-right">{language === "EN" ? "Time Sold" : "เวลาขาย"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f4f2f8]">
@@ -304,14 +326,15 @@ export default function ConsignDesk() {
                 </table>
               </div>
               <div className="border-t border-[#f0eef7] bg-[#faf9fd] px-3 py-2 text-[9px] font-medium text-[#858ba0]">
-                Total Sold This Session: <strong className="font-bold text-[#111747]">6 Units</strong>
+                {language === "EN" ? "Total Sold This Session:" : "ยอดขายรวมในรอบนี้:"}{" "}
+                <strong className="font-bold text-[#111747]">6 {language === "EN" ? "Units" : "ชิ้น"}</strong>
               </div>
             </div>
 
             <div className="rounded-2xl border border-[#eeeafd] bg-white px-3.5 py-3 shadow-[0_4px_14px_rgba(93,76,166,0.035)]">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="text-[9px] font-bold">Current Split Allocation</h3>
-                <span className="text-[8px] text-[#858ba0]">Calculated at 20:45</span>
+                <h3 className="text-[9px] font-bold">{language === "EN" ? "Current Split Allocation" : "สัดส่วนการแบ่งเงินปัจจุบัน"}</h3>
+                <span className="text-[8px] text-[#858ba0]">{language === "EN" ? "Calculated at 20:45" : "คำนวณเมื่อ 20:45"}</span>
               </div>
               <div className="mb-2 flex h-2 w-full overflow-hidden rounded-full">
                 <div className="h-full bg-[#7957ff]" style={{ width: "60%" }} />

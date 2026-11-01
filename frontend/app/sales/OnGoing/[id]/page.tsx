@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {Suspense} from 'react';
 import {
   ChevronRight,
   Store,
@@ -330,11 +331,11 @@ export default function SalesRunDetail() {
   const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
-
+  const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
   //State สำหรับ Toggle Sales Mode / Edit Mode
   const [stepMode, setStepMode] = useState("sales");
   // State สำหรับฟอร์ม Fast Log Shared Expense
-  const [expenseTitle, setExpenseTitle] = useState('Ice bag or plastic bags');
+  const [expenseTitle, setExpenseTitle] = useState('');
   const [category, setCategory] = useState('Stall Supplies');
   const [amount, setAmount] = useState('70');
   //INVITE MODAL
@@ -386,6 +387,7 @@ const ActionTimeAgo = ({ createdAt }: { createdAt: number }) => {
   const [, setTick] = useState(0);
 
   useEffect(() => {
+    setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
     // ให้ Re-render ตัวเองทุกๆ 1 วินาที เพื่ออัปเดตเวลาที่นับผ่านไป
     const interval = setInterval(() => {
       setTick((prev) => prev + 1);
@@ -479,7 +481,9 @@ const handleSell = (id: string) => {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
-      <Navbar />
+      <Suspense fallback="Loading...">
+          <Navbar />
+      </Suspense>
       <main className={`mx-auto w-full max-w-[1280px] flex-1 space-y-5 px-4 pt-16 sm:px-6 ${stepMode === "edit" ? "pb-24" : "pb-6"}`}>
         
         {/* TOP HEADER SECTION CARD */}
@@ -493,12 +497,12 @@ const handleSell = (id: string) => {
                 {stepMode === "edit" ? (
                   <span className="flex items-center gap-1.5 rounded-full border border-[#FDE68A] bg-[#FFFBEB] px-2.5 py-1 text-[10px] font-bold text-[#B45309]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#FFB24C]"></span>
-                    EDIT MODE
+                    {language === 'EN' ? 'Edit Mode' : 'โหมดแก้ไข'}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    LIVE RUN
+                    {language === 'EN' ? 'LIVE' : 'ไลฟ์'}
                   </span>
                 )}
               </div>
@@ -508,9 +512,9 @@ const handleSell = (id: string) => {
                 className="flex w-fit items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF]"
               >
                 <UsersRound className="h-4 w-4 text-[#7C5CFF]" />
-                <span>1 Assistant</span>
+                <span>1 {language === 'EN'?'Assistant':'ผู้ช่วย'}</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-[#7C5CFF]">+ Invite</span>
+                <span className="text-[#7C5CFF]">+ {language === 'EN'?'Invite':'เชิญ'}</span>
               </button>
             </div>
 
@@ -530,7 +534,7 @@ const handleSell = (id: string) => {
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <ShoppingBag className="h-3.5 w-3.5" /> Sales Mode
+                  <ShoppingBag className="h-3.5 w-3.5" /> {language === 'EN' ? 'Sales Mode' : 'โหมดขาย'}
                 </button>
                 <button
                   type="button"
@@ -542,7 +546,7 @@ const handleSell = (id: string) => {
                       : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
-                  <Receipt className="h-3.5 w-3.5" /> Edit Mode
+                  <Receipt className="h-3.5 w-3.5" />  {language === 'EN' ? 'Edit Mode' : 'โหมดแก้ไข'}
                 </button>
               </div>
               <button
@@ -550,7 +554,7 @@ const handleSell = (id: string) => {
                 onClick={() => setIsEndRunOpen(true)}
                 className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15"
               >
-                <X className="h-3.5 w-3.5" /> End Run
+                <X className="h-3.5 w-3.5" /> {language === 'EN' ? 'End Run' : 'จบกิจกรรม'}
               </button>
             </div>
           </div>
@@ -560,7 +564,7 @@ const handleSell = (id: string) => {
             {/* Gross Intake */}
             <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Gross Intake</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Gross Intake' : 'รายได้รวม'}</p>
                 <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
               </div>
               <div className="absolute right-3 top-3 rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
@@ -571,10 +575,10 @@ const handleSell = (id: string) => {
             {/* Total Sold Units */}
             <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Total Sold Units</p>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
                   <span className="text-lg font-extrabold text-[#0B0F4F]">{StockList[0].totalsold}</span>
-                  <span className="text-xs font-medium text-slate-400">/ {StockList[0].totalsoldMax} starting</span>
+                  <span className="text-xs font-medium text-slate-400">/ {StockList[0].totalsoldMax} {language === 'EN' ? 'starting' : 'เริ่มต้น'}</span>
                 </div>
               </div>
               <div className="absolute right-3 top-3 rounded-md bg-[#FFB24C]/15 p-2 text-[#FFB24C]">
@@ -586,11 +590,11 @@ const handleSell = (id: string) => {
             <div className="flex min-h-[76px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white py-2.5 pl-3 pr-5 shadow-sm min-[900px]:col-span-2">
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  <History className="h-3 w-3 text-[#F062C0]" /> Latest Action
+                  <History className="h-3 w-3 text-[#F062C0]" />  {language === 'EN' ? 'Lastest Action' : 'รายการล่าสุด'}
                 </p>
                 <p className="mt-0.5 flex min-w-0 items-center gap-2 truncate text-xs font-semibold text-slate-800">
                   <span className="min-w-0 truncate">
-                    {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : 'No actions yet'}
+                    {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : language === 'EN' ? 'No actions yet' : 'ไม่มีการดำเนินการ'}
                   </span>
                   <span className="shrink-0 rounded-full bg-[#F062C0]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#F062C0]">
                     {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
@@ -598,7 +602,7 @@ const handleSell = (id: string) => {
                 </p>
               </div>
               <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex min-w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-gradient-to-r from-[#FFB24C] to-[#F062C0] hover:brightness-95'}`}>
-                <Undo2 className="h-3.5 w-3.5 shrink-0" /> <span className="leading-none">Undo</span>
+                <Undo2 className="h-3.5 w-3.5 shrink-0" /> <span className="leading-none">{language === 'EN' ? 'Undo' : 'ย้อนกลับ'}</span>
               </button>
             </div>
           </div>
@@ -611,14 +615,14 @@ const handleSell = (id: string) => {
           <div className="space-y-4">
             <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(11,15,79,0.025)]">
               <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]">
-                Catalog Index
+                 {language === 'EN' ? 'Catalog Index' : 'ดัชนีแคตตาล็อก'}
               </h3>
               
               <nav className="space-y-0.5">
                 <button className="flex w-full items-center justify-between gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/10 px-1.5 py-1.5 text-left text-xs font-semibold text-[#0B0F4F]">
                   <div className="flex items-center gap-1.5">
                     <LayoutGrid className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
-                    <span>All Products</span>
+                    <span>{language === 'EN' ? 'All Products' : 'ผลิตภัณฑ์ทั้งหมด'}</span>
                   </div>
                   <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">9</span>
                 </button>
@@ -626,7 +630,7 @@ const handleSell = (id: string) => {
                 <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
                   <div className="flex items-center gap-1.5">
                     <User className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
-                    <span>My Products (Host)</span>
+                    <span>My Products ({language === 'EN' ? 'Host' : 'เจ้าของ'})</span>
                   </div>
                 </button>
 
@@ -649,7 +653,7 @@ const handleSell = (id: string) => {
                 <button onClick={()=>setStepMode("expense")} className="flex w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-1.5 py-1.5 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="h-2.5 w-2.5 text-[#FFB24C]" />
-                    <span>Booth Expenses</span>
+                    <span>{language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่ายของบูธ'}</span>
                   </div>
                   <ChevronDown className="h-2.5 w-2.5 -rotate-90 text-[#858ba0]" />
                 </button>
@@ -658,8 +662,8 @@ const handleSell = (id: string) => {
 
             <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-bold text-[#0B0F4F]">
-                <span className="flex items-center gap-1.5"><UsersRound className="h-3.5 w-3.5 text-[#7C5CFF]" /> Assistants</span>
-                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• 1 Active</span>
+                <span className="flex items-center gap-1.5"><UsersRound className="h-3.5 w-3.5 text-[#7C5CFF]" />  {language === 'EN' ? 'Assistants' : 'ผู้ช่วย'}</span>
+                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• 1 {language === 'EN' ? 'Active' : 'ใช้งาน'}</span>
               </div>
               <div className="mt-2 flex items-center justify-between gap-1.5 rounded-lg bg-slate-50 px-1.5 py-1.5">
                 <div className="flex min-w-0 items-center gap-1.5">
@@ -669,13 +673,13 @@ const handleSell = (id: string) => {
                     <p className="text-[10px] leading-3.5 text-slate-400">Cashier Mode</p>
                   </div>
                 </div>
-                <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• Online</span>
+                <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• {language === 'EN' ? 'Online' : 'ออนไลน์'}</span>
               </div>
               <button onClick={() => setIsOpen(true)} className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733]">
-                <UserPlus className="h-3 w-3 shrink-0" /> + Invite Assistant
+                <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
               <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10">
-                <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Manage Permissions
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" />{language === 'EN' ? 'Manage Permissions' : 'จัดการสิทธิ์'}
               </button>
             </div>
 
@@ -683,9 +687,9 @@ const handleSell = (id: string) => {
             <div className="flex gap-1.5 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
               <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FFB24C]" />
               <div className="min-w-0 space-y-1 text-xs">
-                <p className="font-bold text-[#0B0F4F]">Quick Tip</p>
+                <p className="font-bold text-[#0B0F4F]">{language === 'EN' ? 'Quick Tip' : 'คำแนะนำ'}</p>
                 <p className="leading-snug text-slate-400">
-                  Click supplier tab to jump directly to items. Click action button to register immediate sales.
+                  {language === 'EN' ? 'Click supplier tab to jump directly to items. Click action button to register immediate sales.' : 'คลิกแท็บผู้จัดหาเพื่อไปยังรายการโดยตรง คลิกปุ่มดำเนินการเพื่อลงทะเบียนการขายทันที'}
                 </p>
               </div>
             </div>
@@ -693,7 +697,7 @@ const handleSell = (id: string) => {
             <Link href="/ViewUser/1" className="flex items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-1.5 py-1.5 text-white shadow-sm">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
-                <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5">Sales Activity Board</span><span className="block text-[9px] leading-3 text-white/80">Enter live sales feed &amp; telemetry</span></span>
+                <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5"> {language === 'EN' ? 'Sales Activity Board' : 'บอร์ดกิจกรรมการขาย'}</span><span className="block text-[9px] leading-3 text-white/80"> {language === 'EN' ? 'Enter live sales feed & telemetry' : 'เข้าสู่กระแสการขายสดและข้อมูล telemetry'}</span></span>
               </span>
               <ChevronRight className="h-3 w-3 shrink-0" />
             </Link>
@@ -720,6 +724,7 @@ const handleSell = (id: string) => {
       dotColor={accent.dot}
       items={items.products ?? []}
       placeholderText="Item Name (e.g. Linen Coaster Set)"
+      language={language}
     />
   );
 })}
@@ -735,7 +740,7 @@ const handleSell = (id: string) => {
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-    <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} />
+    <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -752,10 +757,10 @@ const handleSell = (id: string) => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#0B0F4F] tracking-tight">
-              Booth’s Operating Expenses
+              {language === 'EN' ? 'Booth’s Operating Expenses' : 'ค่าใช้จ่ายในการดำเนินงานของบูธ'}
             </h1>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
-              Track and split operational costs for this sales run
+               {language === 'EN' ? 'Track and split operational costs for this sales run' : 'ติดตามและแบ่งค่าใช้จ่ายในการดำเนินงานสำหรับรอบการขายนี้'}
             </p>
           </div>
         </div>
@@ -763,7 +768,7 @@ const handleSell = (id: string) => {
         {/* Status Badge */}
         <div className="bg-[#7C5CFF]/5 text-[#7C5CFF] px-3 py-1.5 rounded-full border border-[#7C5CFF]/20 flex items-center gap-2 text-xs font-semibold">
           <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>Synchronized Ledger</span>
+          <span> {language === 'EN' ? 'Synchronized Ledger' : 'บันทึกการเงินที่ซิงโครไนซ์'}</span>
         </div>
       </div>
 
@@ -772,7 +777,7 @@ const handleSell = (id: string) => {
         {/* Section Title */}
         <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
           <PlusCircle className="w-4 h-4 text-[#FFB24C]" />
-          <span>Fast Log Shared Expense</span>
+          <span>{language === 'EN' ? 'Fast Log Shared Expense' : 'บันทึกค่าใช้จ่ายที่แบ่งปันอย่างรวดเร็ว'}</span>
         </div>
 
         {/* Input Form Grid */}
@@ -781,13 +786,14 @@ const handleSell = (id: string) => {
           {/* Expense Title Input */}
           <div className="md:col-span-5 space-y-1.5">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-              Expense Title
+              {language === 'EN' ? 'Expense Title' : 'ชื่อค่าใช้จ่าย'}
             </label>
             <div className="relative flex items-center">
               <Pencil className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
               <input
                 type="text"
                 value={expenseTitle}
+                placeholder={language === 'EN' ? 'e.g. Stall Supplies' : 'อุปกรณ์บูธ'}
                 onChange={(e) => setExpenseTitle(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-[#7C5CFF] transition-colors"
               />
@@ -797,7 +803,7 @@ const handleSell = (id: string) => {
           {/* Category Dropdown */}
           <div className="md:col-span-3 space-y-1.5">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-              Category
+              {language === 'EN' ? 'Category' : 'หมวดหมู่'}
             </label>
             <div className="relative">
               <select
@@ -805,9 +811,9 @@ const handleSell = (id: string) => {
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 appearance-none focus:bg-white focus:outline-[#7C5CFF] transition-colors pr-8 cursor-pointer"
               >
-                <option value="Stall Supplies">Stall Supplies</option>
-                <option value="Booth Fee">Booth Fee</option>
-                <option value="Travel">Travel</option>
+                <option value="Stall Supplies"> {language === 'EN' ? 'Stall Supplies' : 'อุปกรณ์บูธ'}</option>
+                <option value="Booth Fee">{language === 'EN' ? 'Booth Fee' : 'ค่าใช้จ่ายบูธ'}</option>
+                <option value="Travel">{language === 'EN' ? 'Travel' : 'การเดินทาง'}</option>
               </select>
               <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -816,7 +822,7 @@ const handleSell = (id: string) => {
           {/* Amount (฿) Input */}
           <div className="md:col-span-2 space-y-1.5">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-              Amount (฿)
+              {language === 'EN' ? 'Amount (฿)' : 'จำนวน (฿)'}
             </label>
             <div className="relative flex items-center">
               <span className="text-xs font-semibold text-slate-400 absolute left-3.5">
@@ -834,7 +840,7 @@ const handleSell = (id: string) => {
           {/* Record Button */}
           <div className="md:col-span-2">
             <button className="w-full py-2.5 bg-[#FFB24C] hover:bg-[#f5a733] active:bg-[#e99a2e] text-[#0B0F4F] font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1">
-              <Plus className="w-4 h-4 stroke-[3]" /> Record
+              <Plus className="w-4 h-4 stroke-[3]" />{language === 'EN' ? 'Record' : 'บันทึก'}
             </button>
           </div>
 
@@ -847,10 +853,10 @@ const handleSell = (id: string) => {
         <div className="p-5 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center space-x-2 text-[#0B0F4F] font-bold text-base">
             <Receipt className="w-5 h-5 text-[#FFB24C]" />
-            <span>Recorded Expenses</span>
+            <span> {language === 'EN' ? 'Recorded Expenses' : 'ที่บันทึกแล้ว'}</span>
           </div>
           <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium">
-            Active Read-Only Ledger
+            {language === 'EN' ? 'Active Read-Only Ledger' : 'เล่มบันทึกอ่านได้เฉพาะ'}
           </span>
         </div>
 
@@ -860,11 +866,11 @@ const handleSell = (id: string) => {
             <thead>
               <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 <th className="py-3 px-5 w-12">#</th>
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Expense Detail</th>
-                <th className="py-3 px-4 text-center">Category</th>
-                <th className="py-3 px-4 text-center">Logged By</th>
-                <th className="py-3 px-5 text-right">Amount</th>
+                <th className="py-3 px-4">{language === 'EN' ? 'Timestamp':'วันที่'}</th>
+                <th className="py-3 px-4">{language === 'EN' ? 'Expense Detail' : 'รายละเอียดค่าใช้จ่าย'}</th>
+                <th className="py-3 px-4 text-center">{language === 'EN' ? 'Category' : 'ประเภท'}</th>
+                <th className="py-3 px-4 text-center">{language === 'EN' ? 'Logged By' : 'บันทึกโดย'}</th>
+                <th className="py-3 px-5 text-right">{language === 'EN' ? 'Amount' : 'จำนวน'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
@@ -899,10 +905,10 @@ const handleSell = (id: string) => {
         {/* Table Footer / Summary */}
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-xs">
           <span className="text-slate-400 font-medium">
-            Showing 2 settled market expenses
+            {language === 'EN' ? 'Showing' : 'แสดง'} 2  {language === 'EN' ? 'settled market expenses' : 'ค่าใช้จ่ายตลาด'}
           </span>
           <div className="flex items-center space-x-1.5">
-            <span className="text-slate-400 font-medium">Subtotal Logged:</span>
+            <span className="text-slate-400 font-medium"> {language === 'EN' ? 'Subtotal Logged' : 'รวม'}:</span>
             <span className="font-black text-[#FFB24C] text-sm">฿850.00</span>
           </div>
         </div>
@@ -917,10 +923,10 @@ const handleSell = (id: string) => {
                 <div className="rounded-xl bg-[#6366F1]/10 p-2 text-[#6366F1]">
                   <UserPlus className="w-5 h-5" />
                 </div>
-                <span className="font-bold text-slate-800 text-sm">Add New Supplier</span>
+                <span className="font-bold text-slate-800 text-sm">{language === 'EN' ? 'Add New Supplier' : 'เพิ่มซัพพลายเออร์ใหม่'}</span>
               </div>
               <button className="flex items-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]">
-                <Plus className="w-4 h-4" /> Add Supplier
+                <Plus className="w-4 h-4" /> {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
               </button>
             </div>
             )}
@@ -934,10 +940,10 @@ const handleSell = (id: string) => {
         <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
           <div className="mx-auto flex min-h-[56px] w-full max-w-[1280px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
             <div className="flex min-w-0 items-center gap-2 text-xs">
-              <span className="shrink-0 font-bold text-[#7C5CFF]">0 Unsaved changes</span>
+              <span className="shrink-0 font-bold text-[#7C5CFF]">0  {language === 'EN' ? 'Unsaved changes' : 'การเปลี่ยนแปลงที่ไม่ได้บันทึก'}</span>
               <span className="hidden text-[#d5d7df] sm:inline">•</span>
               <span className="hidden truncate text-[11px] text-[#6F7485] sm:inline">
-                Live run updates will apply instantly to register
+                 {language === 'EN' ? 'Live run updates will apply instantly to register' : 'การอัปเดตรันสดจะใช้กับเครื่องบันทึกเงินสดทันที'}.
               </span>
             </div>
             <div className="flex shrink-0 gap-2">
@@ -946,14 +952,14 @@ const handleSell = (id: string) => {
                 onClick={() => setStepMode("sales")}
                 className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#BA1A1A] transition-colors hover:bg-[#FEE2E2]"
               >
-                Discard Changes
+                {language === 'EN' ? 'Discard Changes' : 'ทิ้งการเปลี่ยนแปลง'}
               </button>
               <button
                 type="button"
                 onClick={() => setStepMode("sales")}
                 className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-4 py-2 text-xs font-bold text-[#111747] shadow-sm transition hover:brightness-105"
               >
-                <Check className="h-3.5 w-3.5" /> Apply to run
+                <Check className="h-3.5 w-3.5" />  {language === 'EN' ? 'Apply to run' : 'บันทึกการเปลี่ยนแปลง'}
               </button>
             </div>
           </div>
@@ -971,15 +977,19 @@ const handleSell = (id: string) => {
             setIsOpen(false);
             setIsPermissionEnabled(true);
           }}
+          language={language}
         />
       )}
       {isPermissionEnabled && (
        < AssistantPermissionsModal
-       onClose={() => setIsPermissionEnabled(false)} />
+       onClose={() => setIsPermissionEnabled(false)}
+       language={language}
+       />
       )}
       {isEndRunOpen && (
         <EndSalesRunModal
           onClose={() => setIsEndRunOpen(false)}
+          language={language}
         />
       )}
     </div>
@@ -1012,9 +1022,10 @@ type SupplierInviteModalProps = {
   inviteUrl: string;
   joinPin: string;
   onOpenPermissions: () => void;
+  language: 'EN' | 'TH';
 };
 // MODAL COMPONENT: Supplier Invite Modal
-function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions }: SupplierInviteModalProps) {
+function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
   return (
     <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
       
@@ -1029,10 +1040,10 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
             </div>
             <div>
               <h2 className="text-lg font-bold text-[#0B0F4F] tracking-tight leading-snug">
-                Invite Run Assistants
+                {language === 'EN' ? 'Invite Run Assistants' : 'เชิญผู้ช่วยรัน'}
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
-                Invited Assistants need permission from you to make actions
+                {language === 'EN' ? 'Invited Assistants need permission from you to make actions' : 'ผู้ช่วยที่ได้รับเชิญต้องได้รับอนุญาตจากคุณในการดำเนินการ'}
               </p>
             </div>
           </div>
@@ -1057,7 +1068,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
               {/* RUN INVITE LINK */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  RUN INVITE LINK
+                  {language === 'EN' ? 'RUN INVITE LINK' : 'ลิงก์เชิญรัน'}
                 </label>
                 <div className="flex items-center gap-1.5">
                   <div                   className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/20 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 truncate w-full">
@@ -1076,7 +1087,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
               {/* RUN JOIN CODE / PIN */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  RUN JOIN CODE / PIN
+                  {language === 'EN' ? 'RUN JOIN CODE / PIN' : 'รหัสเข้าร่วม/พินของรัน'}
                 </label>
                 <div className="inline-flex w-fit min-w-[8rem] items-center justify-center whitespace-nowrap rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-4 py-2.5 text-center text-base font-black tracking-wider text-[#7C5CFF]">
                   {joinPin}
@@ -1094,7 +1105,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
-                Fast Booth Scan
+                {language === 'EN' ? 'Fast Booth Scan' : 'สแกนบูธอย่างรวดเร็ว'}
               </span>
             </div>
 
@@ -1103,7 +1114,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
           {/* ASSISTANTS JOINED (2) SECTION */}
           <div className="space-y-2.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-              ASSISTANTS JOINED (2)
+               {language === 'EN' ? 'ASSISTANTS JOINED ' : 'ผู้ช่วยที่เข้าร่วม'} (2)
             </label>
 
             <div className="space-y-2">
@@ -1119,7 +1130,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 </div>
                 <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Active
+                  {language === 'EN' ? 'Active' : 'ใช้งาน'}
                 </span>
               </div>
 
@@ -1135,7 +1146,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 </div>
                 <span className="bg-slate-100 text-slate-500 border border-slate-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  Offline
+                  {language === 'EN' ? 'Offline' : 'ออฟไลน์'}
                 </span>
               </div>
             </div>
@@ -1147,14 +1158,14 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
           <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-[#6366F1] border border-[#6366F1]/20 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
             <Shield className="w-3.5 h-3.5 text-[#6366F1]" />
-            <span>Assistant Permissions</span>
+            <span>{language === 'EN' ? 'Assistant Permissions' : 'สิทธิ์ของผู้ช่วย'}</span>
           </button>
           
           <button
             onClick={() => onClose()}
             className="px-5 py-2 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
           >
-            Done
+            {language === 'EN' ? 'Done' : 'เสร็จสิ้น'}
           </button>
         </div>
 
@@ -1187,7 +1198,7 @@ function getSupplierAccent(id: string) {
   };
 }
 
-function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText }:any) {
+function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language }:any) {
   return (
     <div className="space-y-3">
       {/* Group Header */}
@@ -1200,18 +1211,18 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
           </span>
         </div>
         <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${countColor}`}>
-          {itemCount} items
+          {language === 'EN' ? `${itemCount} items` : `${itemCount} รายการ`}
         </span>
       </div>
 
       {/* Table Header */}
       <div className="overflow-hidden rounded-2xl border border-[#EEE9FF] bg-white shadow-sm">
       <div className="grid grid-cols-12 border-b border-[#EEE9FF] bg-[#EEE9FF] px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#0B0F4F]">
-        <div className="col-span-5">PRODUCT NAME</div>
-        <div className="col-span-3 text-center">STOCK / QTY</div>
-        <div className="col-span-2 text-center">PRICE (฿)</div>
-        <div className="col-span-1 text-center">SOLD</div>
-        <div className="col-span-1 text-center">ACTION</div>
+        <div className="col-span-5">{language === 'EN' ? 'PRODUCT NAME' : ' ชื่อสินค้า'}</div>
+        <div className="col-span-3 text-center">{language === 'EN' ? 'STOCK / QTY' : 'สต๊อก / ปริมาณ'}</div>
+        <div className="col-span-2 text-center">{language === 'EN' ? 'PRICE (฿)' : 'ราคา (฿)'}</div>
+        <div className="col-span-1 text-center">{language === 'EN' ? 'SOLD' : 'ขายแล้ว'}</div>
+        <div className="col-span-1 text-center">{language === 'EN' ? 'ACTION' : 'การทำงาน'}</div>
       </div>
 
       {/* Product Rows */}
@@ -1271,34 +1282,34 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
         <div className="col-span-6">
           <input
             type="text"
-            placeholder={placeholderText}
+            placeholder={language === 'EN' ? 'Items Name (e.g. T-Shirt)' : 'ชื่อสินค้า (เช่น เสื้อยืด)'}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
-            placeholder="Qty"
+            placeholder={language === 'EN' ? 'Qty' : 'ปริมาณ'}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
           <input
             type="number"
-            placeholder="Price ฿"
+            placeholder={language === 'EN' ? 'Price ฿' : 'ราคา (฿)'}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-2">
           <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
-            <PlusCircle className="w-3.5 h-3.5" /> Add Product
+            <PlusCircle className="w-3.5 h-3.5" />{language === 'EN' ? 'Add Product' : 'เพิ่มสินค้า'}
           </button>
         </div>
       </div>
     </div>
   );
 }
-function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void }) {
+function ProductCard({ item, onSell,language }: { item: any; onSell: (id: string) => void; language: 'EN' | 'TH' }) {
   const IconComponent = item.icon;
   const isOutOfStock = item.stock === 0;
 
@@ -1315,10 +1326,10 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
             {item.name}
           </h3>
           <div className="flex flex-wrap items-center gap-x-1.5 text-xs font-medium text-slate-400">
-            <span>Start: <strong className="text-slate-700">{item.start}</strong></span>
+            <span>{language === 'EN' ? 'Start' : 'เริ่ม'}: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
             <span className={isOutOfStock ? 'text-[#ED571B] font-semibold' : 'text-[#7C5CFF] font-semibold'}>
-              {isOutOfStock ? 'Out of stock' : `${item.stock} in stock`}
+              {isOutOfStock ? (language === 'EN' ? 'Out of stock' : 'หมดสต็อก') : `${item.stock} ${language === 'EN' ? 'in stock' : 'ในสต็อก'}`}
             </span>
           </div>
         </div>
@@ -1332,7 +1343,7 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
             {item.price}
           </div>
           <p className="mt-1 text-sm font-medium text-slate-400">
-            Sold: <span className="font-bold text-slate-700">{item.sold}</span>
+            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.sold}</span>
           </p>
         </div>
 
@@ -1345,7 +1356,7 @@ function ProductCard({ item, onSell }: { item: any; onSell: (id: string) => void
               : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
           }`}
         >
-          Sell - 1
+          {language === 'EN' ? 'Sell - 1' : 'ขาย - 1'}
         </button>
       </div>
     </div>
@@ -1355,11 +1366,13 @@ type AssistantPermissionsModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
   onSave?: (permissions: Record<string, boolean>) => void;
+  language?: 'EN' | 'TH';
 };
 function AssistantPermissionsModal({
   isOpen = true,
   onClose = () => {},
-  onSave = () => {}
+  onSave = () => {},
+  language
 }: AssistantPermissionsModalProps) {
   // State สำหรับเก็บสถานะสวิตช์ทั้ง 5 รายการ (ค่าเริ่มต้นปิดทั้งหมด 0/5 ตามรูป)
   const [permissions, setPermissions] = useState({
@@ -1402,10 +1415,11 @@ function AssistantPermissionsModal({
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-extrabold text-[#0B0F4F] tracking-tight">
-                Assistant Permissions
+                {language === 'EN' ? 'Assistant Permissions' : 'สิทธิ์ของผู้ช่วย'}
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-1 leading-relaxed max-w-xs">
-                Default permissions for new assistants: All disabled (toggle on individually to grant access).
+                
+                {language === 'EN' ? 'Default permissions for new assistants: All disabled (toggle on individually to grant access).' : 'สิทธิ์เริ่มต้นสำหรับผู้ช่วยใหม่: ปิดทั้งหมด (เปิดทีละรายการเพื่อให้สิทธิ์เข้าถึง)'}
               </p>
             </div>
           </div>
@@ -1424,8 +1438,8 @@ function AssistantPermissionsModal({
           {/* SELECT ASSISTANT SECTION */}
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
-              <span>SELECT ASSISTANT</span>
-              <span className="text-slate-400 font-semibold lowercase">3 joined</span>
+              {language === 'EN' ? <span>SELECT ASSISTANT</span> : <span>เลือกผู้ช่วย</span>}
+              <span className="text-slate-400 font-semibold lowercase">3 joined {language === 'EN' ? 'joined' : 'เข้าร่วม'}</span>
             </div>
 
             {/* Custom Dropdown Box */}
@@ -1442,11 +1456,11 @@ function AssistantPermissionsModal({
                   </div>
                   <div className="flex items-center space-x-1 text-xs font-semibold">
                     <span className="text-[#FFB24C]">
-                      Restricted (Viewer only)
+                      {language === 'EN' ? 'Restricted (Viewer only)' : 'ถูกจำกัด (ดูเท่านั้น)'}
                     </span>
                     <span className="text-slate-300">•</span>
                     <span className="text-slate-400 font-medium">
-                      All permissions off by default
+                      {language === 'EN' ? 'All permissions off by default' : 'สิทธิ์ทั้งหมดถูกปิดโดยค่าเริ่มต้น'}
                     </span>
                   </div>
                 </div>
@@ -1460,10 +1474,10 @@ function AssistantPermissionsModal({
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                PERMISSIONS
+                {language === 'EN' ? 'PERMISSIONS' : ' สิทธิ์'}
               </span>
               <span className={`text-[11px] sm:text-xs font-bold ${enabledCount > 0 ? "text-emerald-600" : "text-[#6366F1]"}`}>
-                All permissions off by default ({enabledCount}/5 enabled)
+                {language === 'EN' ? 'All permissions off by default' : 'สิทธิ์ทั้งหมดถูกปิดโดยค่าเริ่มต้น'} ({enabledCount}/5  {language === 'EN' ? 'enabled' : 'เปิดใช้งาน'})
               </span>
             </div>
 
@@ -1473,8 +1487,8 @@ function AssistantPermissionsModal({
               {/* Item 1: Sell Products / Cashier Mode */}
               <PermissionToggleRow
                 icon={<Calculator className={`w-5 h-5 ${permissions.sellProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
-                title="Sell Products / Cashier Mode"
-                description="Sell products and register sales transactions in Sales Mode"
+                title={language === 'EN' ? 'Sell Products / Cashier Mode' : 'ขายสินค้า / โหมดแคชเชียร์'}
+                description={language === 'EN' ? 'Sell products and register sales transactions in Sales Mode' : 'ขายสินค้าและบันทึกการทำธุรกรรมการขายในโหมดการขาย'}
                 enabled={permissions.sellProducts}
                 onToggle={() => togglePermission('sellProducts')}
               />
@@ -1482,8 +1496,8 @@ function AssistantPermissionsModal({
               {/* Item 2: Add / Edit / Delete Products */}
               <PermissionToggleRow
                 icon={<Edit3 className={`w-5 h-5 ${permissions.editProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
-                title="Add / Edit / Delete Products"
-                description="Manage catalog items, quantities, and pricing"
+                title={language === 'EN' ? 'Add / Edit / Delete Products' : 'เพิ่ม / แก้ไข / ลบสินค้า'}
+                description={language === 'EN' ? 'Manage catalog items, quantities, and pricing' : 'จัดการรายการสินค้า, ปริมาณ, และราคา'}
                 enabled={permissions.editProducts}
                 onToggle={() => togglePermission('editProducts')}
               />
@@ -1491,8 +1505,8 @@ function AssistantPermissionsModal({
               {/* Item 3: Record Booth Expenses */}
               <PermissionToggleRow
                 icon={<Receipt className={`w-5 h-5 ${permissions.recordExpenses ? "text-emerald-600" : "text-[#6366F1]"}`} />}
-                title="Record Booth Expenses"
-                description="Record booth expenses and operational costs"
+                title={language === 'EN' ? 'Record Booth Expenses' : 'บันทึกค่าใช้จ่ายของบูธ'}
+                description={language === 'EN' ? 'Record booth expenses and operational costs' : 'บันทึกค่าใช้จ่ายของบูธและค่าใช้จ่ายในการดำเนินงาน'}
                 enabled={permissions.recordExpenses}
                 onToggle={() => togglePermission('recordExpenses')}
               />
@@ -1500,8 +1514,8 @@ function AssistantPermissionsModal({
               {/* Item 4: View Sales Log & Gross Stats */}
               <PermissionToggleRow
                 icon={<History className={`w-5 h-5 ${permissions.viewSalesLog ? "text-emerald-600" : "text-[#6366F1]"}`} />}
-                title="View Sales Log & Gross Stats"
-                description="Access transaction history, undo sales, and total stats"
+                title={language === 'EN' ? 'View Sales Log & Gross Stats' : 'ดูบันทึกการขายและสถิติทั้งหมด'}
+                description={language === 'EN' ? 'Access transaction history, undo sales, and total stats' : 'เข้าถึงประวัติการทำธุรกรรม, ยกเลิกการขาย, และสถิติทั้งหมด'}
                 enabled={permissions.viewSalesLog}
                 onToggle={() => togglePermission('viewSalesLog')}
               />
@@ -1509,9 +1523,9 @@ function AssistantPermissionsModal({
               {/* Item 5: Manage & Grant Permissions */}
               <PermissionToggleRow
                 icon={<Shield className={`w-5 h-5 ${permissions.managePermissions ? "text-emerald-600" : "text-[#6366F1]"}`} />}
-                title="Manage & Grant Permissions"
+                title={language === 'EN' ? 'Manage & Grant Permissions' : 'จัดการและให้สิทธิ์'}
                 badgeText="RESTRICTED"
-                description="Assign roles and grant assistant permissions"
+                description={language === 'EN' ? 'Assign roles and grant assistant permissions' : 'กำหนดบทบาทและให้สิทธิ์แก่ผู้ช่วย'}
                 enabled={permissions.managePermissions}
                 onToggle={() => togglePermission('managePermissions')}
               />
@@ -1527,7 +1541,7 @@ function AssistantPermissionsModal({
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
           >
-            Cancel
+            {language === 'EN' ? ' Cancel' : ' ยกเลิก'}
           </button>
           
           <button
@@ -1535,7 +1549,7 @@ function AssistantPermissionsModal({
             className="w-full sm:w-auto px-5 py-2.5 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
-            <span>Save Permissions</span>
+            <span> {language === 'EN' ? 'Save Permissions' : 'บันทึกสิทธิ์'}</span>
           </button>
         </div>
 
@@ -1616,11 +1630,13 @@ type EndSalesRunModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
   onConfirmEndRun?: () => void;
+  language?: 'EN' | 'TH';
 };
 function EndSalesRunModal({
   isOpen = true,
   onClose = () => {},
-  onConfirmEndRun = () => {}
+  onConfirmEndRun = () => {},
+  language = 'EN'
 }: EndSalesRunModalProps) {
   // State สำหรับ Checkbox การยืนยัน Step 2
   const [isConfirmed, setIsConfirmed] = useState(true);
@@ -1649,10 +1665,10 @@ function EndSalesRunModal({
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-[#BE123C] tracking-tight">
-                End Active Sales Run
+                {language === 'EN' ? 'End Active Sales Run' : 'จบการทำงานขายที่ใช้งานอยู่'}
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
-                Two-step verification required to permanently close session
+                {language === 'EN' ? 'Two-step verification required to permanently close session' : ' ต้องยืนยันสองขั้นตอนเพื่อปิดเซสชันอย่างถาวร'}
               </p>
             </div>
           </div>
@@ -1672,20 +1688,20 @@ function EndSalesRunModal({
           <div className="bg-[#BE123C]/5 border border-[#BE123C]/15 rounded-2xl p-4 space-y-2">
             <div className="flex items-center space-x-2 text-[#BE123C] font-bold text-xs">
               <Lock className="w-4 h-4 shrink-0" />
-              <span>Step 1: Session Lockdown Warnings</span>
+              <span>{language === 'EN' ? 'Step 1: Session Lockdown Warnings' : 'ขั้นตอนที่ 1: คำเตือนการล็อกเซสชัน'}</span>
             </div>
 
             <ul className="text-[11px] text-slate-500 font-medium space-y-1 pl-6 list-disc marker:text-slate-400 leading-relaxed">
-              <li>Disconnects active assistants (Ploy W. and others).</li>
-              <li>Locks all product inventories and disables instant sales logging.</li>
-              <li>Calculates final supplier payouts and locks telemetry tallies.</li>
+              <li> {language === 'EN' ? 'Disconnects active assistants (Ploy W. and others).' : 'จะตัดการเชื่อมต่อผู้ช่วยที่ใช้งานอยู่ รวมถึง Ploy W. และอื่นๆ.'}</li>
+              <li> {language === 'EN' ? 'Locks all product inventories and disables instant sales logging.' : 'จะป้องกันการบันทึกการขายใหม่ๆ.'}</li>
+              <li>{language === 'EN' ? 'Calculates final supplier payouts and locks telemetry tallies.' : 'จะคำนวณการชำระเงินให้ผู้จัดหาสุดท้ายและป้องกันการบันทึกข้อมูลทางเทคนิค'}</li>
             </ul>
           </div>
 
           {/* STEP 2: VERIFICATION & RECONCILIATION */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-slate-800">
-              Step 2: Verification & Reconciliation
+              {language === 'EN' ? 'Step 2: Verification & Reconciliation' : 'ขั้นตอนที่ 2: การตรวจสอบและการปรับสมดุล'}
             </h3>
 
             {/* CONFIRMATION CHECKBOX BOX */}
@@ -1701,7 +1717,7 @@ function EndSalesRunModal({
                 {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
               </div>
               <span className="text-xs font-bold text-slate-800">
-                I confirm that the sales session has ended.
+                {language === 'EN' ? 'I confirm that the sales session has ended.' : ' ฉันยืนยันว่าการขายได้สิ้นสุดลงแล้ว'}
               </span>
             </label>
 
@@ -1728,7 +1744,7 @@ function EndSalesRunModal({
             onClick={onClose}
             className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
           >
-            Cancel
+            {language === 'EN' ? 'Cancel' : 'ยกเลิก'}
           </button>
           
           <button
@@ -1743,7 +1759,7 @@ function EndSalesRunModal({
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            <span>Confirm & End Run</span>
+            {language === 'EN' ? <span>Confirm & End Run</span> : <span>ยืนยันและจบการขาย</span>}
           </button>
         </div>
 
@@ -1758,12 +1774,14 @@ function SaleSection({
   Name,
   Role,
   id,
+  language
 }: {
   products: any[];
   handleSell: (id: string) => void;
   Name: string;
   Role: string;
   id: string;
+  language: 'EN' | 'TH';
 }) {
   // กรองสินค้าของ Supplier ที่ตรงกับ ID
   const filteredProducts = products.filter(
@@ -1789,7 +1807,7 @@ function SaleSection({
         </div>
 
         <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${accent.count}`}>
-          {filteredProducts.length} items
+          {filteredProducts.length} {language === 'EN' ? 'items' : ' รายการ'}
         </span>
       </div>
 
@@ -1799,6 +1817,7 @@ function SaleSection({
           key={cardItem.id}
           item={cardItem}
           onSell={handleSell}
+          language={language}
         />
       ))}
     </div>
