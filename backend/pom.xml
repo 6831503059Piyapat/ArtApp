@@ -75,7 +75,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-        			<mainClass>com.example.backend.BackendApplication</mainClass>
+        			<mainClass>com.example.demo.BackendApplication</mainClass>
     			</configuration>
 			</plugin>
 		</plugins>

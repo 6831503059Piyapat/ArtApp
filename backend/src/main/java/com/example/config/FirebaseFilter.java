@@ -19,7 +19,13 @@ public class FirebaseFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+                String path = request.getServletPath();
 
+        // 1. กำหนด Path ของ WebSocket ที่ต้องการยกเว้น
+        if (path.startsWith("/ws-public")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // หากเป็น OPTIONS Request ให้ถือว่าผ่านและตอบ SC_OK กลับไปทันที
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
