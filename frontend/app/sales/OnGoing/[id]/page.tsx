@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {Suspense} from 'react';
 import {
@@ -40,12 +40,39 @@ import {
   ShieldCheck,
   RotateCcw,
   Check,
-  Minus
+  Minus,
+  Image as ImageIcon,
+  Upload,
+  type LucideIcon
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
+
+type InventoryProduct = {
+  id: string;
+  name: string;
+  start: number;
+  stock: number;
+  price: number;
+  sold: number;
+  icon: LucideIcon;
+  iconBg: string;
+  supplierId: string;
+  imageUrl?: string;
+};
+
+type Supplier = {
+  id: string;
+  name: string;
+  role: string;
+  accent: string;
+  category: string;
+  placeholder: string;
+  products: InventoryProduct[];
+};
+
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
-  const Suppliers = [
+  const Suppliers: Supplier[] = [
     {
     id: "host-8466468345",
     name: "My Products",
@@ -341,9 +368,17 @@ export default function SalesRunDetail() {
   //INVITE MODAL
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [imageProduct, setImageProduct] = useState<{
+    supplierId: string;
+    productId: string;
+    name: string;
+    imageUrl?: string;
+  } | null>(null);
   const [previousActions, setPreviousActions] = useState<{supplierId: string; productId: string; productName: string; quantity: number; time:string }[]>([]);
   // End Sales Run Modal
   const [isEndRunOpen, setIsEndRunOpen] = useState(false);
+  const [isFinalEndRunOpen, setIsFinalEndRunOpen] = useState(false);
+  const [isEndRunConfirmed, setIsEndRunConfirmed] = useState(false);
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
   const joinPin = '88X2-901';
   // Toggle Switches State
@@ -359,6 +394,25 @@ export default function SalesRunDetail() {
   });
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+  const handleSaveProductImage = (imageUrl: string) => {
+    if (!imageProduct) return;
+
+    setProducts((prev) =>
+      prev.map((supplier) =>
+        supplier.id !== imageProduct.supplierId
+          ? supplier
+          : {
+              ...supplier,
+              products: supplier.products.map((product) =>
+                product.id === imageProduct.productId
+                  ? { ...product, imageUrl }
+                  : product,
+              ),
+            },
+      ),
+    );
+    setImageProduct(null);
   };
   const handleCopy = () => {
     navigator.clipboard.writeText(inviteUrl);
@@ -551,7 +605,10 @@ const handleSell = (id: string) => {
               </div>
               <button
                 type="button"
-                onClick={() => setIsEndRunOpen(true)}
+                onClick={() => {
+                  setIsEndRunConfirmed(false);
+                  setIsEndRunOpen(true);
+                }}
                 className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15"
               >
                 <X className="h-3.5 w-3.5" /> {language === 'EN' ? 'End Run' : 'จบกิจกรรม'}
@@ -740,7 +797,7 @@ const handleSell = (id: string) => {
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-    <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
+   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} onImageClick={(product) => setImageProduct({ supplierId: supplier.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -988,8 +1045,45 @@ const handleSell = (id: string) => {
       )}
       {isEndRunOpen && (
         <EndSalesRunModal
-          onClose={() => setIsEndRunOpen(false)}
+          isConfirmed={isEndRunConfirmed}
+          onClose={() => {
+            setIsEndRunOpen(false);
+            setIsFinalEndRunOpen(false);
+          }}
+          onRequestConfirmation={() => setIsFinalEndRunOpen(true)}
+          onUnconfirm={() => setIsEndRunConfirmed(false)}
+          onConfirmEndRun={() => {
+            setIsEndRunOpen(false);
+            setIsEndRunConfirmed(false);
+          }}
           language={language}
+        />
+      )}
+      {isFinalEndRunOpen && (
+        <FinalEndRunModal
+          onClose={() => {
+            setIsFinalEndRunOpen(false);
+            setIsEndRunOpen(false);
+            setIsEndRunConfirmed(false);
+          }}
+          onCancel={() => {
+            setIsFinalEndRunOpen(false);
+            setIsEndRunConfirmed(false);
+          }}
+          onConfirm={() => {
+            setIsFinalEndRunOpen(false);
+            setIsEndRunConfirmed(true);
+          }}
+          language={language}
+        />
+      )}
+      {imageProduct && (
+        <ProductImageModal
+          productName={imageProduct.name}
+          imageUrl={imageProduct.imageUrl}
+          language={language}
+          onClose={() => setImageProduct(null)}
+          onSave={handleSaveProductImage}
         />
       )}
     </div>
@@ -1309,7 +1403,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
     </div>
   );
 }
-function ProductCard({ item, onSell,language }: { item: any; onSell: (id: string) => void; language: 'EN' | 'TH' }) {
+function ProductCard({ item, onSell, onImageClick, language }: { item: InventoryProduct; onSell: (id: string) => void; onImageClick: (item: InventoryProduct) => void; language: 'EN' | 'TH' }) {
   const IconComponent = item.icon;
   const isOutOfStock = item.stock === 0;
 
@@ -1317,9 +1411,23 @@ function ProductCard({ item, onSell,language }: { item: any; onSell: (id: string
     <div className="flex min-h-[88px] items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-4 shadow-2xs transition-shadow hover:shadow-md">
       {/* Left Column: Icon + Name + Stock Info */}
       <div className="flex min-w-0 items-center gap-2">
-        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-lg ${item.iconBg}`}>
-          <IconComponent className="h-7 w-7" />
-        </div>
+        <button
+          type="button"
+          onClick={() => onImageClick(item)}
+          aria-label={`${language === 'EN' ? 'Upload image for' : 'อัปโหลดรูปภาพสำหรับ'} ${item.name}`}
+          className={`flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+        >
+          {item.imageUrl ? (
+            <span
+              role="img"
+              aria-label={item.name}
+              className="h-full w-full bg-cover bg-center"
+              style={{ backgroundImage: `url("${item.imageUrl}")` }}
+            />
+          ) : (
+            <IconComponent className="h-7 w-7" />
+          )}
+        </button>
 
         <div className="min-w-0 space-y-0.5">
           <h3 className="truncate text-base font-bold tracking-tight text-[#0B0F4F]">
@@ -1628,24 +1736,23 @@ function PermissionToggleRow({
 }
 type EndSalesRunModalProps = {
   isOpen?: boolean;
+  isConfirmed: boolean;
   onClose?: () => void;
+  onRequestConfirmation: () => void;
+  onUnconfirm: () => void;
   onConfirmEndRun?: () => void;
   language?: 'EN' | 'TH';
 };
 function EndSalesRunModal({
   isOpen = true,
+  isConfirmed,
   onClose = () => {},
+  onRequestConfirmation,
+  onUnconfirm,
   onConfirmEndRun = () => {},
   language = 'EN'
 }: EndSalesRunModalProps) {
-  // State สำหรับ Checkbox การยืนยัน Step 2
-  const [isConfirmed, setIsConfirmed] = useState(true);
-
-  // State สำหรับ Text Input ยืนยันคำว่า "END RUN"
-  const [confirmText, setConfirmText] = useState('END RUN');
-
-  // ตรวจสอบเงื่อนไขว่าสามารถกดปุ่ม Confirm & End Run ได้หรือไม่
-  const isReadyToSubmit = isConfirmed && confirmText.trim().toUpperCase() === 'END RUN';
+  const isReadyToSubmit = isConfirmed;
 
   // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
   if (!isOpen) return null;
@@ -1668,7 +1775,7 @@ function EndSalesRunModal({
                 {language === 'EN' ? 'End Active Sales Run' : 'จบการทำงานขายที่ใช้งานอยู่'}
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-0.5 leading-relaxed">
-                {language === 'EN' ? 'Two-step verification required to permanently close session' : ' ต้องยืนยันสองขั้นตอนเพื่อปิดเซสชันอย่างถาวร'}
+                {language === 'EN' ? 'Confirm to permanently close this sales session' : 'ยืนยันเพื่อปิดเซสชันการขายนี้อย่างถาวร'}
               </p>
             </div>
           </div>
@@ -1701,39 +1808,32 @@ function EndSalesRunModal({
           {/* STEP 2: VERIFICATION & RECONCILIATION */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-slate-800">
-              {language === 'EN' ? 'Step 2: Verification & Reconciliation' : 'ขั้นตอนที่ 2: การตรวจสอบและการปรับสมดุล'}
+              {language === 'EN' ? 'Confirmation' : 'การยืนยัน'}
             </h3>
 
             {/* CONFIRMATION CHECKBOX BOX */}
             <label
-              onClick={() => setIsConfirmed(!isConfirmed)}
-              className="bg-[#BE123C]/5 border border-[#BE123C]/20 rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-[#BE123C]/10 transition-colors select-none"
+              onClick={() => {
+                if (isConfirmed) {
+                  onUnconfirm();
+                } else {
+                  onRequestConfirmation();
+                }
+              }}
+              className="bg-[#EEE9FF] border border-[#E4E6F2] rounded-2xl p-3.5 flex items-center space-x-3 cursor-pointer hover:bg-[#EEE9FF]/80 transition-colors select-none"
             >
               <div
                 className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors shrink-0 ${
-                  isConfirmed ? 'bg-[#BE123C] text-white' : 'border border-slate-300 bg-white'
+                  isConfirmed ? 'bg-[#7C5CFF] text-white' : 'border border-[#E4E6F2] bg-white'
                 }`}
               >
                 {isConfirmed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
               </div>
-              <span className="text-xs font-bold text-slate-800">
+              <span className="text-xs font-bold text-[#0B0F4F]">
                 {language === 'EN' ? 'I confirm that the sales session has ended.' : ' ฉันยืนยันว่าการขายได้สิ้นสุดลงแล้ว'}
               </span>
             </label>
 
-            {/* INPUT CONFIRMATION TEXT */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700 block">
-                Type <span className="font-bold text-[#BE123C]">END RUN</span> below to confirm:
-              </label>
-              <input
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="END RUN"
-                className="w-full bg-slate-50/60 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-[#BE123C] uppercase transition-all placeholder:text-slate-300"
-              />
-            </div>
           </div>
 
         </div>
@@ -1759,7 +1859,7 @@ function EndSalesRunModal({
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            {language === 'EN' ? <span>Confirm & End Run</span> : <span>ยืนยันและจบการขาย</span>}
+            {language === 'EN' ? <span>OK</span> : <span>ตกลง</span>}
           </button>
         </div>
 
@@ -1768,16 +1868,96 @@ function EndSalesRunModal({
   );
 }
 
+function FinalEndRunModal({
+  onClose,
+  onCancel,
+  onConfirm,
+  language,
+}: {
+  onClose: () => void;
+  onCancel: () => void;
+  onConfirm: () => void;
+  language: 'EN' | 'TH';
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#11152E]/90 p-4"
+      onClick={onClose}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="final-end-run-title"
+        className="w-full max-w-[580px] overflow-hidden rounded-2xl bg-[#FFF2F2] shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+              <AlertTriangle className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-lg font-extrabold tracking-tight text-[#0B0F4F]">
+                {language === 'EN' ? 'End Active Sales Run' : 'จบการทำงานขายที่ใช้งานอยู่'}
+              </h2>
+              <p className="text-xs font-medium text-slate-500">
+                {language === 'EN'
+                  ? 'Two-step verification required to permanently close session'
+                  : 'ต้องยืนยันสองขั้นตอนเพื่อปิดเซสชันอย่างถาวร'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={language === 'EN' ? 'Close' : 'ปิด'}
+            className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </header>
+
+        <div className="flex min-h-[235px] flex-col items-center justify-center gap-12 px-6 py-8">
+          <h3
+            id="final-end-run-title"
+            className="text-4xl font-extrabold tracking-tight text-[#BE123C] sm:text-5xl"
+          >
+            {language === 'EN' ? 'End Run?' : 'จบการขาย?'}
+          </h3>
+          <div className="flex w-full max-w-[350px] items-center justify-between gap-5">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 rounded-xl border border-slate-300 bg-white px-5 py-3 text-base font-bold text-slate-500 transition-colors hover:bg-slate-50"
+            >
+              {language === 'EN' ? 'No' : 'ไม่'}
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="flex-1 rounded-xl bg-red-600 px-5 py-3 text-base font-bold text-white transition-colors hover:bg-red-700"
+            >
+              {language === 'EN' ? 'Yes' : 'ใช่'}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function SaleSection({
   products,
   handleSell,
+  onImageClick,
   Name,
   Role,
   id,
   language
 }: {
-  products: any[];
+  products: InventoryProduct[];
   handleSell: (id: string) => void;
+  onImageClick: (item: InventoryProduct) => void;
   Name: string;
   Role: string;
   id: string;
@@ -1817,9 +1997,179 @@ function SaleSection({
           key={cardItem.id}
           item={cardItem}
           onSell={handleSell}
+          onImageClick={onImageClick}
           language={language}
         />
       ))}
+    </div>
+  );
+}
+
+function ProductImageModal({
+  productName,
+  imageUrl,
+  language,
+  onClose,
+  onSave,
+}: {
+  productName: string;
+  imageUrl?: string;
+  language: 'EN' | 'TH';
+  onClose: () => void;
+  onSave: (imageUrl: string) => void;
+}) {
+  const [preview, setPreview] = useState(imageUrl ?? '');
+  const [error, setError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const readImage = (file: File) => {
+    const allowedTypes = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']);
+    const allowedExtension = /\.(png|jpe?g|webp|svg)$/i.test(file.name);
+    if ((!allowedTypes.has(file.type) && !(file.type === '' && allowedExtension)) || !allowedExtension) {
+      setError(language === 'EN'
+        ? 'Please choose a PNG, JPG, WEBP, or SVG image.'
+        : 'กรุณาเลือกไฟล์ภาพ PNG, JPG, WEBP หรือ SVG');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError(language === 'EN' ? 'Image must be 5 MB or smaller.' : 'ขนาดรูปภาพต้องไม่เกิน 5 MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setPreview(reader.result);
+        setError('');
+      } else {
+        setError(language === 'EN' ? 'Unable to preview this image.' : 'ไม่สามารถแสดงตัวอย่างรูปภาพนี้ได้');
+      }
+    };
+    reader.onerror = () => {
+      setError(language === 'EN' ? 'Unable to read this image.' : 'ไม่สามารถอ่านไฟล์รูปภาพนี้ได้');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [onClose]);
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) readImage(file);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-3 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-image-title"
+        className="flex max-h-[95vh] w-full max-w-[590px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#EEE9FF] text-[#7C5CFF]">
+              <ImageIcon className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 id="product-image-title" className="truncate text-lg font-bold text-[#0B0F4F]">
+                {productName}
+              </h2>
+              <p className="text-sm text-slate-500">{language === 'EN' ? 'Image / icon' : 'รูปภาพ / ไอคอน'}</p>
+            </div>
+          </div>
+          <button type="button" onClick={onClose} aria-label={language === 'EN' ? 'Close' : 'ปิด'} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100">
+            <X className="h-5 w-5" />
+          </button>
+        </header>
+
+        <div className="space-y-5 overflow-y-auto px-5 py-6">
+          <div className="flex h-[min(46vh,276px)] items-center justify-center rounded-2xl border border-[#E1E4EF] bg-[#F8F9FC] shadow-sm">
+            <div className="flex h-[min(32vh,190px)] w-[min(32vh,190px)] items-center justify-center overflow-hidden rounded-xl border border-[#C7B7FF] bg-[#EEE9FF] text-[#7C5CFF] shadow-sm">
+              {preview ? (
+                <span
+                  role="img"
+                  aria-label={`${productName} preview`}
+                  className="h-full w-full bg-contain bg-center bg-no-repeat"
+                  style={{ backgroundImage: `url("${preview}")` }}
+                />
+              ) : (
+                <ImageIcon className="h-7 w-7" />
+              )}
+            </div>
+          </div>
+
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label={language === 'EN' ? 'Choose or drop an image file' : 'เลือกหรือลากไฟล์รูปภาพมาวาง'}
+            className={`flex min-h-[190px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-5 py-6 text-center transition-colors ${isDragging ? 'border-[#7C5CFF] bg-[#F5F2FF]' : 'border-[#D6C8FF] bg-[#FCFBFF] hover:bg-[#F8F6FF]'}`}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml"
+              className="sr-only"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) readImage(file);
+                event.target.value = '';
+              }}
+            />
+            <span className="mb-4 flex h-13 w-13 items-center justify-center rounded-2xl bg-[#EEE9FF] text-[#7C5CFF]">
+              <Upload className="h-6 w-6" />
+            </span>
+            <p className="text-sm font-bold text-[#0B0F4F]">
+              {language === 'EN' ? 'Click to browse' : 'คลิกเพื่อเลือกไฟล์'}
+              <span className="font-normal text-slate-500"> {language === 'EN' ? 'or drag & drop file here' : 'หรือลากไฟล์มาวางที่นี่'}</span>
+            </p>
+            <p className="mt-4 text-xs text-slate-500">PNG, JPG, WEBP, or SVG (Max 5MB)</p>
+            {error && <p role="alert" className="mt-2 text-xs font-semibold text-rose-600">{error}</p>}
+          </div>
+        </div>
+
+        <footer className="flex items-center justify-end gap-3 border-t border-slate-200 bg-[#F8F9FC] px-5 py-4">
+          <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-200/60">
+            {language === 'EN' ? 'Cancel' : 'ยกเลิก'}
+          </button>
+          <button
+            type="button"
+            disabled={!preview || Boolean(error)}
+            onClick={() => onSave(preview)}
+            className="flex items-center gap-2 rounded-xl bg-[#7C5CFF] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#6847e8] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Check className="h-4 w-4" />
+            {language === 'EN' ? 'Save Image' : 'บันทึกรูปภาพ'}
+          </button>
+        </footer>
+      </section>
     </div>
   );
 }
