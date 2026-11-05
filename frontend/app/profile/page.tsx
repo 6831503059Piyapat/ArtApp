@@ -1,5 +1,6 @@
 'use client';
 import Navbar from '@/app/components/navbar';
+import Image from 'next/image';
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { Store, User, CheckCircle2, Save, SlidersHorizontal } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -86,7 +87,21 @@ export default function ProfilePage() {
         <div className="space-y-6">
           <div className="bg-white rounded-3xl border border-slate-200/70 shadow-sm p-6 md:p-8">
             <div className="bg-gradient-to-r from-[#7C5CFF]/5 to-[#7C5CFF]/[0.02] border border-[#7C5CFF]/15 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-            <div className="w-20 h-20 rounded-2xl bg-[#7C5CFF]/15 border border-[#7C5CFF]/25 text-[#7C5CFF] font-bold text-2xl flex items-center justify-center shrink-0">AC</div>
+            <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#7C5CFF]/15 border border-[#7C5CFF]/25 text-[#7C5CFF] font-bold text-2xl flex items-center justify-center shrink-0">
+              {profileImage ? (
+                <Image
+                  src={profileImage}
+                  alt={`${username}'s profile`}
+                  width={80}
+                  height={80}
+                  unoptimized
+                  onError={() => setProfileImage(null)}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                'AC'
+              )}
+            </div>
             <div className="space-y-1.5 flex-1">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h2 className="text-xl font-bold text-[#0B0F4F]">{username}</h2>
