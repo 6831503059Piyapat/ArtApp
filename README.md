@@ -1,12 +1,20 @@
-# ArtApp
+# ConsignDesk
+Stakeholders : P'Nubthong
+
+# Member of The Group
+6831503033 Kanyaphorn Saengwong
+6831503043 Natdaporn Thao-on
+6831503059 Piyapat Koedsuk
+6831503074 Sirinan Mahapibule 
+6831503077 Sutheemon Kawee
 
 # ABOUT
-ArtApp is a web application for managing artist merchandise, tracking sales and inventory, and calculating revenue sharing and shared expenses. It helps improve accuracy, transparency, and efficiency in booth management.
+ConsignDesk is a web application for managing artist merchandise, tracking sales and inventory, and calculating revenue sharing and shared expenses. It helps improve accuracy, transparency, and efficiency in booth management.
 
 Main objectives:
 - Track sales and update inventory in real time.
 - Calculate each artist's earnings accurately.
-- Allocate shared expenses, such as booth rental and transportation costs.
+- Allocate shared expenses, such as booth expenses and transportation costs.
 - Generate transparent sales and financial summaries.
 - Reduce manual errors and financial disputes.
 
