@@ -29,6 +29,7 @@ public record SaleRunDTO(
     String runDate,
     String runLocation,
     String Host_id,
+    String Host_Name,
     List<SaleRunExpenseDTO> Expense,
     List<SaleRunSupplierDTO> Supplier
 ) {}

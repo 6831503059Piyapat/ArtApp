@@ -33,6 +33,29 @@ export default function ProfilePage() {
   const [email, setEmail] = useState('alex.chen@artmarket.io');
   const [showToast, setShowToast] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  
+  async function handleChange(){
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      try{
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/users/display-name', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`},
+        body: JSON.stringify({
+          uid: user.uid,
+          displayName: username,
+          stallAlias: stallAlias
+        })
+      });
+      console.log('Profile updated:', response);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }}
+   
+  }
 
   function handleLanguageChange(lang: 'EN' | 'TH') {
     localStorage.setItem('language', lang);
@@ -49,6 +72,7 @@ export default function ProfilePage() {
 
   const handleSave = () => {
     setShowToast(true);
+    handleChange();
     setTimeout(() => setShowToast(false), 3000);
   };
 

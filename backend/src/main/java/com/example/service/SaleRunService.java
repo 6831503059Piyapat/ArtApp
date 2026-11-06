@@ -38,7 +38,7 @@ public class SaleRunService {
             expense.setDescription(expenseDTO.Name());
             expense.setCategory(expenseDTO.Category());
             expense.setAmount(expenseDTO.Price().doubleValue());
-            expense.setPaid_by_User_id(saleRunDTO.Host_id());
+            expense.setPaid_by_User_Name(saleRunDTO.Host_Name());
             expense.setTimestamp(saleRunDTO.runDate());
             saleRun.addExpense(expense);
         });
@@ -51,7 +51,7 @@ public class SaleRunService {
             Optional.ofNullable(supplierDTO.Product()).orElseGet(List::of).forEach(productDTO -> {
                 ProductEntity product = new ProductEntity();
                 product.setProduct_id(String.valueOf(productDTO.Id()));
-                product.setProduct_name(productDTO.Name());
+                product.setProduct_Name(productDTO.Name());
                 product.setPrice(productDTO.Price().doubleValue());
                 product.setStart_stock(productDTO.Quantity().intValue());
                 product.setCurrent_stock(productDTO.Quantity().intValue());

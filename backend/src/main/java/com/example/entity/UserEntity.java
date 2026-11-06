@@ -11,14 +11,11 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 
-    @Column(name = "User_id")
+    @Column(name = "User_Id")
     private String Userid;
     
     @Column(name = "Email")
     private String email;
-
-    @Column(name = "Token")
-    private String token;
 
     @Column(name = "Display_name")
     private String displayName;
@@ -31,10 +28,9 @@ public class UserEntity {
     // Getters, Setters, and Constructors
     public UserEntity() {
     }
-    public UserEntity(String userid, String email, String token, String displayName) {
+    public UserEntity(String userid, String email, String displayName) {
         this.Userid = userid;
         this.email = email;
-        this.token = token;
         this.displayName = displayName;
     }
     public String getUserid() {
@@ -48,12 +44,6 @@ public class UserEntity {
     }
     public void setEmail(String email) {
         this.email = email;
-    }
-    public String getToken() {
-        return token;
-    }
-    public void setToken(String token) {
-        this.token = token;
     }
     public String getDisplayName() {
         return displayName;

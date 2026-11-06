@@ -10,13 +10,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class SaleRunEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Sale_run_id")
+    @Column(name = "Sale_run_Id")
     private String Sale_run_id;
 
     @Column(name = "Sale_run_name", nullable = false)
     private String Sale_run_name;
 
-    @Column(name = "location", nullable = true)
+    @Column(name = "Booth_Location", nullable = true)
     private String Sale_run_location;
 
     @Column(name = "Date_created", nullable = false)
@@ -25,8 +25,12 @@ public class SaleRunEntity {
     @Column(name = "Date_closed", nullable = false)
     private String Date_closed;
 
-    @Column(name = "Is_Active", nullable = false)
+    @Column(name = "SaleRun_Status", nullable = false)
     private boolean Is_Active;
+
+    @Column(name = "Host_user_Id", nullable = false, insertable = false, updatable = false)
+    private String Host_user_Id;
+
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
     private List<SaleLogsEntity> saleLogs = new ArrayList<>();
@@ -47,7 +51,7 @@ public class SaleRunEntity {
     private List<RunAssistanceEntity> runAssistants = new ArrayList<>();
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)   
-    @JoinColumn(name = "Host_user_id", referencedColumnName = "User_id")
+    @JoinColumn(name = "Host_user_Id", referencedColumnName = "User_Id")
     private UserEntity user;
     // Helper Method
 
@@ -74,13 +78,16 @@ public class SaleRunEntity {
     public SaleRunEntity() {
     }
 
-    public SaleRunEntity(String Sale_run_id, String Sale_run_name, String Date_created, String Date_closed, boolean Is_Active) {
+    public SaleRunEntity(String Sale_run_id, String Sale_run_name, String Date_created, String Date_closed, boolean Is_Active, String Host_user_Id) {
         this.Sale_run_id = Sale_run_id;
         this.Sale_run_name = Sale_run_name;
         this.Date_created = Date_created;
         this.Date_closed = Date_closed;
         this.Is_Active = Is_Active;
+        this.Host_user_Id = Host_user_Id;
     }
+
+
 
      public void setSale_run_location(String Sale_run_location) {
         this.Sale_run_location = Sale_run_location;
@@ -160,6 +167,18 @@ public class SaleRunEntity {
 
     public void setRunAssistants(List<RunAssistanceEntity> runAssistants) {
         this.runAssistants = runAssistants;
+    }
+    public UserEntity getUser() {
+        return user;
+    }
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+    public String getHost_user_Id() {
+        return Host_user_Id;
+    }
+    public void setHost_user_Id(String Host_user_Id) {
+        this.Host_user_Id = Host_user_Id;
     }
 
 }

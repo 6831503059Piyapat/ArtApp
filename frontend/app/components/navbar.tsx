@@ -20,7 +20,7 @@ export default function Navbar() {
     setDisplayName(user.displayName || '');
     setProfileImage(user.photoURL || null);
     // User is signed in, you can access user information here
-    console.log("User is signed in:", user);}
+    }
     else{
       router.replace('/auth/login');
     }

@@ -8,28 +8,30 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public class SaleLogsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Sale_logs_id")
+    @Column(name = "Sale_logs_Id")
     private String Sale_logs_id;
     // Getters & Setters
-    @Column(name = "Sale_run_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Sale_run_Id", nullable = false, insertable = false, updatable = false)
     private String Sale_run_id;
     @Column(name = "Product_name", nullable = false, insertable = false, updatable = false)
     private String Product_name;
-    @Column(name = "User_id", nullable = false)
-    private String User_id;
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
-    @Column(name = "unit_price", nullable = false)
-    private double unit_price;
-    @Column(name = "Time_sold", nullable = false)
-    private String Time_sold;
+    @Column(name = "Run_Assistant_Name", nullable = false)
+    private String Run_Assistant_Name;
+    @Column(name = "Quantity_sold", nullable = false)
+    private int Quantity_sold;
+    @Column(name = "Product_Unit_Price", nullable = false)
+    private double Product_Unit_Price;
+    @Column(name = "Time_Stamp", nullable = false)
+    private String Time_Stamp;
     @Column(name ="Supplier_Name", nullable = false, insertable = false, updatable = false)
     private String Supplier_Name;
+    @Column(name = "Total_Price", nullable = false)
+    private double Total_Price;
 
     
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sale_run_id", referencedColumnName = "Sale_run_id")
+    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity saleRun;
     
 
@@ -58,29 +60,29 @@ public class SaleLogsEntity {
     public void setProduct_name(String Product_name) {
         this.Product_name = Product_name;
     }
-    public String getUser_id() {
-        return User_id;
+    public String getRun_Assistant_Name() {
+        return Run_Assistant_Name;
     }
-    public void setUser_id(String User_id) {
-        this.User_id = User_id;
+    public void setRun_Assistant_Name(String Run_Assistant_Name) {
+        this.Run_Assistant_Name = Run_Assistant_Name;
     }
     public int getQuantity() {
-        return quantity;
+        return Quantity_sold;
     }
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setQuantity(int Quantity_sold) {
+        this.Quantity_sold = Quantity_sold;
     }
     public double getUnit_price() {
-        return unit_price;
+        return Product_Unit_Price;
     }
-    public void setUnit_price(double unit_price) {
-        this.unit_price = unit_price;
+    public void setUnit_price(double Product_Unit_Price) {
+        this.Product_Unit_Price = Product_Unit_Price;
     }
     public String getTime_sold() {
-        return Time_sold;
+        return Time_Stamp;
     }
-    public void setTime_sold(String Time_sold) {
-        this.Time_sold = Time_sold;
+    public void setTime_sold(String Time_Stamp) {
+        this.Time_Stamp = Time_Stamp;
     }
     public SaleRunEntity getSaleRun() {
         return saleRun;
@@ -93,5 +95,12 @@ public class SaleLogsEntity {
     }
     public void setSupplier_Name(String Supplier_Name) {
         this.Supplier_Name = Supplier_Name;
+    }
+
+    public double getTotal_Price() {
+        return Total_Price;
+    }
+    public void setTotal_Price(double Total_Price) {
+        this.Total_Price = Total_Price;
     }
 }

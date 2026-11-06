@@ -14,37 +14,38 @@ public class RunAssistanceEntity {
     @Column(name = "Run_Assistance_id")
     private String Assistanceid;
     
-    @Column(name = "Sales_run_id", insertable = false, updatable = false)
+    @Column(name = "Sales_run_Id", insertable = false, updatable = false)
     private String Salesrunid;
 
-    @Column(name = "User_id", insertable = false, updatable = false)
+    @Column(name = "User_Id", insertable = false, updatable = false)
     private String Userid;
 
     @Column(name = "Can_sell")
     private boolean CanSell;
 
-    @Column(name = "Can_crud")
+    @Column(name = "Can_Manage_Stock")
     private boolean CanCrud;
 
-    @Column(name = "Can_record_Expenses")
+    @Column(name = "Can_Record_Expenses")
     private boolean CanRecordExpenses;
 
     @Column(name = "Can_View_Log")
     private boolean CanViewLog;
 
+    @Column(name = "Can_Manage_Permission")
+    private boolean CanManagePermissions;
+
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sales_run_id", referencedColumnName = "Sale_run_id")
+    @JoinColumn(name = "Sales_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity SaleRun;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "User_id", referencedColumnName = "User_id")
+    @JoinColumn(name = "User_Id", referencedColumnName = "User_Id")
     private UserEntity user;
+
     
-    @JsonManagedReference
-    @OneToMany(fetch = FetchType.LAZY ,cascade = CascadeType.ALL ,mappedBy = "RunAssistant")
-    private List<ExpenseLogEntity> expensesLogs = new ArrayList<>();
 
     // Getters, Setters, and Constructors
   public RunAssistanceEntity() {
@@ -116,6 +117,13 @@ public class RunAssistanceEntity {
         this.CanViewLog = canViewLog;
     }
 
+    public boolean isCanManagePermissions() {
+        return CanManagePermissions;
+    }
+    public void setCanManagePermissions(boolean canManagePermissions) {
+        this.CanManagePermissions = canManagePermissions;
+    }
+
     public SaleRunEntity getSaleRun() {
         return SaleRun;
     }
@@ -124,11 +132,4 @@ public class RunAssistanceEntity {
         this.SaleRun = saleRun;
     }
 
-    public List<ExpenseLogEntity> getExpensesLogs() {
-        return expensesLogs;
-    }
-
-    public void setExpensesLogs(List<ExpenseLogEntity> expensesLogs) {
-        this.expensesLogs = expensesLogs;
-    }
 }
