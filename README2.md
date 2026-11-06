@@ -1,7 +1,7 @@
 
 <div align="center">
 
-# 🚀 ConsignDesk
+# 🎨 ConsignDesk
 
 ### Building Smarter Solutions Through Technology
 
@@ -26,11 +26,7 @@ A university coursework project developed to solve real-world problems through t
 
 ## 📖 About The Project
 
-ConsignDesk is a web application for managing artist merchandise consignment, tracking sales and inventory, and calculating revenue sharing and shared expenses.
-
-The system is designed to improve accuracy, transparency, and operational efficiency in shared booth management.
-
-Instead of relying on manual records and calculations, ConsignDesk provides a centralized platform where booth administrators and artists can manage products, monitor transactions, and review financial information.
+ConsignDesk is here to rescue shared booth management from the chaos of manual records! 📝❌ It provides a centralized, transparent platform where Host and Assistance can effortlessly manage products, track transactions, and calculate fair revenue sharing and shared expenses for Suppliers.
 
 ### 🎯 Project Objectives
 
@@ -45,43 +41,35 @@ Instead of relying on manual records and calculations, ConsignDesk provides a ce
 ✅ Reduce manual errors and financial disputes.
 
 ### 🎯 Target Users
-1. Booth Administrator / Host:
+<details>
+<summary><b>1. Booth Administrator / Host</b> <i>(Click to expand)</i></summary>
 
-#Responsibilities:
->> Create and manage Sales Runs.
->> Manage suppliers, products, and inventory and.
->> Invite members and manage access permissions.
->> Monitor sales transactions and expenses.
->> Review sales summaries and export reports.
+*   Create and manage **Sales Runs**.
+*   Manage suppliers, products, and inventory.
+*   Invite members and assign access permissions.
+*   Monitor sales transactions and log expenses.
+*   Review sales summaries and export final reports.
+</details>
 
-2. Collaborator/Assistance
-#Responsibilities:
+<details>
+<summary><b>2. Collaborator / Assistant</b> <i>(Click to expand)</i></summary>
 
->> Monitor product inventory and sales performance.
->> View individual sales records and earnings.
->> Review financial summaries and allocated expenses.
->> Track sales progress during an active Sales Run.
-
+*   Monitor product inventory and sales performance.
+*   View individual sales records and earnings.
+*   Review financial summaries and allocated expenses.
+*   Track live sales progress during an active Sales Run.
+</details>
 
 ---
 
-## ✨ Features
-
-| Feature | Description |
-|---|---|
-| 🔐 Authentication | Secure user login and access |
-
-| 📅 Sales Run Management  & Collaboration| Creating, configuring, and managing dedicated sales session rooms ("Sales Runs") with multi-user collaboration support to invite staff (assistants) and participating consignors (suppliers). |
-
-| 📦 Real-Time Stock & Sales Activity | Real-time tracking of sales transactions, automated stock level updates, central expense logging and edits made to the run |
-
-| 💰 Automated Revenue & Expense Allocation| Automated calculation of gross earnings per supplier, proportional deduction of shared booth expenses|
-
-| 📊  Live Statistics Dashboard | Real-time metrics dashboard displaying current sales activity and remaining inventory, with shareable view-only access links for stakeholders and everyone involved. 
- |
-
- | 📈 Sales Summary & Data Export| Post-run sales summary pages and local data export functionalities supporting CSV, XLSX, and PDF formats. |
-
+| 🗝️ Feature | 📝 Description |
+|:---|:---|
+| **Authentication** | Secure user login and protected access. |
+| **Sales Run & Collab** | Create and manage dedicated sales session rooms with multi-user collaboration for assistants and suppliers. |
+| **Real-Time Activity** | Live tracking of sales transactions, automated stock updates, and central expense logging. |
+| **Smart Allocation** | Automated gross earnings calculation per supplier with proportional shared booth expense deductions. |
+| **Live Dashboard** | Real-time metrics for sales activity and inventory, featuring view-only access links for stakeholders and everyone involved. |
+| **Data Export** | Post-run sales summaries and local data exports via CSV, XLSX, and PDF formats. |
 
 ---
 
@@ -91,27 +79,26 @@ Technologies used in this project:
 
 <div align="center">
 
-![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-
 
 </div>
 
 ---
 
-## 📸 Screenshots
+## 🖼️ The Gallery (Screenshots)
 
-### 🏠 Homepage
-![Homepage](./images/homepage.png)!
-
-### 📊 Dashboard
-![Dashboard](image-1.png)!
-
-### ⚙️ Main Features
-![Main Features](image-2.png)!
+| 🏠 Homepage | 📊 Dashboard |
+|:---:|:---:|
+| ![Homepage](./images/homepage.png) | ![Dashboard](image-1.png) |
+| <br> **⚙️ Main Features** <br> | 
+| ![Main Features](image-2.png) |
 
 ---
+
 
 ## 📂 Project Structure
 
@@ -181,13 +168,42 @@ Run
 
 ## 👥 Contributors
 
-|---|---|---|
-| Kanyaphorn Saengwong | 6831503033
- | Documentation |
-| Natdaporn Thao-on | 6831503043 | Database/ frontend |
-| Piyapat Koedsuk | 6831503059 | Backend /frontend|
-| Sirinan Mahapibule | 6831503074 | Documentation/ frontend|
-| Sutheemon Kawee | 6831503077 | Documentation |
+<div align="center">
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://ui-avatars.com/api/?name=Kanyaphorn+S&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <sub><b>Kanyaphorn Saengwong</b></sub><br />
+      <code>6831503033</code><br />
+      📝 Docs
+    </td>
+    <td align="center">
+      <img src="https://ui-avatars.com/api/?name=Natdaporn+T&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <sub><b>Natdaporn Thao-on</b></sub><br />
+      <code>6831503043</code><br />
+      🗄️ DB / 🎨 Frontend
+    </td>
+    <td align="center">
+      <img src="https://ui-avatars.com/api/?name=Piyapat+K&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <sub><b>Piyapat Koedsuk</b></sub><br />
+      <code>6831503059</code><br />
+      ⚙️ Backend / 🎨 Frontend
+    </td>
+    <td align="center">
+      <img src="https://ui-avatars.com/api/?name=Sirinan+M&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <sub><b>Sirinan Mahapibule</b></sub><br />
+      <code>6831503074</code><br />
+      📝 Docs / 🎨 Frontend
+    </td>
+    <td align="center">
+      <img src="https://ui-avatars.com/api/?name=Sutheemon+K&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <sub><b>Sutheemon Kawee</b></sub><br />
+      <code>6831503077</code><br />
+      📝 Docs
+    </td>
+  </tr>
+</table>
+</div>
 
 ---
 
