@@ -14,10 +14,10 @@ A university coursework project developed to solve real-world problems through t
 
 <br/>
 
-[Features](#-features) •
-[Tech Stack](#-tech-stack) •
-[Screenshots](#-screenshots) •
-[Installation](#-installation) •
+[Features](#features) •
+[Tech Stack](#tech-stack) •
+[Screenshots](#screenshots) •
+[Installation](#installation) •
 [Contributors](#-contributors)
 
 </div>
@@ -42,7 +42,7 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
 
 ### 🎯 Target Users
 <details>
-<summary><b>1. Booth Administrator / Host</b> <i>(Click to expand)</i></summary>
+<summary><b>1. Host</b> <i>(Click to expand)</i></summary>
 
 *   Create and manage **Sales Runs**.
 *   Manage suppliers, products, and inventory.
@@ -61,6 +61,9 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
 </details>
 
 ---
+<a id="features"></a>
+## ✨ Features
+
 
 | 🗝️ Feature | 📝 Description |
 |:---|:---|
@@ -72,7 +75,7 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
 | **Data Export** | Post-run sales summaries and local data exports via CSV, XLSX, and PDF formats. |
 
 ---
-
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 Technologies used in this project:
@@ -88,14 +91,14 @@ Technologies used in this project:
 </div>
 
 ---
-
+<a id="screenshots"></a>
 ## 🖼️ The Gallery (Screenshots)
 
 | 🏠 Homepage | 📊 Dashboard |
 |:---:|:---:|
 | ![Homepage](./images/homepage.png) | ![Dashboard](image-1.png) |
 | <br> **⚙️ Main Features** <br> | 
-| ![Main Features](image-2.png) |
+| ![Main Features](image-2.png) | ![Main Features](image-1.png)
 
 ---
 
@@ -139,7 +142,7 @@ ArtApp/Backend
 └── README.md
 ```
 ---
-
+<a id="installation"></a>
 ## ⚙️ Installation
 
 Follow these steps to run the project locally.
@@ -172,31 +175,31 @@ Run
 <table>
   <tr>
     <td align="center">
-      <img src="https://ui-avatars.com/api/?name=Kanyaphorn+S&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <img src="https://github.com/KanyaphornSaengwong.png?size=100" width="80px;" alt=""/><br />
       <sub><b>Kanyaphorn Saengwong</b></sub><br />
       <code>6831503033</code><br />
       📝 Docs
     </td>
-    <td align="center">
-      <img src="https://ui-avatars.com/api/?name=Natdaporn+T&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+   <td align="center">
+      <img src="https://github.com/NatdapornThaoon.png?size=100" width="80px;" alt=""/><br />
       <sub><b>Natdaporn Thao-on</b></sub><br />
       <code>6831503043</code><br />
-      🗄️ DB / 🎨 Frontend
+      🗄️ Database / 🎨 Frontend
     </td>
     <td align="center">
-      <img src="https://ui-avatars.com/api/?name=Piyapat+K&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <img src="https://github.com/6831503059Piyapat.png?size=100" width="80px;" alt=""/><br />
       <sub><b>Piyapat Koedsuk</b></sub><br />
       <code>6831503059</code><br />
       ⚙️ Backend / 🎨 Frontend
     </td>
     <td align="center">
-      <img src="https://ui-avatars.com/api/?name=Sirinan+M&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <img src="https://github.com/Jimara01.png?size=100" width="80px;" alt=""/><br />
       <sub><b>Sirinan Mahapibule</b></sub><br />
       <code>6831503074</code><br />
       📝 Docs / 🎨 Frontend
     </td>
     <td align="center">
-      <img src="https://ui-avatars.com/api/?name=Sutheemon+K&background=random&color=fff&size=100&rounded=true" width="80px;" alt=""/><br />
+      <img src="https://github.com/SutheemonKawee.png?size=100" width="80px;" alt=""/><br />
       <sub><b>Sutheemon Kawee</b></sub><br />
       <code>6831503077</code><br />
       📝 Docs
