@@ -13,8 +13,8 @@ public class SaleLogsEntity {
     // Getters & Setters
     @Column(name = "Sale_run_id", nullable = false, insertable = false, updatable = false)
     private String Sale_run_id;
-    @Column(name = "Product_id", nullable = false, insertable = false, updatable = false)
-    private String Product_id;
+    @Column(name = "Product_name", nullable = false, insertable = false, updatable = false)
+    private String Product_name;
     @Column(name = "User_id", nullable = false)
     private String User_id;
     @Column(name = "quantity", nullable = false)
@@ -23,23 +23,22 @@ public class SaleLogsEntity {
     private double unit_price;
     @Column(name = "Time_sold", nullable = false)
     private String Time_sold;
+    @Column(name ="Supplier_Name", nullable = false, insertable = false, updatable = false)
+    private String Supplier_Name;
 
     
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Sale_run_id", referencedColumnName = "Sale_run_id")
     private SaleRunEntity saleRun;
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Product_id", referencedColumnName = "Product_id")
-    private ProductEntity Product;
+    
 
     public SaleLogsEntity() {
     }   
-    public SaleLogsEntity(String Sale_logs_id, String Sale_run_id, String Product_id) {
+    public SaleLogsEntity(String Sale_logs_id, String Sale_run_id, String Product_name) {
         this.Sale_logs_id = Sale_logs_id;
         this.Sale_run_id = Sale_run_id;
-        this.Product_id = Product_id;
+        this.Product_name = Product_name;
     }
     public String getSale_logs_id() {
         return Sale_logs_id;
@@ -53,11 +52,11 @@ public class SaleLogsEntity {
     public void setSale_run_id(String Sale_run_id) {
         this.Sale_run_id = Sale_run_id;
     }
-    public String getProduct_id() {
-        return Product_id;
+    public String getProduct_name() {
+        return Product_name;
     }
-    public void setProduct_id(String Product_id) {
-        this.Product_id = Product_id;
+    public void setProduct_name(String Product_name) {
+        this.Product_name = Product_name;
     }
     public String getUser_id() {
         return User_id;
@@ -88,5 +87,11 @@ public class SaleLogsEntity {
     }
     public void setSaleRun(SaleRunEntity saleRun) {
         this.saleRun = saleRun;
+    }
+    public String getSupplier_Name() {
+        return Supplier_Name;
+    }
+    public void setSupplier_Name(String Supplier_Name) {
+        this.Supplier_Name = Supplier_Name;
     }
 }

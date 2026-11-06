@@ -35,9 +35,7 @@ public class ProductEntity {
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Supplier_id", referencedColumnName = "Supplier_id")
     private SupplierEntity Supplier;
-    @JsonManagedReference
-    @OneToMany(fetch = FetchType.LAZY ,cascade = CascadeType.ALL ,mappedBy = "Product")
-    private List<SaleLogsEntity> SaleLogs = new ArrayList<>();
+  
 
 
     // Getters & Setters

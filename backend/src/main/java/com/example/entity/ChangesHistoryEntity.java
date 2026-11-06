@@ -14,8 +14,8 @@ public class ChangesHistoryEntity {
     @Column(name = "Sale_run_id", nullable = false, insertable = false, updatable = false) 
     private String Sale_run_id;
 
-    @Column(name = "Changed_by_User_id", nullable = false, insertable = false, updatable = false)
-    private String Changed_by_User_id;
+    @Column(name = "Changed_by_User_name", nullable = false, insertable = false, updatable = false)
+    private String Changed_by_User_name;
 
     @Column(name = "timestamp", nullable = false)
     private String timestamp;
@@ -27,20 +27,16 @@ public class ChangesHistoryEntity {
 
     @Column(name = "entity_name", nullable = false)
     private String entity_name;
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Changed_by_User_id", referencedColumnName = "User_id")
-    private UserEntity user;
+   
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Sale_run_id", referencedColumnName = "Sale_run_id")
     private SaleRunEntity SaleRun;
     public ChangesHistoryEntity() {
     }
-    public ChangesHistoryEntity(String History_id, String Sale_run_id, String Changed_by_User_id, String timestamp, String action, String details, String entity_name) {
+    public ChangesHistoryEntity(String History_id, String Sale_run_id, String timestamp, String action, String details, String entity_name) {
         this.History_id = History_id;
         this.Sale_run_id = Sale_run_id;
-        this.Changed_by_User_id = Changed_by_User_id;
         this.timestamp = timestamp;
         this.action = action;
         this.details = details;
@@ -58,13 +54,6 @@ public class ChangesHistoryEntity {
     public void setSale_run_id(String Sale_run_id) {
         this.Sale_run_id = Sale_run_id;
     }
-    public String getChanged_by_User_id() {
-        return Changed_by_User_id;
-    }
-    public void setChanged_by_User_id(String Changed_by_User_id) {
-        this.Changed_by_User_id = Changed_by_User_id;
-    }
-
     public String getTimestamp() {
         return timestamp;
     }

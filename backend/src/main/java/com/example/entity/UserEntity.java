@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+
     @Column(name = "User_id")
     private String Userid;
     
@@ -22,9 +23,7 @@ public class UserEntity {
     @Column(name = "Display_name")
     private String displayName;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChangesHistoryEntity> changesHistories = new ArrayList<>();
+
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SaleRunEntity> saleRun = new ArrayList<>();
