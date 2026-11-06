@@ -730,6 +730,7 @@ export default function ConsignDeskDashboard() {
                   </div>
                 </div>
               </div>
+              
               </div>
             </div>
           )}
