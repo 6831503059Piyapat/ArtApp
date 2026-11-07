@@ -12,17 +12,17 @@ public class SupplierEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Supplier_id")
+    @Column(name = "Supplier_Id")
     private String Supplier_id;
 
-    @Column(name = "Supplier_name", nullable = false)
+    @Column(name = "Supplier_Name", nullable = false)
     private String Supplier_name;
 
-    @Column(name = "Sales_run_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Sales_run_Id", nullable = false, insertable = false, updatable = false)
     private String Sales_run_id;
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sales_run_id", referencedColumnName = "Sale_run_id")
+    @JoinColumn(name = "Sales_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity SaleRun;
 
     @JsonManagedReference

@@ -29,6 +29,7 @@ class SaleRunServiceTests {
                 "2026-11-04",
                 "Bangkok",
                 "DAWIF-OPFWOPFA959-89",
+                "John Doe",
                 List.of(new SaleRunExpenseDTO(1, "Rent", "Venue", 1500)),
                 List.of(new SaleRunSupplierDTO(
                         "supplier-1",

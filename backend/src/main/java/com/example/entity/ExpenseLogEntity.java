@@ -8,44 +8,41 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public class ExpenseLogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Expense_id")
+    @Column(name = "Expense_Id")
     private String Expense_id;
 
-    @Column(name = "Sale_run_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Sale_run_Id", nullable = false, insertable = false, updatable = false)
     private String Sale_run_id;
 
-    @Column(name = "Paid_by_User_id", nullable = false)
-    private String Paid_by_User_id;
+    @Column(name = "Paid_by_User_Name", nullable = false)
+    private String Paid_by_User_Name;
 
-    @Column(name = "timestamp", nullable = false)
-    private String timestamp;
+    @Column(name = "Time_Stamp", nullable = false)
+    private String Time_Stamp;
 
-    @Column(name = "description", nullable = false)
-    private String description;
-    @Column(name = "category", nullable = false)
-    private String category;
+    @Column(name = "Description", nullable = false)
+    private String Description;
+    @Column(name = "Category", nullable = false)
+    private String Category;
 
-    @Column(name = "amount", nullable = false)
-    private Double amount;
+    @Column(name = "Amount", nullable = false)
+    private Double Amount;
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sale_run_id", referencedColumnName = "Sale_run_id")
+    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity SaleRun;
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sales_run_id", referencedColumnName = "Sales_run_id")
-    private RunAssistanceEntity RunAssistant;
+    
     // Getters & Setters
     public ExpenseLogEntity() {
     }
-    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_id, String timestamp, String description, String category, Double amount) {
+    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_Name, String timestamp, String description, String category, Double amount) {
         this.Expense_id = Expense_id;
         this.Sale_run_id = Sale_run_id;
-        this.Paid_by_User_id = Paid_by_User_id;
-        this.timestamp = timestamp;
-        this.description = description;
-        this.category = category;
-        this.amount = amount;
+        this.Paid_by_User_Name = Paid_by_User_Name;
+        this.Time_Stamp = timestamp;
+        this.Description = description;
+        this.Category = category;
+        this.Amount = amount;
     }
     public String getExpense_id() {
         return Expense_id;
@@ -59,35 +56,35 @@ public class ExpenseLogEntity {
     public void setSale_run_id(String Sale_run_id) {
         this.Sale_run_id = Sale_run_id;
     }
-    public String getPaid_by_User_id() {
-        return Paid_by_User_id;
+    public String getPaid_by_User_Name() {
+        return Paid_by_User_Name;
     }
-    public void setPaid_by_User_id(String Paid_by_User_id) {
-        this.Paid_by_User_id = Paid_by_User_id;
+    public void setPaid_by_User_Name(String Paid_by_User_Name) {
+        this.Paid_by_User_Name = Paid_by_User_Name;
     }
     public String getTimestamp() {
-        return timestamp;
+        return Time_Stamp;
     }
     public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+        this.Time_Stamp = timestamp;
     }
     public String getDescription() {
-        return description;
+        return Description;
     }
     public void setDescription(String description) {
-        this.description = description;
+        this.Description = description;
     }
     public String getCategory() {
-        return category;
+        return Category;
     }
     public void setCategory(String category) {
-        this.category = category;
+        this.Category = category;
     }
     public Double getAmount() {
-        return amount;
+        return Amount;
     }
     public void setAmount(Double amount) {
-        this.amount = amount;
+        this.Amount = amount;
     }
     public void setSaleRun(SaleRunEntity saleRun) {
         this.SaleRun = saleRun;

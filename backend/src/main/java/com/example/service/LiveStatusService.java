@@ -3,6 +3,8 @@ package com.example.service;
 import com.example.repository.LiveStatusRepo;
 import org.springframework.stereotype.Service;
 import com.example.dto.LiveStatsDTO;
+import com.example.dto.response.SaleLogs.SaleLogsDTO;
+import com.example.dto.SupplierLiveDTO;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +17,15 @@ public class LiveStatusService {
         this.LiveStatusRepository = LiveStatusRepository;
     }
 
+
     @Transactional(readOnly = true)
     public LiveStatsDTO updateLiveStatus(String SaleId) {
-        return LiveStatusRepository.findLiveStatusBySalesId(SaleId);
+        List<SaleLogsDTO> saleLogsList = LiveStatusRepository.findSaleLogsBySaleRun_SaleId(SaleId);
+        List<SupplierLiveDTO> supplierList = LiveStatusRepository.findSupplierBySaleRun_SaleId(SaleId);
+        LiveStatsDTO liveStatsDTO = new LiveStatsDTO();
+        liveStatsDTO.setSaleLogs(saleLogsList);
+        liveStatsDTO.setSupplier(supplierList);
+        return liveStatsDTO;
     }
     
 }

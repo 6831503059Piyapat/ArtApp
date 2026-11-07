@@ -5,6 +5,9 @@ public class LiveStatsDTO {
     private List<SaleLogsDTO> saleLogs;
     private List<SupplierLiveDTO> Supplier;
 
+    public LiveStatsDTO() {
+    }
+
     public LiveStatsDTO(List<SaleLogsDTO> saleLogs, List<SupplierLiveDTO> Supplier) {
         this.saleLogs = saleLogs;
         this.Supplier = Supplier;
