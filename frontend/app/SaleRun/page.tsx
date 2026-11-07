@@ -1,6 +1,7 @@
 "use client";
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Footer from "@/app/components/footer";
 import { useState, type FormEvent,useEffect } from "react";
 import {
@@ -17,7 +18,7 @@ import {
   Trash2,
   UserRound,
   UsersRound,
-} from "lucide-react";
+} from "lucide-react";  
 
 type Product = {
   id: number;
@@ -84,6 +85,8 @@ const inputClass ="min-w-0 rounded-lg border  bg-white px-2.5 py-2 text-sm text-
 const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
 export default function CreateSalesRun() {
+  //token 
+  const [token, setToken] = useState<string | null>(null);
   // State for manage sections and expenses
   const [language, setLanguage] = useState<'EN' | 'TH'>('EN');
 
@@ -114,16 +117,7 @@ export default function CreateSalesRun() {
 
   //Not real Function for send to backend, just for test
   async function hamdleSubmit(){
-    // const Response = await fetch("http://localhost:3000/api/salesRun",{
-    //   method: "POST",
-    //   headers: {"Content-Type": "application/json"},
-    //   body: JSON.stringify({
-    //     runName: runName,
-    //     runDate: runDate,
-    //     runLocation: runLocation,
-    //     ownerProduct: ownerProducts
-    //   })
-    // })
+   
     if(!runName ){
       if(!runName) setRunNameError(true);
       if (runName) setRunNameError(false);
@@ -134,6 +128,45 @@ export default function CreateSalesRun() {
       setError("Please fill in all required fields");
       return;
     }
+     const Response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/backend/sale-runs/create",{
+      method: "POST",
+      headers: {"Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+
+      },
+      body: JSON.stringify({
+        runName: runName,
+        runDate: runDate,
+        runLocation: runLocation,
+        runOwnerId:getAuth().currentUser?.uid,
+        runSections: sections,
+        runExpenses: expenses
+      })
+    })
+    console.log(Response.text());
+    // const saleList = 
+    // [{
+    //   accent: "purple",
+    //   id: "host-8466468345",
+    //   name: "My Products",
+    //   placeholder: "Item Name (e.g. Linen Coaster Set)",
+    //   products: [
+    //     {
+    //       id: 1791050351463,
+    //       name: "Linen Coaster Set",
+    //       owner :'',
+    //       price:100,
+    //       quantity:85
+    //     }
+    //   ],
+    //   role:'Host'
+    // }];
+    // const expenseLog = [{
+    //   amount:120,
+    //   category:""
+    // }]
+
+    
     setRunNameError(false);
     setRunDateError(false);
     setRunLocationError(false);
@@ -182,8 +215,20 @@ export default function CreateSalesRun() {
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
 
   useEffect(() => {
-    setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+
+
+    const auth = getAuth();
+  setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
+    const emailName = user?.email?.split('@')[0];
+    const idToken = await user?.getIdToken();
+    setToken(idToken ?? null);
+    }
+    
   })
+  return unsubscribe;
+},[]);
   return (
     <div className="min-h-screen bg-[#f7f8fc] pb-20 font-sans text-[#111747]">
       
