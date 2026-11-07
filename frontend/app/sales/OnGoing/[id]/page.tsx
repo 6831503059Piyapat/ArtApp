@@ -69,6 +69,15 @@ type Supplier = {
   placeholder: string;
   products: InventoryProduct[];
 };
+//เพิ่ม Type สำหรับระบบตะกร้า (Cart)
+type CartItem = {
+  supplierId: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  stock: number;
+};
 
 export default function SalesRunDetail() {
   // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
@@ -392,6 +401,14 @@ export default function SalesRunDetail() {
     restockQuantities: true,
     addNewProducts: false
   });
+
+  //เพิ่ม State สำหรับระบบตะกร้า (Cart)
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showUndoNotification, setShowUndoNotification] = useState(false);
+
+
+
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -489,49 +506,127 @@ const handleUndo = () => {
 
 
 
-const handleSell = (id: string) => {
+// const handleSell = (id: string) => {
 
-  // 1. ค้นหาสินค้าจากทุก Supplier
+//   // 1. ค้นหาสินค้าจากทุก Supplier
+//   const productToSell = products
+//     .flatMap((supplier) => supplier.products ?? [])
+//     .find((item) => item.id === id);
+
+//   // 2. ตรวจสอบว่าสินค้ามีอยู่และมี Stock
+//   if (!productToSell || productToSell.stock <= 0) {
+//     console.log("Product not found or out of stock");
+//     return;
+//   }
+
+//   // 3. อัปเดต Stock และ Sold โดยสร้าง State ใหม่
+//   setProducts((prev) =>
+//     prev.map((supplier) => ({
+//       ...supplier,
+//       products: (supplier.products ?? []).map((item) => {
+//         if (item.id === id) {
+//           return {
+//             ...item,
+//             stock: item.stock - 1,
+//             sold: item.sold + 1,
+//           };
+//         }
+
+//         return item;
+//       }),
+//     }))
+//   );
+
+//   // 4. บันทึกประวัติการขาย
+//   setPreviousActions((prev) => [
+//     ...prev,
+//     {
+//       supplierId: productToSell.supplierId,
+//       productId: id,
+//       productName: productToSell.name,
+//       quantity: 1,
+//       time: Date.now().toString(),
+//     },
+//   ]);
+// };
+
+const handleSell = (id: string) => {
   const productToSell = products
     .flatMap((supplier) => supplier.products ?? [])
     .find((item) => item.id === id);
 
-  // 2. ตรวจสอบว่าสินค้ามีอยู่และมี Stock
-  if (!productToSell || productToSell.stock <= 0) {
-    console.log("Product not found or out of stock");
-    return;
-  }
+  if (!productToSell || productToSell.stock <= 0) return;
 
-  // 3. อัปเดต Stock และ Sold โดยสร้าง State ใหม่
-  setProducts((prev) =>
-    prev.map((supplier) => ({
-      ...supplier,
-      products: (supplier.products ?? []).map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            stock: item.stock - 1,
-            sold: item.sold + 1,
-          };
-        }
-
-        return item;
-      }),
-    }))
-  );
-
-  // 4. บันทึกประวัติการขาย
-  setPreviousActions((prev) => [
-    ...prev,
-    {
-      supplierId: productToSell.supplierId,
-      productId: id,
-      productName: productToSell.name,
-      quantity: 1,
-      time: Date.now().toString(),
-    },
-  ]);
+  setCart((prev) => {
+    const existing = prev.find((item) => item.productId === id);
+    if (existing) {
+      return prev.map((item) =>
+        item.productId === id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    }
+    return [
+      ...prev,
+      {
+        supplierId: productToSell.supplierId,
+        productId: id,
+        name: productToSell.name,
+        price: productToSell.price,
+        quantity: 1,
+        stock: productToSell.stock,
+      },
+    ];
+  });
 };
+//เพิ่มฟังก์ชัน handleConfirmSale สำหรับกดยืนยันจาก Sidebar วางฟังก์ชันนี้ไว้ใต้ handleSell เพื่อทำหน้าที่หักสต็อกจริงและจับเวลา Undo 10 วินาที
+
+const handleConfirmSale = () => {
+  if (cart.length === 0) return;
+// 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
+  setProducts((prev) =>
+    prev.map((supplier) => {
+      const cartItemsForSupplier = cart.filter(c => c.supplierId === supplier.id);
+      if (cartItemsForSupplier.length === 0) return supplier;
+
+      return {
+        ...supplier,
+        products: (supplier.products ?? []).map((product) => {
+          const cartItem = cartItemsForSupplier.find(c => c.productId === product.id);
+          if (cartItem) {
+            return {
+              ...product,
+              stock: product.stock - cartItem.quantity,
+              sold: product.sold + cartItem.quantity,
+            };
+          }
+          return product;
+        }),
+      };
+    })
+  );
+// 2. บันทึกประวัติเพื่อใช้สำหรับปุ่ม Undo
+  cart.forEach(item => {
+    setPreviousActions((prev) => [
+      ...prev,
+      {
+        supplierId: item.supplierId,
+        productId: item.productId,
+        productName: item.name,
+        quantity: item.quantity,
+        time: Date.now().toString(),
+      },
+    ]);
+  });
+// 3. เคลียร์ตะกร้าและปิด Sidebar
+  setCart([]);
+  setIsCartOpen(false);
+  // 4. โชว์ Notification 10 วินาที
+  setShowUndoNotification(true);
+  setTimeout(() => setShowUndoNotification(false), 10000);
+};
+
+
+
+
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
@@ -829,6 +924,12 @@ const handleSell = (id: string) => {
         </div>
       </div>
 
+
+
+
+
+
+
       {/* 2. FAST LOG SHARED EXPENSE CARD */}
       <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-2xs space-y-4">
         {/* Section Title */}
@@ -992,6 +1093,124 @@ const handleSell = (id: string) => {
             
         </div>
       </main>
+
+      {/* ---------------- UI: 10s Undo Notification ---------------- */}
+{showUndoNotification && (
+  <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-full bg-white px-5 py-3 shadow-lg border border-slate-100 animate-in fade-in slide-in-from-top-4">
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0">
+      <Check className="h-4 w-4" />
+    </div>
+    <div className="text-sm">
+      <p className="font-bold text-[#0B0F4F]">Sale Confirmed Successfully!</p>
+      <p className="text-slate-400 text-xs">Registered items. Stock reserved.</p>
+    </div>
+    <button 
+      onClick={() => {
+        handleUndo();
+        setShowUndoNotification(false);
+      }} 
+      className="ml-4 flex items-center gap-1.5 rounded-full bg-[#FFB24C]/10 px-4 py-1.5 text-sm font-bold text-[#FFB24C] hover:bg-[#FFB24C]/20"
+    >
+      <Undo2 className="h-4 w-4" /> Undo
+    </button>
+  </div>
+)}
+
+{/* ---------------- UI: Bottom Cart Bar (Current Sales Cart) ---------------- */}
+{cart.length > 0 && (
+  <div className="fixed bottom-6 right-6 z-40 flex items-center gap-6 rounded-2xl bg-[#0B0F4F] px-5 py-3 text-white shadow-2xl">
+    <div className="flex items-center gap-3">
+      <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[#7C5CFF]/20 text-[#7C5CFF]">
+        <ShoppingBag className="h-5 w-5" />
+        <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+          {cart.reduce((sum, item) => sum + item.quantity, 0)}
+        </span>
+      </div>
+      <div>
+        <p className="text-sm font-bold text-white">Current Sales Cart •</p>
+        <p className="text-xs text-slate-300">
+          ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US')} • {cart.length} items ready
+        </p>
+      </div>
+    </div>
+    <button 
+      onClick={() => setIsCartOpen(true)}
+      className="rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:brightness-110 active:scale-95"
+    >
+      View Cart →
+    </button>
+  </div>
+)}
+
+{/* ---------------- UI: Sidebar Checkout ---------------- */}
+{isCartOpen && (
+  <div className="fixed inset-0 z-50 flex justify-end">
+    {/* Overlay */}
+    <div 
+      className="absolute inset-0 bg-[#0B0F4F]/20 backdrop-blur-sm"
+      onClick={() => setIsCartOpen(false)}
+    />
+    
+    {/* Sidebar Panel */}
+    <div className="relative flex h-full w-[400px] flex-col bg-white shadow-2xl animate-in slide-in-from-right-full">
+      <div className="flex items-center justify-between border-b border-slate-100 p-5">
+        <div>
+          <h2 className="text-lg font-bold text-[#0B0F4F]">Current Sales Cart</h2>
+          <p className="text-xs text-slate-400">{cart.length} items</p>
+        </div>
+        <button onClick={() => setCart([])} className="text-xs font-bold text-red-500 hover:text-red-600">
+          Clear Cart ✕
+        </button>
+      </div>
+      
+      {/* Cart Items */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        {cart.map((item) => (
+          <div key={item.productId} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-bold text-[#0B0F4F]">{item.name}</p>
+              <p className="text-xs text-slate-400">฿{item.price} each</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-bold text-[#0B0F4F]">x {item.quantity}</p>
+              <p className="text-xs font-bold text-[#7C5CFF]">฿{item.price * item.quantity}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Bottom Total & Confirm Button */}
+      <div className="border-t border-slate-100 p-5 bg-slate-50 space-y-4">
+        <div className="flex items-end justify-between">
+          <p className="text-sm font-semibold text-slate-500">Subtotal in Cart</p>
+          <p className="text-2xl font-extrabold text-[#0B0F4F]">
+            ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US')}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => setIsCartOpen(false)}
+            className="flex-1 rounded-xl bg-white border border-slate-200 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleConfirmSale}
+            className="flex-[2] rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] py-3 text-sm font-bold text-white hover:brightness-110 active:scale-95"
+          >
+            Confirm & Log Sale
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
+
 
       {stepMode === "edit" && (
         <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
@@ -1455,7 +1674,7 @@ function ProductCard({ item, onSell, onImageClick, language }: { item: Inventory
           </p>
         </div>
 
-        <button
+        {/* <button
           onClick={() => onSell(item.id)}
           disabled={isOutOfStock}
           className={`flex h-9 min-w-[112px] items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
@@ -1466,7 +1685,21 @@ function ProductCard({ item, onSell, onImageClick, language }: { item: Inventory
         >
           {language === 'EN' ? 'Sell - 1' : 'ขาย - 1'}
         </button>
-      </div>
+      </div> */}
+      <button
+    // เปลี่ยนจาก onSell(item.id) เป็นฟังก์ชันเพิ่มลงตะกร้า 
+    // แนะนำให้ส่งไปทั้ง item เพื่อให้ตะกร้ารู้ชื่อและราคา
+    onClick={() => onSell(item.id)}
+  disabled={isOutOfStock}
+  className={`flex h-9 min-w-[112px] items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
+    isOutOfStock
+      ? 'bg-gray-400 opacity-90 cursor-not-allowed'
+      : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
+  }`}
+>
+  {language === 'EN' ? 'Sell - 1' : 'ขาย - 1'}
+</button>
+</div>
     </div>
   );
 }
