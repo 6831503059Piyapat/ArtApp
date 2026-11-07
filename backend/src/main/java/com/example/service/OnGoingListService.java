@@ -1,8 +1,7 @@
 package com.example.service;
-
-
-import com.example.repository.OnGoingListRepo;
 import com.example.dto.response.OnGoingDTO;
+import com.example.repository.OnGoing.OnGoingListRepo;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

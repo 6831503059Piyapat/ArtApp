@@ -15,8 +15,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // ให้ Client ที่กดติดตาม (Subscribe) รับข้อมูลผ่าน Path ขึ้นต้นด้วย /topic
         config.enableSimpleBroker("/topic");
         
-        // ให้ Client ส่งข้อมูลเข้ามายัง Server ผ่าน Path ขึ้นต้นด้วย /app
-        config.setApplicationDestinationPrefixes("/app");
+        
     }
 
     @Override

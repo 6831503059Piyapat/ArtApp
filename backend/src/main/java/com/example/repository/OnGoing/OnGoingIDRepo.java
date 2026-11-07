@@ -10,6 +10,7 @@ import com.example.dto.response.OnGoingDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDProductDTO;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 import com.example.dto.response.OnGoingID.ProductDTO;
 // import org.springframework.data.jpa.repository.Modifying;
 // import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,11 @@ public interface OnGoingIDRepo extends JpaRepository<SaleRunEntity, String> {
        Query here
     """,nativeQuery = true)
     List<OnGoingIDProductDTO> findSupplierBySaleRunId(@Param("Sale_run_Id") String Sale_run_Id);
+
+    @Query (value = """
+       Query here
+    """,nativeQuery = true)
+    List<OnGoingIDDTO> findOnGoingIDListBySalesId(@Param("sales_id") String sales_id);
 
     
 }

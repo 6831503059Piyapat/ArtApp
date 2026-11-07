@@ -1,9 +1,7 @@
 package com.example.service.OnGoing;
 
 
-import com.example.repository.OnGoingListRepo;
 import com.example.repository.OnGoing.OnGoingIDRepo;
-import com.example.dto.response.OnGoingDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDProductDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 import com.example.dto.response.OnGoingID.ProductDTO;
@@ -24,20 +22,37 @@ public class OnGoingIDService {
     }
 
     @Transactional(readOnly = true)
-    public OnGoingIDDTO getOnGoingListByUserId(String Sale_run_Id) {
+    public OnGoingIDDTO getOnGoingListBySalesId(String Sale_run_Id) {
+    //     String Supplier_Id;
+    // String Supplier_Name;
+    // String Category;
+    //String Host_user_Id;
        List<OnGoingIDProductDTO> onGoingIDProductDTO = onGoingIDRepository.findSupplierBySaleRunId(Sale_run_Id);
        for (OnGoingIDProductDTO supplier : onGoingIDProductDTO) {
             String Supplier_id = supplier.getSupplier_Id();
             List<ProductDTO> products = onGoingIDRepository.findProductBySupplierId(Supplier_id);
             supplier.setProducts(products);
+            if(products.get(0).getSupplier_Id().equals(Supplier_id) ){
+                supplier.setCategory("Host");
+            }
+            else{
+                supplier.setCategory("Supplier");
+            }
         }
         List<String> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
-    //        String Supplier_Id;
-    // String Supplier_Name;
-    // String Category;
-    // List<ProductDTO> products;
+    //           String Sale_run_Id;
+    // String Sale_run_Name;
+    // Double Gross_sales;
+    // List<String> Run_Assistant_Name;
+    // Integer Total_Stock;
+    // Integer Total_Sale;
+    // List<String> Supplier_Name;
+    // List<OnGoingIDProductDTO> Supplier;
 
-        OnGoingIDDTO onGoingIDDTO = new OnGoingIDDTO();
+        OnGoingIDDTO onGoingIDDTO = onGoingIDRepository.findOnGoingIDListBySalesId(Sale_run_Id)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("On-going ID list not found for Sale_run_Id: " + Sale_run_Id));
         onGoingIDDTO.setSupplier(onGoingIDProductDTO);
         onGoingIDDTO.setRun_Assistant_Name(assistanceNames);
 

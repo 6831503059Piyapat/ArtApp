@@ -1,9 +1,8 @@
-package com.example.repository;
+package com.example.repository.OnGoing;
 
-import com.example.dto.response.DashboardDTO;
-import com.example.dto.response.List_RunDTO;
+
 import com.example.entity.SaleRunEntity;
-import com.example.entity.UserEntity;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.example.dto.response.OnGoingDTO;

@@ -25,6 +25,7 @@ public class OnGoingIDProductDTO {
     String Supplier_Id;
     String Supplier_Name;
     String Category;
+    String Host_user_Id;
     List<ProductDTO> products;
 
     public String getSupplier_Id() {
@@ -50,6 +51,12 @@ public class OnGoingIDProductDTO {
     }
     public void setProducts(List<ProductDTO> products) {
         this.products = products;
+    }
+    public String getHost_user_Id() {
+        return Host_user_Id;
+    }
+    public void setHost_user_Id(String host_user_Id) {
+        Host_user_Id = host_user_Id;
     }
 
 }
