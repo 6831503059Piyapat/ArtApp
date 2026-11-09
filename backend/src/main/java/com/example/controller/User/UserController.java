@@ -6,7 +6,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.dto.request.Profile.CreateUserDTO;
+import com.example.service.Users.UserRegisterService;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +16,11 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final UserRegisterService userRegisterService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRegisterService userRegisterService) {
         this.userService = userService;
+        this.userRegisterService = userRegisterService;
     }
 
     @PutMapping("/display-name")
@@ -40,5 +43,20 @@ public class UserController {
             errorResponse.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
         }
+    }
+    @PostMapping ("/register-profile")
+    public ResponseEntity<String> updateUserDatabase(@RequestBody CreateUserDTO request) {
+        
+        // try {
+            if(userRegisterService.userExists(request.getUid())) {
+            return ResponseEntity.badRequest().body("User already exists in the database.");
+        }
+        
+            userRegisterService.registerUser(request.getUid(), request.getEmail(), request.getDisplayName());
+            return ResponseEntity.ok("User profile updated successfully.");
+        // } catch (Exception e) {
+        //     return ResponseEntity.badRequest().body("Error updating user profile: " + e.getMessage());
+        // }
+        
     }
 }

@@ -1,14 +1,16 @@
-
 package com.example.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import com.example.entity.SaleRunEntity;
+import org.springframework.stereotype.Repository;
+import com.example.entity.ExpenseLogEntity;
+
 
 @Repository
-public interface SaleRunRepo extends JpaRepository<SaleRunEntity, String> {
+public interface ExpenseRepo extends JpaRepository<ExpenseLogEntity, String> {
+
+   
 
 
+   
 }
-

@@ -1,4 +1,5 @@
 package com.example.dto.response;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 // List_Run:
 // {
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 public record List_RunDTO(
 
     String Id,
-    Integer Total_stock,
-    Integer Total_Items_sold,
+    BigDecimal Total_stock,
+    BigDecimal Total_Items_sold,
     LocalDateTime Date_created,
     LocalDateTime Date_closed,
     Boolean isActive,

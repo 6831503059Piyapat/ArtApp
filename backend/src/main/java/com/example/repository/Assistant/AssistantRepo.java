@@ -19,7 +19,7 @@ import java.util.List;
 @Repository
 public interface AssistantRepo extends JpaRepository<RunAssistanceEntity, String> {
     @Query(value = """
-       Query here
+       SELECT us.display_name FROM `run_assistance` ra LEFT JOIN `users` us ON `ra`.user_id = us.user_id WHERE ra.sales_run_id = :Sales_id
     """,nativeQuery = true)
     List<String> findListAssistantBySalesId(@Param("Sales_id") String Sales_id);
     

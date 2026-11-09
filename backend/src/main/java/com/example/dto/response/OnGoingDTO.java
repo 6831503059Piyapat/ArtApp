@@ -1,35 +1,26 @@
 package com.example.dto.response;
-import java.util.List;
-// {
-// Id:number;
-// isOwner:boolean;
-// Title:string;
-// Status:boolean;
-// Booth_time_create:string; (time_stamp)
-// boothtimeEnd:string; (time_stamp)
-// grossSales:number;
-// netSales:number;
-// itemsCleared:number;
-// itemsClearedMax:number;
-// soldPercentage:number;
-// boothStaffMax:number;
-// boothStaffList:string[];
-// }[];
 
-public record OnGoingDTO(
-    String id,
-    Boolean isOwner,
-    String title,
-    Boolean status, 
-    String booth_time_create,
-    String boothtimeEnd,
-    Double grossSales,
-    Double netSales,
-    Integer itemsCleared,
-    Integer itemsClearedMax,
-    Double soldPercentage,
-    Integer boothStaffMax,
-    Integer boothStaffList
+import org.springframework.beans.factory.annotation.Value;
 
-     
-) {}
+public interface OnGoingDTO {
+    String getId();
+    
+    // ดึงค่า 1/0 มาแปลงเป็น boolean ผ่าน SpEL ป้องกัน Projection พัง
+    @Value("#{target.isOwner == 1}")
+    Boolean getIsOwner();
+    
+    String getTitle();
+    
+    @Value("#{target.status == 1}")
+    Boolean getStatus();
+    
+    String getBooth_time_create();
+    String getBoothtimeEnd();
+    Double getGrossSales();
+    Double getNetSales();
+    Long getItemsCleared();
+    Long getItemsClearedMax();
+    Double getSoldPercentage();
+    Integer getBoothStaffMax();
+    Long getBoothStaffList();
+}

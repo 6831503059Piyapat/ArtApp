@@ -1,13 +1,18 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
+
+import java.sql.Date;
+import java.time.LocalDateTime;
+
+import org.springframework.data.domain.Persistable;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "Expense_log")
-public class ExpenseLogEntity {
+public class ExpenseLogEntity implements Persistable<String> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Expense_Id")
     private String Expense_id;
 
@@ -18,7 +23,7 @@ public class ExpenseLogEntity {
     private String Paid_by_User_Name;
 
     @Column(name = "Time_Stamp", nullable = false)
-    private String Time_Stamp;
+    private LocalDateTime Time_Stamp;
 
     @Column(name = "Description", nullable = false)
     private String Description;
@@ -35,7 +40,7 @@ public class ExpenseLogEntity {
     // Getters & Setters
     public ExpenseLogEntity() {
     }
-    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_Name, String timestamp, String description, String category, Double amount) {
+    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_Name, LocalDateTime timestamp, String description, String category, Double amount) {
         this.Expense_id = Expense_id;
         this.Sale_run_id = Sale_run_id;
         this.Paid_by_User_Name = Paid_by_User_Name;
@@ -47,6 +52,17 @@ public class ExpenseLogEntity {
     public String getExpense_id() {
         return Expense_id;
     }
+
+    @Override
+    public String getId() {
+        return Expense_id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
+    }
+
     public void setExpense_id(String Expense_id) {
         this.Expense_id = Expense_id;
     }
@@ -62,10 +78,10 @@ public class ExpenseLogEntity {
     public void setPaid_by_User_Name(String Paid_by_User_Name) {
         this.Paid_by_User_Name = Paid_by_User_Name;
     }
-    public String getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return Time_Stamp;
     }
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.Time_Stamp = timestamp;
     }
     public String getDescription() {

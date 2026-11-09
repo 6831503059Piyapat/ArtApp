@@ -1,8 +1,7 @@
 'use client';
 import {useRouter} from "next/navigation";
 import { useState,useEffect } from 'react';
-import {onAuthStateChanged} from "firebase/auth";
-import { auth } from '@/lib/firebase';
+import {onAuthStateChanged,getAuth} from "firebase/auth";
 import Link from 'next/link';
 import {
   Trophy,
@@ -37,15 +36,43 @@ export default function DashboardPage() {
   const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
 const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 const [runCode, setRunCode] = useState('');
-
+const [saleRunId, setSaleRunId] = useState();
 const router = useRouter();
+
+async function fetchDashboardData(idToken:any) {
+  try{
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/dashboard', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}` // ส่ง token ของผู้ใช้ปัจจุบันไปยัง backend
+      }
+
+
+    });
+    const data = await response.json();
+    console.log("Response:", data);
+  }catch(err){
+    console.error("Error fetching dashboard data:", err);
+  }
+}
+
 useEffect(() => {
+  const auth = getAuth();
   setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
     const emailName = user?.email?.split('@')[0];
     setDisplayName(user?.displayName?.trim() || emailName || '');
-  });
+    const idToken = await user?.getIdToken();
+    // setToken(idToken ?? null);
+    fetchDashboardData(idToken);
+    }
+    
+  }
 
+);
+  
   return unsubscribe;
 }, []);
 const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,6 +84,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
   // หากรหัสถูกต้องจึงเข้าสู่หน้า Run
   router.push('/sales/OnGoing');
 };
+
+
 
   return (
     <div className="relative isolate flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#0B0F4F]">

@@ -35,7 +35,22 @@ const LoginWithGoogle = async () => {
 
     console.log('Google Login Success:', result.user.uid);
     console.log('Email:', result.user.email);
+    console.log('Display Name:', result.user.displayName);
 
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/users/register-profile',{
+      method: 'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${await result.user.getIdToken()}`
+      },
+      body: JSON.stringify({
+        uid: String(result.user.uid),
+        email: String(result.user.email),
+        displayName: String(result.user.displayName)
+      })
+    })
+console.log('Backend response status:', response.status);
+console.log('Backend response body:', await response.text());
   } catch (error) {
     console.error('Google Login Error:', error);
     setFormMessage(

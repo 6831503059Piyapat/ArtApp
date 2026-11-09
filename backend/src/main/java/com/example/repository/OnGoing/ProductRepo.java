@@ -5,12 +5,14 @@ import com.example.dto.response.List_RunDTO;
 import com.example.entity.SaleRunEntity;
 import com.example.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import com.example.dto.response.OnGoingDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDProductDTO;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.dto.response.OnGoingID.ProductDTO;
 import com.example.entity.ProductEntity;
 
@@ -29,9 +31,10 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
        UPDATE Product SET current_stock = :Start_Stock WHERE id = :Product_Id
     """,nativeQuery = true)
     void updateProductStartStock(@Param ("Product_Id") String Product_Id, @Param ("Start_Stock") Integer StartStock);
-
+@Modifying
+@Transactional
     @Query (value = """
-       UPDATE Product SET current_stock = :current_stock WHERE id = :Product_Id
+       UPDATE Product SET current_stock = start_stock - :current_stock WHERE product_id = :Product_Id
     """,nativeQuery = true)
     void updateProductCurrentStock(@Param ("Product_Id") String Product_Id, @Param ("current_stock") Integer current_stock);
 
@@ -58,13 +61,18 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
 
 
 
-
+    //ADD Product
     @Query (
         value = """
         INSERT INTO Product(Product_Id, Supplier_Id, Product_Name, Product_Unit_Price, Image_url, Start_Stock, Current_Stock) VALUES (:Product_Id,:Supplier_Id,:Product_Name,:Product_Unit_Price,:Image_url,:Start_Stock,:Current_Stock)
         """,nativeQuery = true)
         void addProduct(@Param ("Product_Id") String Product_Id, @Param ("Supplier_Id") String Supplier_Id, @Param ("Product_Name") String Product_Name, @Param ("Product_Unit_Price") Double Product_Unit_Price, @Param ("Image_url") String Image_url, @Param ("Start_Stock") Integer Start_Stock, @Param ("Current_Stock") Integer Current_Stock);
-    
+    // Sell Product
+        @Query(
+        value = """
+        INSERT INTO sale_logs(sale_logs_id, product_unit_price,product_name,quantity_sold,run_assistant_name,sale_run_id,supplier_name,time_stamp,total_price) VALUES (:sale_logs_id,:product_unit_price,:product_name,:quantity_sold,:run_assistant_name,:sale_run_id,:supplier_name,:time_stamp,:total_price)
+        """,nativeQuery = true)
+        void addSaleLog(@Param ("sale_logs_id") String sale_logs_id, @Param ("product_unit_price") Double product_unit_price, @Param ("product_name") String product_name, @Param ("quantity_sold") Integer quantity_sold, @Param ("run_assistant_name") String run_assistant_name, @Param ("sale_run_id") String sale_run_id, @Param ("supplier_name") String supplier_name, @Param ("time_stamp") String time_stamp, @Param ("total_price") Double total_price);
     
     
 }
