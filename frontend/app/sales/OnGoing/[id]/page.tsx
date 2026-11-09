@@ -405,6 +405,7 @@ export default function SalesRunDetail() {
   //เพิ่ม State สำหรับระบบตะกร้า (Cart)
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'mobileBanking' | 'cash'>('mobileBanking');
   const [showUndoNotification, setShowUndoNotification] = useState(false);
 
 
@@ -560,6 +561,7 @@ const handleSell = (id: string) => {
   setCart((prev) => {
     const existing = prev.find((item) => item.productId === id);
     if (existing) {
+      if (existing.quantity >= productToSell.stock) return prev;
       return prev.map((item) =>
         item.productId === id ? { ...item, quantity: item.quantity + 1 } : item
       );
@@ -577,6 +579,20 @@ const handleSell = (id: string) => {
     ];
   });
 };
+
+const updateCartQuantity = (productId: string, change: number) => {
+  setCart((prev) =>
+    prev.flatMap((item) => {
+      if (item.productId !== productId) return [item];
+
+      const quantity = item.quantity + change;
+      if (quantity <= 0) return [];
+      if (quantity > item.stock) return [item];
+      return [{ ...item, quantity }];
+    })
+  );
+};
+
 //เพิ่มฟังก์ชัน handleConfirmSale สำหรับกดยืนยันจาก Sidebar วางฟังก์ชันนี้ไว้ใต้ handleSell เพื่อทำหน้าที่หักสต็อกจริงและจับเวลา Undo 10 วินาที
 
 const handleConfirmSale = () => {
@@ -712,9 +728,9 @@ const handleConfirmSale = () => {
           </div>
 
           {/* Key Stat Cards Grid */}
-          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-4 min-[600px]:grid-cols-[1.2fr_1fr_1fr]">
             {/* Gross Intake */}
-            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Gross Intake' : 'รายได้รวม'}</p>
                 <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
@@ -725,7 +741,7 @@ const handleConfirmSale = () => {
             </div>
 
             {/* Total Sold Units */}
-            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
@@ -738,24 +754,24 @@ const handleConfirmSale = () => {
               </div>
             </div>
 
-            {/* Latest Action & Undo */}
-            <div className="flex min-h-[76px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white py-2.5 pl-3 pr-5 shadow-sm min-[900px]:col-span-2">
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  <History className="h-3 w-3 text-[#F062C0]" />  {language === 'EN' ? 'Lastest Action' : 'รายการล่าสุด'}
+            {/* Remaining Stock */}
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  {language === 'EN' ? 'Remaining Stock' : 'สินค้าคงเหลือ'}
                 </p>
-                <p className="mt-0.5 flex min-w-0 items-center gap-2 truncate text-xs font-semibold text-slate-800">
-                  <span className="min-w-0 truncate">
-                    {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : language === 'EN' ? 'No actions yet' : 'ไม่มีการดำเนินการ'}
+                <div className="mt-0.5 flex items-baseline gap-1.5">
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">
+                    {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.stock, 0), 0)}
                   </span>
-                  <span className="shrink-0 rounded-full bg-[#F062C0]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#F062C0]">
-                    {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
+                  <span className="text-xs font-medium text-slate-400">
+                    / {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.start, 0), 0)} {language === 'EN' ? 'starting' : 'เริ่มต้น'}
                   </span>
-                </p>
+                </div>
               </div>
-              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex min-w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-gradient-to-r from-[#FFB24C] to-[#F062C0] hover:brightness-95'}`}>
-                <Undo2 className="h-3.5 w-3.5 shrink-0" /> <span className="leading-none">{language === 'EN' ? 'Undo' : 'ย้อนกลับ'}</span>
-              </button>
+              <div className="absolute right-3 top-3 rounded-md bg-emerald-500/10 p-2 text-emerald-600">
+                <Package className="h-4 w-4" />
+              </div>
             </div>
           </div>
         </div>
@@ -876,6 +892,7 @@ const handleConfirmSale = () => {
       dotColor={accent.dot}
       items={items.products ?? []}
       placeholderText="Item Name (e.g. Linen Coaster Set)"
+      onImageClick={(product) => setImageProduct({ supplierId: items.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })}
       language={language}
     />
   );
@@ -892,7 +909,7 @@ const handleConfirmSale = () => {
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} onImageClick={(product) => setImageProduct({ supplierId: supplier.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
+   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -1135,9 +1152,9 @@ const handleConfirmSale = () => {
     </div>
     <button 
       onClick={() => setIsCartOpen(true)}
-      className="rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:brightness-110 active:scale-95"
+      className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:brightness-110 active:scale-95"
     >
-      View Cart →
+      View Cart <ChevronRight className="h-4 w-4" />
     </button>
   </div>
 )}
@@ -1152,53 +1169,154 @@ const handleConfirmSale = () => {
     />
     
     {/* Sidebar Panel */}
-    <div className="relative flex h-full w-[400px] flex-col bg-white shadow-2xl animate-in slide-in-from-right-full">
-      <div className="flex items-center justify-between border-b border-slate-100 p-5">
-        <div>
-          <h2 className="text-lg font-bold text-[#0B0F4F]">Current Sales Cart</h2>
-          <p className="text-xs text-slate-400">{cart.length} items</p>
+    <div className="relative flex h-full w-full max-w-[440px] flex-col bg-white shadow-2xl animate-in slide-in-from-right-full">
+      <div className="flex items-center justify-between gap-3 border-b border-[#E8E2FF] bg-[#F8F6FF] p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7C5CFF] text-white shadow-sm">
+            <ShoppingBag className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="truncate text-lg font-extrabold tracking-tight text-[#0B0F4F]">Current Sales Cart</h2>
+              <span className="shrink-0 rounded-full bg-[#EEE9FF] px-2 py-0.5 text-[10px] font-bold text-[#7C5CFF]">{cart.length} items</span>
+            </div>
+            <p className="mt-0.5 truncate text-xs font-medium text-slate-500">In-Cart Checkout</p>
+          </div>
         </div>
-        <button onClick={() => setCart([])} className="text-xs font-bold text-red-500 hover:text-red-600">
-          Clear Cart ✕
+        <button
+          type="button"
+          onClick={() => setCart([])}
+          className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+        >
+          Clear Cart <X className="h-3.5 w-3.5" />
         </button>
       </div>
       
       {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
-        {cart.map((item) => (
-          <div key={item.productId} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-bold text-[#0B0F4F]">{item.name}</p>
-              <p className="text-xs text-slate-400">฿{item.price} each</p>
+      <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
+        {cart.map((item) => {
+          const supplier = products.find((entry) => entry.id === item.supplierId);
+          const product = supplier?.products.find((entry) => entry.id === item.productId);
+          const ProductIcon = product?.icon ?? Package;
+          const supplierBadge = supplier?.category === 'host'
+            ? 'bg-[#EEE9FF] text-[#7C5CFF]'
+            : supplier?.id.includes('kaimook')
+              ? 'bg-[#FCE7F3] text-[#DB2777]'
+              : 'bg-[#FFF2DF] text-[#C66A00]';
+
+          return (
+            <div key={item.productId} className="flex min-h-[76px] items-center gap-2 rounded-xl bg-[#F0F1FF] px-2.5 py-2">
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg ${product?.imageUrl ? 'bg-white' : product?.iconBg ?? 'bg-[#EEE9FF] text-[#7C5CFF]'}`}>
+                {product?.imageUrl ? (
+                  <span
+                    role="img"
+                    aria-label={item.name}
+                    className="h-full w-full bg-cover bg-center"
+                    style={{ backgroundImage: `url("${product.imageUrl}")` }}
+                  />
+                ) : (
+                  <ProductIcon className="h-5 w-5" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold leading-tight text-[#171A2E]">{item.name}</p>
+                <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
+                  <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold leading-none ${supplierBadge}`}>
+                    {supplier?.category === 'host' ? 'Host' : supplier?.name ?? 'Supplier'}
+                  </span>
+                  <span className="text-[11px] text-slate-500">฿{item.price.toFixed(2)} each</span>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <div className="flex h-8 items-center gap-2 rounded-full bg-white px-2.5 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => updateCartQuantity(item.productId, -1)}
+                    aria-label={`Decrease ${item.name} quantity`}
+                    className="text-sm font-bold text-[#0B0F4F] hover:text-[#7C5CFF]"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <span className="min-w-3 text-center text-sm font-bold text-[#0B0F4F]">{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => updateCartQuantity(item.productId, 1)}
+                    disabled={item.quantity >= item.stock}
+                    aria-label={`Increase ${item.name} quantity`}
+                    className="text-sm font-bold text-[#0B0F4F] hover:text-[#7C5CFF] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+                <span className="min-w-[48px] text-right text-sm font-extrabold text-[#171A2E]">฿{item.price * item.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setCart((prev) => prev.filter((cartItem) => cartItem.productId !== item.productId))}
+                  aria-label={`Remove ${item.name} from cart`}
+                  className="p-1 text-slate-500 transition-colors hover:text-red-500"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-bold text-[#0B0F4F]">x {item.quantity}</p>
-              <p className="text-xs font-bold text-[#7C5CFF]">฿{item.price * item.quantity}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       
       {/* Bottom Total & Confirm Button */}
-      <div className="border-t border-slate-100 p-5 bg-slate-50 space-y-4">
-        <div className="flex items-end justify-between">
-          <p className="text-sm font-semibold text-slate-500">Subtotal in Cart</p>
-          <p className="text-2xl font-extrabold text-[#0B0F4F]">
-            ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US')}
+      <div className="space-y-3 border-t border-[#E8E2FF] bg-white px-4 pb-4 pt-3">
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-extrabold uppercase tracking-wide text-slate-600">Payment Method</p>
+          <div className="flex gap-1 rounded-full bg-[#EEEFFF] p-1" role="group" aria-label="Payment method">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('mobileBanking')}
+              aria-pressed={paymentMethod === 'mobileBanking'}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all ${
+                paymentMethod === 'mobileBanking'
+                  ? 'bg-[#8057F6] text-white shadow-[0_4px_12px_rgba(124,92,255,0.28)]'
+                  : 'text-[#171A2E] hover:bg-white/60'
+              }`}
+            >
+              <QrCode className="h-3.5 w-3.5" />
+              Mobile banking
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cash')}
+              aria-pressed={paymentMethod === 'cash'}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all ${
+                paymentMethod === 'cash'
+                  ? 'bg-[#8057F6] text-white shadow-[0_4px_12px_rgba(124,92,255,0.28)]'
+                  : 'text-[#171A2E] hover:bg-white/60'
+              }`}
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              Cash
+            </button>
+          </div>
+        </div>
+        <div className="flex items-end justify-between border-t border-slate-100 pt-2">
+          <p className="text-sm font-medium text-slate-500">Subtotal in Cart</p>
+          <p className="text-2xl font-extrabold leading-none text-[#171A2E]">
+            ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button 
             onClick={() => setIsCartOpen(false)}
-            className="flex-1 rounded-xl bg-white border border-slate-200 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"
+            className="rounded-full bg-[#EEEFFF] px-5 py-2.5 text-sm font-semibold text-[#41445A] transition-colors hover:bg-[#E2E4FF]"
           >
             Cancel
           </button>
           <button 
             onClick={handleConfirmSale}
-            className="flex-[2] rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] py-3 text-sm font-bold text-white hover:brightness-110 active:scale-95"
+            className="flex-1 rounded-full bg-gradient-to-r from-[#8057F6] to-[#E84CC5] py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99]"
           >
-            Confirm & Log Sale
+            <span className="inline-flex items-center justify-center gap-1.5">
+              <Check className="h-4 w-4 rounded-full border border-white p-0.5" />
+              Confirm &amp; Log Sale (฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US', { maximumFractionDigits: 0 })})
+            </span>
           </button>
         </div>
       </div>
@@ -1511,7 +1629,7 @@ function getSupplierAccent(id: string) {
   };
 }
 
-function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language }:any) {
+function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language, onImageClick }:any) {
   return (
     <div className="space-y-3">
       {/* Group Header */}
@@ -1540,53 +1658,74 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
 
       {/* Product Rows */}
       <div>
-        {items.map((item:any) => (
-          <div key={item.id} className="grid grid-cols-12 items-center border-b border-slate-200 px-4 py-3 text-xs font-medium transition-colors last:border-b-0 hover:bg-slate-50/70">
-            <div className="col-span-5 flex items-center gap-2">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
-              <input
-                type="text"
-                defaultValue={item.name}
-                className="w-fit min-w-[50%] max-w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF]"
-              />
-            </div>
+        {items.map((item:any) => {
+          const IconComponent = item.icon;
 
-            {/* Qty Stepper */}
-            <div className="col-span-3 flex w-fit items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-2 py-1">
-              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
-                <Minus className="h-2.5 w-2.5" />
-              </button>
-              <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
-              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
-                <Plus className="h-2.5 w-2.5" />
-              </button>
-            </div>
-
-            {/* Price */}
-            <div className="col-span-2 flex items-center justify-center">
-              <div className="flex w-20 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 shadow-2xs">
-                <span className="font-bold text-[#FFB24C]">฿</span>
+          return (
+            <div key={item.id} className="grid grid-cols-12 items-center border-b border-slate-200 px-4 py-3 text-xs font-medium transition-colors last:border-b-0 hover:bg-slate-50/70">
+              <div className="col-span-5 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => onImageClick?.(item)}
+                  aria-label={`Edit icon for ${item.name}`}
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 shadow-2xs ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+                >
+                  {item.imageUrl ? (
+                    <span
+                      role="img"
+                      aria-label={item.name}
+                      className="h-full w-full bg-cover bg-center"
+                      style={{ backgroundImage: `url("${item.imageUrl}")` }}
+                    />
+                  ) : (
+                    <IconComponent className="h-5 w-5" />
+                  )}
+                </button>
+                <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
                 <input
                   type="text"
-                  defaultValue={item.price}
-                  className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
+                  defaultValue={item.name}
+                  className="w-fit min-w-[50%] max-w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF]"
                 />
               </div>
-            </div>
 
-            {/* Sold Count */}
-            <div className="col-span-1 text-center font-bold text-slate-700">
-              {item.sold}
-            </div>
+              {/* Qty Stepper */}
+              <div className="col-span-3 flex w-fit items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-2 py-1">
+                <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
+                  <Minus className="h-2.5 w-2.5" />
+                </button>
+                <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
+                <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
+                  <Plus className="h-2.5 w-2.5" />
+                </button>
+              </div>
 
-            {/* Delete Action */}
-            <div className="col-span-1 text-center">
-              <button className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                <Trash2 className="mx-auto h-3.5 w-3.5" />
-              </button>
+              {/* Price */}
+              <div className="col-span-2 flex items-center justify-center">
+                <div className="flex w-20 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 shadow-2xs">
+                  <span className="font-bold text-[#FFB24C]">฿</span>
+                  <input
+                    type="text"
+                    defaultValue={item.price}
+                    className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Sold Count */}
+              <div className="col-span-1 text-center font-bold text-slate-700">
+                {item.sold}
+              </div>
+
+              {/* Delete Action */}
+              <div className="col-span-1 text-center">
+                <button className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
+                  <Trash2 className="mx-auto h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       </div>
@@ -1622,31 +1761,44 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
     </div>
   );
 }
-function ProductCard({ item, onSell, onImageClick, language }: { item: InventoryProduct; onSell: (id: string) => void; onImageClick: (item: InventoryProduct) => void; language: 'EN' | 'TH' }) {
+function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSell: (id: string) => void; language: 'EN' | 'TH' }) {
   const IconComponent = item.icon;
   const isOutOfStock = item.stock === 0;
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   return (
     <div className="flex min-h-[88px] items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-4 shadow-2xs transition-shadow hover:shadow-md">
       {/* Left Column: Icon + Name + Stock Info */}
       <div className="flex min-w-0 items-center gap-2">
-        <button
-          type="button"
-          onClick={() => onImageClick(item)}
-          aria-label={`${language === 'EN' ? 'Upload image for' : 'อัปโหลดรูปภาพสำหรับ'} ${item.name}`}
-          className={`flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+        <div
+          className="group relative shrink-0"
+          onMouseMove={(event) => setTooltipPosition({ x: event.clientX, y: event.clientY })}
         >
-          {item.imageUrl ? (
-            <span
-              role="img"
-              aria-label={item.name}
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: `url("${item.imageUrl}")` }}
-            />
-          ) : (
-            <IconComponent className="h-7 w-7" />
-          )}
-        </button>
+          <div
+            aria-hidden="true"
+            className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+          >
+            {item.imageUrl ? (
+              <span
+                role="img"
+                aria-label={item.name}
+                className="h-full w-full bg-cover bg-center"
+                style={{ backgroundImage: `url("${item.imageUrl}")` }}
+              />
+            ) : (
+              <IconComponent className="h-7 w-7" />
+            )}
+          </div>
+          <span
+            role="tooltip"
+            style={{ left: tooltipPosition.x + 12, top: tooltipPosition.y + 12 }}
+            className="pointer-events-none fixed z-50 w-36 rounded-lg bg-[#0B0F4F]/75 px-2 py-1.5 text-center text-[10px] font-medium leading-tight text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+          >
+            Image can be changed
+            <br />
+            in edit mode
+          </span>
+        </div>
 
         <div className="min-w-0 space-y-0.5">
           <h3 className="truncate text-base font-bold tracking-tight text-[#0B0F4F]">
@@ -2182,7 +2334,6 @@ function FinalEndRunModal({
 function SaleSection({
   products,
   handleSell,
-  onImageClick,
   Name,
   Role,
   id,
@@ -2190,7 +2341,6 @@ function SaleSection({
 }: {
   products: InventoryProduct[];
   handleSell: (id: string) => void;
-  onImageClick: (item: InventoryProduct) => void;
   Name: string;
   Role: string;
   id: string;
@@ -2230,7 +2380,6 @@ function SaleSection({
           key={cardItem.id}
           item={cardItem}
           onSell={handleSell}
-          onImageClick={onImageClick}
           language={language}
         />
       ))}

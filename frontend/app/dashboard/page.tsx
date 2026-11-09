@@ -284,31 +284,30 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="join-run-title"
-      className="w-full max-w-[550px] rounded-[30px]
-        border border-[#e9e7f2] bg-white p-6
-        shadow-2xl sm:p-10"
+      className="w-full max-w-lg rounded-3xl
+        border border-[#e9e7f2] bg-white px-6 py-8
+        shadow-2xl"
       onClick={(e) => e.stopPropagation()}
     >
-      <form onSubmit={handleJoinRun}>
+      <form onSubmit={handleJoinRun} style={{ zoom: 0.9 }}>
         {/* HEADER */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
               <UserRoundPlus
-                size={28}
+                size={24}
                 className="text-[#7C5CFF]"
               />
               <h2
                 id="join-run-title"
-                className="text-2xl font-extrabold tracking-tight
-                  text-[#0B0F4F] sm:text-3xl"
+                className="text-xl font-extrabold tracking-tight
+                  text-[#0B0F4F] sm:text-2xl"
               >
                  {language === 'EN' ? 'Join Sales Run' : 'เข้าร่วมรายการขาย'}
               </h2>
             </div>
 
-            <p className="mt-2 text-sm leading-6 text-[#858ba0]
-              sm:text-base">
+            <p className="mt-1.5 text-sm leading-5 text-[#858ba0]">
               {language === 'EN' ? 'Enter the 6 or 8-digit run code or PIN shared by the booth host' : 'ป้อนรหัสรายการขาย 6 หรือ 8 หลัก หรือ PIN ที่ถูกแชร์โดยเจ้าของ Booth'}
               {language === 'EN' ? ' to join the sales run.' : ' เพื่อเข้าร่วมรายการขาย'}
             </p>
@@ -325,20 +324,19 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           </button>
         </div>
 
-        <div className="my-5 border-t border-[#ececf4]" />
+        <div className="my-4 border-t border-[#ececf4]" />
 
         {/* INPUT */}
         <label
           htmlFor="run-code"
-          className="mb-2 block text-sm font-semibold
-            text-[#0B0F4F] sm:text-base"
+          className="mb-2 block text-sm font-semibold text-[#0B0F4F]"
         >
           {language === 'EN' ? 'RUN / ROOM CODE' : 'รหัสรายการ / ห้อง'}
         </label>
 
-        <div className="flex h-16 items-center gap-3
-          rounded-[24px] border-2 border-[#7C5CFF]
-          px-4 transition focus-within:border-[#7C5CFF]
+        <div className="flex h-12 items-center gap-3
+          rounded-2xl border-2 border-[#7C5CFF]
+          px-3 transition focus-within:border-[#7C5CFF]
           focus-within:ring-4 focus-within:ring-[#7C5CFF]/10">
           <input
             id="run-code"
@@ -348,25 +346,26 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             placeholder="E.G. 88X2-901 OR 482910"
             autoComplete="off"
             required
-            className="min-w-0 flex-1 bg-transparent text-base
+            className="min-w-0 flex-1 bg-transparent text-sm
               text-[#0B0F4F] outline-none placeholder:text-[#858ba0]
-              sm:text-xl"
+              sm:text-base"
           />
 
           <Keyboard
-            size={21}
+            size={18}
             className="shrink-0 text-[#858ba0]"
           />
         </div>
 
-        <p className="mt-3 text-sm text-[#858ba0]">
+        <p className="mt-3 text-xs leading-5 text-[#858ba0]">
           {language === 'EN' ? 'Your active host run code is' : 'รหัสรายการขายที่ใช้งานอยู่ของคุณคือ '}
+          {' '}
           <span className="font-bold text-[#7C5CFF]">
             88X2-901
           </span>.
         </p>
 
-        <div className="my-7 border-t border-[#ececf4]" />
+        <div className="my-6 border-t border-[#ececf4]" />
 
         {/* FOOTER BUTTONS */}
         <div className="flex flex-col-reverse justify-end gap-3
@@ -374,8 +373,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           <button
             type="button"
             onClick={() => setIsJoinModalOpen(false)}
-            className="h-14 rounded-full border border-[#e9e7f2]
-              px-7 text-sm font-semibold text-[#777b91]
+            className="h-11 rounded-full border border-[#e9e7f2]
+              px-5 text-sm font-semibold text-[#777b91]
               transition hover:bg-slate-50"
           >
             Cancel {language === 'EN' ? 'Cancel' : 'ยกเลิก'}
@@ -383,13 +382,13 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
 
           <button
             type="submit"
-            className="inline-flex h-14 items-center justify-center
-              gap-2 rounded-full bg-[#7C5CFF] px-8
+            className="inline-flex h-11 items-center justify-center
+              gap-2 rounded-full bg-[#7C5CFF] px-6
               text-sm font-bold text-white shadow-lg
               shadow-[0_10px_20px_rgba(124,92,255,0.2)] transition
               hover:bg-[#7C5CFF] active:scale-[0.98]"
           >
-            <LogIn size={22} />
+            <LogIn size={18} />
             {language === 'EN' ? 'Join Run' : 'เข้าร่วมรายการขาย'}
           </button>
         </div>

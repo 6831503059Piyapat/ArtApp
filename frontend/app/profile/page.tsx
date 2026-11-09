@@ -2,9 +2,10 @@
 import Navbar from '@/app/components/navbar';
 import Image from 'next/image';
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
-import { Store, User, CheckCircle2, Save, SlidersHorizontal } from 'lucide-react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { Store, User, CheckCircle2, Info, Save, SlidersHorizontal, LogOut } from 'lucide-react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
 
 const getLanguage = (): 'EN' | 'TH' =>
   localStorage.getItem('language') === 'TH' ? 'TH' : 'EN';
@@ -20,6 +21,7 @@ const subscribeToLanguage = (onChange: () => void) => {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Completed');
   const language = useSyncExternalStore(
     subscribeToLanguage,
@@ -32,6 +34,8 @@ export default function ProfilePage() {
   const [stallAlias, setStallAlias] = useState('alexchen');
   const [email, setEmail] = useState('alex.chen@artmarket.io');
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isInfoToast, setIsInfoToast] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   
   async function handleChange(){
@@ -47,7 +51,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           uid: user.uid,
           displayName: username,
-          stallAlias: stallAlias
+          stallAlias
         })
       });
       console.log('Profile updated:', response);
@@ -71,9 +75,27 @@ export default function ProfilePage() {
   };
 
   const handleSave = () => {
+    setToastMessage(language === 'EN' ? 'Changes saved successfully!' : 'บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!');
+    setIsInfoToast(false);
     setShowToast(true);
     handleChange();
     setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const notifyFieldCannotChange = () => {
+    setToastMessage(language === 'EN' ? 'Username and email cannot be changed.' : 'ไม่สามารถเปลี่ยนชื่อผู้ใช้และอีเมลได้');
+    setIsInfoToast(true);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.replace('/auth/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   useEffect(() => {
@@ -89,10 +111,10 @@ export default function ProfilePage() {
 
   return (
     <div className="relative isolate min-h-screen flex flex-col bg-[#f7f8fc] text-[#0B0F4F] font-sans antialiased">
-      <div className={`fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#0B0F4F] text-white px-5 py-3.5 rounded-2xl shadow-2xl transition-all duration-300 border border-[#0B0F4F]/80 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
-        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+      <div role="status" className={`fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-[#0B0F4F] text-white px-5 py-3.5 rounded-2xl shadow-2xl transition-all duration-300 border border-[#0B0F4F]/80 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'}`}>
+        {isInfoToast ? <Info className="h-5 w-5 text-sky-300" /> : <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
         <span className="text-sm font-semibold" suppressHydrationWarning>
-         {language === 'EN' ? 'Changes saved successfully!' : 'บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!'}
+          {toastMessage}
         </span>
       </div>
 
@@ -145,10 +167,10 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400">{language === 'EN' ? 'Username' : 'ชื่อผู้ใช้'}</label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full bg-slate-50 border border-slate-200 focus:border-[#7C5CFF] focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-[#0B0F4F] outline-none" />
+                <input type="text" value={username} readOnly onClick={notifyFieldCannotChange} className="w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-medium text-slate-500 outline-none" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400">{language === 'EN' ? 'Stall Alias' : 'ชื่อร้าน'}</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400">{language === 'EN' ? 'Display Name' : 'ชื่อที่แสดง'}</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">@</span>
                   <input type="text" value={stallAlias} onChange={(e) => setStallAlias(e.target.value)} className="w-full bg-slate-50 border border-slate-200 focus:border-[#7C5CFF] focus:bg-white rounded-xl pl-8 pr-4 py-3 text-sm font-medium text-[#0B0F4F] outline-none" />
@@ -156,7 +178,7 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-slate-50 border border-slate-200 focus:border-[#7C5CFF] focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-[#0B0F4F] outline-none" />
+                <input type="email" value={email} readOnly onClick={notifyFieldCannotChange} className="w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-medium text-slate-500 outline-none" />
               </div>
             </div>
 
@@ -200,7 +222,11 @@ export default function ProfilePage() {
           </div>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-between pt-2">
+            <button type="button" onClick={handleLogout} className="flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 font-bold text-red-600 transition-colors hover:bg-red-100">
+              <LogOut className="h-4 w-4" />
+              {language === 'EN' ? 'Log Out' : 'ออกจากระบบ'}
+            </button>
             <button type="button" onClick={handleSave} className="flex items-center gap-2 bg-[#FFB24C] hover:bg-[#F4A62F] text-[#0B0F4F] font-bold px-7 py-3 rounded-2xl shadow-lg transition-all cursor-pointer">
               <Save className="w-4 h-4" />{language === 'EN' ? 'Save Changes' : 'บันทึกการเปลี่ยนแปลง'}
             </button>
