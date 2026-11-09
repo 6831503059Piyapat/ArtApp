@@ -5,7 +5,7 @@ import com.example.dto.response.List_RunDTO;
 import com.example.repository.DashboardRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.example.dto.DashboardTotalDTO;
 import java.util.List;
 
 @Service
@@ -18,7 +18,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public DashboardDTO getDashboardByUserId(String userId) {
+    public DashboardTotalDTO getDashboardByUserId(String userId) {
         return dashboardRepository.findTotalDashboardByUserId(userId)
                 .stream()
                 .findFirst()

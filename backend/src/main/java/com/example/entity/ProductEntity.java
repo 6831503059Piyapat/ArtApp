@@ -2,15 +2,17 @@ package com.example.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
+
+import org.springframework.data.domain.Persistable;
+
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "Product")
-public class ProductEntity {
+public class ProductEntity implements Persistable<String> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Product_Id")
     private String Product_id;
 
@@ -36,9 +38,7 @@ public class ProductEntity {
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Supplier_Id", referencedColumnName = "Supplier_Id")
     private SupplierEntity Supplier;
-  
-
-
+ 
     // Getters & Setters
     public ProductEntity() {
     }
@@ -54,6 +54,16 @@ public class ProductEntity {
 
     public String getProduct_id() {
         return Product_id;
+    }
+
+    @Override
+    public String getId() {
+        return Product_id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
     }
 
     public String getProduct_Name() {
@@ -103,4 +113,38 @@ public class ProductEntity {
     public void setCurrent_stock(int current_stock) {
         this.Current_Stock = current_stock;
     }
+    public SupplierEntity getSupplier() {
+        return Supplier;
+    }
+    public void setProduct_UnitPrice(double product_Unit_Price) {
+        this.Product_Unit_Price = product_Unit_Price;
+    }
+    public double getProduct_UnitPrice() {
+        return Product_Unit_Price;
+    }
+    public void setStart_Stock(int start_Stock) {
+        this.Start_Stock = start_Stock;
+    }
+    public void setCurrent_Stock(int current_Stock) {
+        this.Current_Stock = current_Stock;
+    }
+    public int getStart_Stock() {
+        return Start_Stock;
+    }
+    public int getCurrent_Stock() {
+        return Current_Stock;
+    }
+    public void setProduct_Unit_Price(double product_Unit_Price) {
+        this.Product_Unit_Price = product_Unit_Price;
+    }
+    public double getProduct_Unit_Price() {
+        return Product_Unit_Price;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.Image_url = imageUrl;
+    }
+    public String getImageUrl() {
+        return Image_url;
+    }
+
 }

@@ -14,6 +14,8 @@ import Footer from "@/app/components/footer";
 import Link from 'next/link';
 import Navbar from '@/app/components/navbar';
 import { matchesSalesRun } from '../../features/OnGoing/utils/search';
+import {getAuth,onAuthStateChanged} from "firebase/auth";
+
 import { getRunTiming } from '../../features/OnGoing/utils/time';
 
 type SalesRun = {
@@ -33,21 +35,45 @@ type SalesRun = {
 };
 
 export default function ConsignDeskDashboard() {
-  const [activeTab, setActiveTab] = useState('Ongoing');
   const [filter, setFilter] = useState('All Ongoing');
   const [searchQuery, setSearchQuery] = useState('');
   const [now, setNow] = useState<number | null>(null);
   const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); 
+  async function fetchOngoingList(token: string) {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/backend/ongoing-list',{
+      method: 'GET',
+      headers:{
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to load ongoing sales: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("Ongoing Sales Runs:", data);
+  }
   useEffect(() => {
+    const auth = getAuth();
     const updateNow = () => setNow(Date.now());
     const initialTimer = window.setTimeout(updateNow, 0);
     const timer = window.setInterval(updateNow, 60_000);
     setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
+    const idToken = await user?.getIdToken();
+    fetchOngoingList(idToken);
+    }
+    
+  });
+    
     return () => {
+      unsubscribe();
       window.clearTimeout(initialTimer);
       window.clearInterval(timer);
     };
   }, []);
+
 
   // ข้อมูลจำลองของการขาย (Sales Runs Data)
   const salesRuns: SalesRun[] = [
