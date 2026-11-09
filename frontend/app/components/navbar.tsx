@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import {useState,useEffect} from "react";
+import { createPortal } from "react-dom";
 import {onAuthStateChanged} from "firebase/auth";
 import { usePathname,useRouter } from 'next/navigation';
 import {signOut} from "firebase/auth";
 import { auth } from '@/lib/firebase';
-import { CircleHelp, LogOut, MessageCircle, UserRound, X } from 'lucide-react';
+import { CircleHelp, LogOut, Menu, MessageCircle, UserRound, X } from 'lucide-react';
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname()
@@ -15,6 +16,24 @@ export default function Navbar() {
   const [ProfileImage, setProfileImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isNavDrawerOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsNavDrawerOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isNavDrawerOpen]);
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -49,7 +68,8 @@ async function logout() {
     }`;
 
   return (
-   <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-creatory-border shadow-[0_2px_12px_rgba(11,15,79,0.04)]">
+    <>
+   <header className="fixed top-0 left-0 z-50 w-full pointer-events-auto bg-white border-b border-creatory-border shadow-[0_2px_12px_rgba(11,15,79,0.04)]">
         <div className="h-12.5 max-w-[1280px] mx-auto px-[22px] flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <button
@@ -57,8 +77,10 @@ async function logout() {
               onClick={() => setIsNavDrawerOpen(true)}
               aria-label="Open navigation menu"
               aria-expanded={isNavDrawerOpen}
-              className="group flex items-center gap-2 text-creatory-navy"
+              aria-controls="mobile-navigation"
+              className="group flex min-h-11 touch-manipulation items-center gap-2 rounded-lg text-creatory-navy focus-visible:outline-2 focus-visible:outline-primary"
             >
+              <Menu aria-hidden="true" className="h-6 w-6 md:hidden" />
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-primary via-creatory-pink to-creatory-orange text-white shadow-sm shadow-primary/30 transition-all duration-200 group-hover:shadow-[0_0_14px_rgba(124,92,255,0.65)] group-hover:brightness-110">
                 <span className="material-symbols-outlined text-[17px]">storefront</span>
               </div>
@@ -118,19 +140,21 @@ async function logout() {
             </div>
           </div>
         </div>
-        {isNavDrawerOpen && (
-          <div className="fixed inset-0 z-[60]">
+        </header>
+        {isNavDrawerOpen && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[100] touch-manipulation">
             <button
               type="button"
               aria-label="Close navigation menu"
               onClick={() => setIsNavDrawerOpen(false)}
-              className="absolute inset-0 h-full w-full bg-[#0B0F4F]/30 backdrop-blur-[2px]"
+              className="absolute inset-0 z-0 h-full w-full touch-manipulation bg-[#0B0F4F]/30 backdrop-blur-[2px]"
             />
             <aside
+              id="mobile-navigation"
               aria-label="Main navigation"
-              className="absolute left-0 top-0 flex h-full w-[min(280px,85vw)] flex-col border-r border-creatory-border bg-white shadow-2xl animate-in slide-in-from-left duration-200"
+              className="absolute left-0 top-0 z-10 flex h-[100dvh] w-[min(320px,88vw)] flex-col overscroll-contain border-r border-creatory-border bg-white shadow-2xl animate-in slide-in-from-left duration-200"
             >
-              <div className="flex h-14 items-center justify-between border-b border-creatory-border px-5">
+              <div className="flex h-14 shrink-0 items-center justify-between border-b border-creatory-border px-5">
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-primary via-creatory-pink to-creatory-orange text-white shadow-sm shadow-primary/30">
                     <span className="material-symbols-outlined text-[17px]">storefront</span>
@@ -143,23 +167,23 @@ async function logout() {
                   type="button"
                   onClick={() => setIsNavDrawerOpen(false)}
                   aria-label="Close navigation menu"
-                  className="rounded-lg p-2 text-creatory-gray transition-colors hover:bg-creatory-lavender/70 hover:text-creatory-navy"
+                  className="flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg p-2 text-creatory-gray transition-colors hover:bg-creatory-lavender/70 hover:text-creatory-navy"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-1 p-3">
-                <Link href="/dashboard" onClick={() => setIsNavDrawerOpen(false)} className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive('/dashboard') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Dashboard</Link>
-                <Link href="/SaleRun" onClick={() => setIsNavDrawerOpen(false)} className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive('/SaleRun') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Sales Runs</Link>
-                <Link href="/sales/OnGoing" scroll={true} onClick={() => setIsNavDrawerOpen(false)} className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive('/sales/OnGoing') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Ongoing</Link>
-                <Link href="/sales/completed" onClick={() => setIsNavDrawerOpen(false)} className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isActive('/sales/completed') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Completed</Link>
+              <nav className="flex flex-col gap-1 overflow-y-auto p-3">
+                <Link href="/dashboard" onClick={() => setIsNavDrawerOpen(false)} className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-medium transition-colors ${isActive('/dashboard') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Dashboard</Link>
+                <Link href="/SaleRun" onClick={() => setIsNavDrawerOpen(false)} className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-medium transition-colors ${isActive('/SaleRun') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Sales Runs</Link>
+                <Link href="/sales/OnGoing" scroll={true} onClick={() => setIsNavDrawerOpen(false)} className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-medium transition-colors ${isActive('/sales/OnGoing') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Ongoing</Link>
+                <Link href="/sales/completed" onClick={() => setIsNavDrawerOpen(false)} className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-medium transition-colors ${isActive('/sales/completed') ? 'bg-creatory-lavender text-primary' : 'text-creatory-gray hover:bg-creatory-lavender/70 hover:text-creatory-navy'}`}>Completed</Link>
               </nav>
-              <div className="mt-auto border-t border-creatory-border p-3">
+              <div className="mt-auto shrink-0 border-t border-creatory-border p-3">
                 <div className="flex flex-col gap-1">
                   <Link
                     href="/profile"
                     onClick={() => setIsNavDrawerOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-creatory-navy transition-colors hover:bg-creatory-lavender/70"
+                    className="flex min-h-11 items-center gap-3 rounded-lg px-4 text-sm font-medium text-creatory-navy transition-colors hover:bg-creatory-lavender/70"
                   >
                     <UserRound className="h-4 w-4" />
                     User Profile
@@ -167,7 +191,7 @@ async function logout() {
                   <button
                     type="button"
                     onClick={logout}
-                    className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+                    className="flex min-h-11 w-full items-center gap-3 rounded-lg px-4 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                   >
                     <LogOut className="h-4 w-4" />
                     Log Out
@@ -185,8 +209,9 @@ async function logout() {
                 </div>
               </div>
             </aside>
-          </div>
+          </div>,
+          document.body
         )}
-        </header>
+    </>
   );
 }
