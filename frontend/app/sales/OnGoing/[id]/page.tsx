@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import {getAuth , onAuthStateChanged} from "firebase/auth"; 
 import {Suspense} from 'react';
+import { useParams } from "next/navigation";
+
 import {
   ChevronRight,
   Store,
@@ -58,6 +61,7 @@ type InventoryProduct = {
   iconBg: string;
   supplierId: string;
   imageUrl?: string;
+  supplierName: string;
 };
 
 type Supplier = {
@@ -72,15 +76,52 @@ type Supplier = {
 //เพิ่ม Type สำหรับระบบตะกร้า (Cart)
 type CartItem = {
   supplierId: string;
+  supplierName: string;
   productId: string;
   name: string;
   price: number;
   quantity: number;
   stock: number;
 };
-
 export default function SalesRunDetail() {
-  // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
+  return (
+   
+    
+      <SalesRunDetailContent />
+   
+  );
+}
+
+function SalesRunDetailContent() {
+  const { id } = useParams<{ id: string }>();
+  const [AssistantName, setAsistantName] = useState<string>('');
+  async function fetchSalesRunData(saleRunId: string, idToken: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+
+
+    }
+  );
+   console.log(response.json());
+  }
+  
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if(user){
+        const idToken = await user?.getIdToken();
+        const AssistantName = user?.displayName || '';
+        setAsistantName(AssistantName);
+        fetchSalesRunData(id, idToken);
+      }
+    });
+    console.log("Sales Run ID:", id);
+    return () => unsubscribe();
+  }, [id]);
   const Suppliers: Supplier[] = [
     {
     id: "host-8466468345",
@@ -92,7 +133,7 @@ export default function SalesRunDetail() {
 
     products: [
       {
-      id: '1',
+      id: 'product-0-20261109115632-qx4hjObfR9rBeyY-20261109115632-0',
       name: 'Green Horned Frog',
       start: 13,
       stock: 3,
@@ -100,7 +141,8 @@ export default function SalesRunDetail() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
     },
     {
       id: '2',
@@ -111,8 +153,8 @@ export default function SalesRunDetail() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
-      
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
     },
     {
       id: '3',
@@ -123,7 +165,8 @@ export default function SalesRunDetail() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
      
     },
     ],
@@ -145,7 +188,8 @@ export default function SalesRunDetail() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
      
     },
     {
@@ -157,7 +201,8 @@ export default function SalesRunDetail() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
      
     },
     {
@@ -169,7 +214,8 @@ export default function SalesRunDetail() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
     },
     ],
   },
@@ -190,7 +236,8 @@ export default function SalesRunDetail() {
         sold: 7,
         icon: Package,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
       {
         id: 'nong-japan-2',
@@ -201,7 +248,8 @@ export default function SalesRunDetail() {
         sold: 3,
         icon: Droplets,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
       {
         id: 'nong-japan-3',
@@ -212,7 +260,8 @@ export default function SalesRunDetail() {
         sold: 3,
         icon: Grid,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
     ],
   },
@@ -233,104 +282,7 @@ export default function SalesRunDetail() {
     },
   
   ];
-  // const initialProducts = [
-  //   // My Products / Host Items
-  //   {
-  //     id: '1',
-  //     name: 'Green Horned Frog',
-  //     start: 10,
-  //     stock: 0,
-  //     price: 150,
-  //     sold: 10,
-  //     icon: Leaf,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     category: 'host'
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Yellow Horned Frog',
-  //     start: 10,
-  //     stock: 1,
-  //     price: 150,
-  //     sold: 9,
-  //     icon: Sun,
-  //     iconBg: 'bg-amber-100/70 text-amber-500',
-  //     category: 'host'
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Brown Horned Frog',
-  //     start: 10,
-  //     stock: 6,
-  //     price: 150,
-  //     sold: 4,
-  //     icon: Mountain,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     category: 'host'
-  //   },
-  //   // P' Kaimook
-  //   {
-  //     id: '4',
-  //     name: 'Japanese turtle (Big)',
-  //     start: 8,
-  //     stock: 3,
-  //     price: 250,
-  //     sold: 5,
-  //     icon: Rabbit,
-  //     iconBg: 'bg-pink-100/70 text-pink-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   {
-  //     id: '5',
-  //     name: 'Japanese turtle (Small)',
-  //     start: 17,
-  //     stock: 10,
-  //     price: 100,
-  //     sold: 7,
-  //     icon: Fish,
-  //     iconBg: 'bg-pink-100/70 text-pink-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   {
-  //     id: '6',
-  //     name: 'Turtle food 500g',
-  //     start: 62,
-  //     stock: 40,
-  //     price: 80,
-  //     sold: 22,
-  //     icon: Grid,
-  //     iconBg: 'bg-amber-100/70 text-amber-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   // Nong' Japan
-  //   {
-  //     id: '7',
-  //     name: 'Aquarium Moss Ball (Medium)',
-  //     start: 15,
-  //     stock: 8,
-  //     price: 60,
-  //     sold: 7,
-  //     icon: Package,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     supplier: "Nong' Japan",
-  //     category: 'japan'
-  //   },
-  //   {
-  //     id: '8',
-  //     name: 'Mini Terrarium Starter Glass',
-  //     start: 6,
-  //     stock: 3,
-  //     price: 190,
-  //     sold: 3,
-  //     icon: Droplets,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     supplier: "Nong' Japan",
-  //     category: 'japan'
-  //   }
-  // ];
+ 
   const expensesList = [
     {
       id: '01',
@@ -357,7 +309,7 @@ export default function SalesRunDetail() {
   ];
   const StockList = [
     {
-      id: '1',
+      id,
       name:"MFU outside night market (MON 14)",
       totalsoldMax:85,
       totalsold:66,
@@ -459,11 +411,13 @@ const ActionTimeAgo = ({ createdAt }: { createdAt: number }) => {
   const [, setTick] = useState(0);
 
   useEffect(() => {
+    // ตั้งค่าภาษาเริ่มต้น
     setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
     // ให้ Re-render ตัวเองทุกๆ 1 วินาที เพื่ออัปเดตเวลาที่นับผ่านไป
     const interval = setInterval(() => {
       setTick((prev) => prev + 1);
     }, 1000);
+    
 
     return () => clearInterval(interval);
   }, []);
@@ -506,51 +460,6 @@ const handleUndo = () => {
 };
 
 
-
-// const handleSell = (id: string) => {
-
-//   // 1. ค้นหาสินค้าจากทุก Supplier
-//   const productToSell = products
-//     .flatMap((supplier) => supplier.products ?? [])
-//     .find((item) => item.id === id);
-
-//   // 2. ตรวจสอบว่าสินค้ามีอยู่และมี Stock
-//   if (!productToSell || productToSell.stock <= 0) {
-//     console.log("Product not found or out of stock");
-//     return;
-//   }
-
-//   // 3. อัปเดต Stock และ Sold โดยสร้าง State ใหม่
-//   setProducts((prev) =>
-//     prev.map((supplier) => ({
-//       ...supplier,
-//       products: (supplier.products ?? []).map((item) => {
-//         if (item.id === id) {
-//           return {
-//             ...item,
-//             stock: item.stock - 1,
-//             sold: item.sold + 1,
-//           };
-//         }
-
-//         return item;
-//       }),
-//     }))
-//   );
-
-//   // 4. บันทึกประวัติการขาย
-//   setPreviousActions((prev) => [
-//     ...prev,
-//     {
-//       supplierId: productToSell.supplierId,
-//       productId: id,
-//       productName: productToSell.name,
-//       quantity: 1,
-//       time: Date.now().toString(),
-//     },
-//   ]);
-// };
-
 const handleSell = (id: string) => {
   const productToSell = products
     .flatMap((supplier) => supplier.products ?? [])
@@ -575,6 +484,7 @@ const handleSell = (id: string) => {
         price: productToSell.price,
         quantity: 1,
         stock: productToSell.stock,
+        supplierName: productToSell.supplierName
       },
     ];
   });
@@ -595,8 +505,24 @@ const updateCartQuantity = (productId: string, change: number) => {
 
 //เพิ่มฟังก์ชัน handleConfirmSale สำหรับกดยืนยันจาก Sidebar วางฟังก์ชันนี้ไว้ใต้ handleSell เพื่อทำหน้าที่หักสต็อกจริงและจับเวลา Undo 10 วินาที
 
-const handleConfirmSale = () => {
+const handleConfirmSale = async () => {
   if (cart.length === 0) return;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/confirm-sale`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body: JSON.stringify(
+      {
+        saleRunId: id,
+        assistanceName: AssistantName,
+        cart:cart
+      }
+    ),
+  });
+  console.log("Confirming sale for items:", await response.text());
+
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
   setProducts((prev) =>
     prev.map((supplier) => {
@@ -612,6 +538,7 @@ const handleConfirmSale = () => {
               ...product,
               stock: product.stock - cartItem.quantity,
               sold: product.sold + cartItem.quantity,
+              supplierName: cartItem.supplierName,
             };
           }
           return product;
@@ -619,6 +546,7 @@ const handleConfirmSale = () => {
       };
     })
   );
+
 // 2. บันทึกประวัติเพื่อใช้สำหรับปุ่ม Undo
   cart.forEach(item => {
     setPreviousActions((prev) => [
@@ -628,6 +556,7 @@ const handleConfirmSale = () => {
         productId: item.productId,
         productName: item.name,
         quantity: item.quantity,
+        supplierName: item.supplierName,
         time: Date.now().toString(),
       },
     ]);
@@ -676,6 +605,7 @@ const handleConfirmSale = () => {
                 onClick={() => setIsOpen(true)}
                 className="flex w-fit items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF]"
               >
+                
                 <UsersRound className="h-4 w-4 text-[#7C5CFF]" />
                 <span>1 {language === 'EN'?'Assistant':'ผู้ช่วย'}</span>
                 <span className="text-slate-500">•</span>

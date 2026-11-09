@@ -17,10 +17,27 @@ public class ProductDTO {
    private String Product_Id;
    private String Product_Name;
    private String Supplier_Id;
-    private String Product_Unit_Price;
+    private Double Product_Unit_Price;
     private String Image_url;
-    private String Start_Stock;
-    private String Current_Stock;
+    private Integer Start_Stock;
+    private Integer Current_Stock;
+
+     public ProductDTO(
+             String productId,
+             String productName,
+             String supplierId,
+             Double productUnitPrice,
+             String imageUrl,
+             Integer startStock,
+             Integer currentStock) {
+         Product_Id = productId;
+         Product_Name = productName;
+         Supplier_Id = supplierId;
+         Product_Unit_Price = productUnitPrice;
+         Image_url = imageUrl;
+         Start_Stock = startStock;
+         Current_Stock = currentStock;
+     }
 
     public String getProduct_Id() {
         return Product_Id;
@@ -40,10 +57,10 @@ public class ProductDTO {
     public void setSupplier_Id(String supplier_Id) {
         Supplier_Id = supplier_Id;
     }
-    public String getProduct_Unit_Price() {
+    public Double getProduct_Unit_Price() {
         return Product_Unit_Price;
     }
-    public void setProduct_Unit_Price(String product_Unit_Price) {
+    public void setProduct_Unit_Price(Double product_Unit_Price) {
         Product_Unit_Price = product_Unit_Price;
     }
     public String getImage_url() {
@@ -52,16 +69,16 @@ public class ProductDTO {
     public void setImage_url(String image_url) {
         Image_url = image_url;
     }
-    public String getStart_Stock() {
+    public Integer getStart_Stock() {
         return Start_Stock;
     }
-    public void setStart_Stock(String start_Stock) {
+    public void setStart_Stock(Integer start_Stock) {
         Start_Stock = start_Stock;
     }
-    public String getCurrent_Stock() {
+    public Integer getCurrent_Stock() {
         return Current_Stock;
     }
-    public void setCurrent_Stock(String current_Stock) {
+    public void setCurrent_Stock(Integer current_Stock) {
         Current_Stock = current_Stock;
     }
 

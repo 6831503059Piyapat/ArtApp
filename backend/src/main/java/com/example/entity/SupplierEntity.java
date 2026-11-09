@@ -3,15 +3,15 @@ package com.example.entity;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
+import org.springframework.data.domain.Persistable;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "Supplier")
-public class SupplierEntity {
+public class SupplierEntity implements Persistable<String> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Supplier_Id")
     private String Supplier_id;
 
@@ -28,6 +28,7 @@ public class SupplierEntity {
     @JsonManagedReference
     @OneToMany(fetch = FetchType.LAZY ,cascade = CascadeType.ALL ,mappedBy = "Supplier")
     private List<ProductEntity> Products = new ArrayList<>();
+
     // Getters & Setters
     public SupplierEntity() {
     }
@@ -38,6 +39,16 @@ public class SupplierEntity {
     }
     public String getSupplier_id() {
         return Supplier_id;
+    }
+
+    @Override
+    public String getId() {
+        return Supplier_id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
     }
 
     public void setSaleRun (SaleRunEntity SaleRun) {

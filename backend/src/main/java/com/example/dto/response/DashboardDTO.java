@@ -1,15 +1,16 @@
 package com.example.dto.response;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record DashboardDTO(
-    Integer Total_create,
-    Integer Total_complete,
-    Integer Total_active,
-    Integer Total_item_sold,
+    Long Total_create,
+    Long Total_complete,
+    Long Total_active,
+    BigDecimal Total_item_sold,
     Double Best_revenue,
-    List<List_RunDTO> List_run
+    List<List_RunDTO> List_Run
 ) {}
 //Total_create:number;
 // Total_complete:number;

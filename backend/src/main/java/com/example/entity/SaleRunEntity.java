@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -20,10 +21,10 @@ public class SaleRunEntity {
     private String Sale_run_location;
 
     @Column(name = "Date_created", nullable = false)
-    private String Date_created;
+    private LocalDateTime Date_created;
 
-    @Column(name = "Date_closed", nullable = false)
-    private String Date_closed;
+    @Column(name = "Date_closed", nullable = true)
+    private LocalDateTime Date_closed;
 
     @Column(name = "SaleRun_Status", nullable = false)
     private boolean Is_Active;
@@ -78,7 +79,7 @@ public class SaleRunEntity {
     public SaleRunEntity() {
     }
 
-    public SaleRunEntity(String Sale_run_id, String Sale_run_name, String Date_created, String Date_closed, boolean Is_Active, String Host_user_Id) {
+    public SaleRunEntity(String Sale_run_id, String Sale_run_name, LocalDateTime Date_created, LocalDateTime Date_closed, boolean Is_Active, String Host_user_Id) {
         this.Sale_run_id = Sale_run_id;
         this.Sale_run_name = Sale_run_name;
         this.Date_created = Date_created;
@@ -111,19 +112,19 @@ public class SaleRunEntity {
         this.Sale_run_name = Sale_run_name;
     }
 
-    public String getDate_created() {
+    public LocalDateTime getDate_created() {
         return Date_created;
     }
 
-    public void setDate_created(String Date_created) {
+    public void setDate_created(LocalDateTime Date_created) {
         this.Date_created = Date_created;
     }
 
-    public String getDate_closed() {
+    public LocalDateTime getDate_closed() {
         return Date_closed;
     }
 
-    public void setDate_closed(String Date_closed) {
+    public void setDate_closed(LocalDateTime Date_closed) {
         this.Date_closed = Date_closed;
     }
 

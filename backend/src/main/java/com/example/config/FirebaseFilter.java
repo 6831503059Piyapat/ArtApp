@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 // *** ห้ามใส่ @Component หรือ @Service บนหัวคลาสนี้เด็ดขาด ***
 public class FirebaseFilter extends OncePerRequestFilter {
@@ -34,26 +34,25 @@ public class FirebaseFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            try {
-                FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-                String uid = decodedToken.getUid();
+        if (header == null || !header.startsWith("Bearer ")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing Bearer token");
+            return;
+        }
 
+        String token = header.substring(7);
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            String uid = decodedToken.getUid();
 
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(uid, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(uid, null,
+                            List.of(() -> "ROLE_USER"));
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-    //              System.err.println(
-    //     "Firebase token verification failed: " + e.getMessage()
-    // );
-
-            
-            }
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
+            return;
         }
 
         filterChain.doFilter(request, response);
