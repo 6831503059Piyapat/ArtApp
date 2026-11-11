@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import {getAuth , onAuthStateChanged} from "firebase/auth"; 
 import {Suspense} from 'react';
+import { useParams } from "next/navigation";
+
 import {
   ChevronRight,
   Store,
@@ -58,6 +61,7 @@ type InventoryProduct = {
   iconBg: string;
   supplierId: string;
   imageUrl?: string;
+  supplierName: string;
 };
 
 type Supplier = {
@@ -72,15 +76,52 @@ type Supplier = {
 //เพิ่ม Type สำหรับระบบตะกร้า (Cart)
 type CartItem = {
   supplierId: string;
+  supplierName: string;
   productId: string;
   name: string;
   price: number;
   quantity: number;
   stock: number;
 };
-
 export default function SalesRunDetail() {
-  // ตัวอย่าง State สำหรับจัดการจำนวนสต็อก/สินค้า
+  return (
+   
+    
+      <SalesRunDetailContent />
+   
+  );
+}
+
+function SalesRunDetailContent() {
+  const { id } = useParams<{ id: string }>();
+  const [AssistantName, setAsistantName] = useState<string>('');
+  async function fetchSalesRunData(saleRunId: string, idToken: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+
+
+    }
+  );
+   console.log(response.json());
+  }
+  
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if(user){
+        const idToken = await user?.getIdToken();
+        const AssistantName = user?.displayName || '';
+        setAsistantName(AssistantName);
+        fetchSalesRunData(id, idToken);
+      }
+    });
+    console.log("Sales Run ID:", id);
+    return () => unsubscribe();
+  }, [id]);
   const Suppliers: Supplier[] = [
     {
     id: "host-8466468345",
@@ -92,7 +133,7 @@ export default function SalesRunDetail() {
 
     products: [
       {
-      id: '1',
+      id: 'product-0-20261109115632-qx4hjObfR9rBeyY-20261109115632-0',
       name: 'Green Horned Frog',
       start: 13,
       stock: 3,
@@ -100,7 +141,8 @@ export default function SalesRunDetail() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
     },
     {
       id: '2',
@@ -111,8 +153,8 @@ export default function SalesRunDetail() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
-      
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
     },
     {
       id: '3',
@@ -123,7 +165,8 @@ export default function SalesRunDetail() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345"
+      supplierId: "host-8466468345",
+      supplierName:"My Products"
      
     },
     ],
@@ -145,7 +188,8 @@ export default function SalesRunDetail() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
      
     },
     {
@@ -157,7 +201,8 @@ export default function SalesRunDetail() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
      
     },
     {
@@ -169,7 +214,8 @@ export default function SalesRunDetail() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345"
+      supplierId: "kaimook-8466468345",
+      supplierName:"P Kaimook"
     },
     ],
   },
@@ -190,7 +236,8 @@ export default function SalesRunDetail() {
         sold: 7,
         icon: Package,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
       {
         id: 'nong-japan-2',
@@ -201,7 +248,8 @@ export default function SalesRunDetail() {
         sold: 3,
         icon: Droplets,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
       {
         id: 'nong-japan-3',
@@ -212,7 +260,8 @@ export default function SalesRunDetail() {
         sold: 3,
         icon: Grid,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345"
+        supplierId: "nong-japan-8466468345",
+        supplierName:"Nong' Japan"
       },
     ],
   },
@@ -233,104 +282,7 @@ export default function SalesRunDetail() {
     },
   
   ];
-  // const initialProducts = [
-  //   // My Products / Host Items
-  //   {
-  //     id: '1',
-  //     name: 'Green Horned Frog',
-  //     start: 10,
-  //     stock: 0,
-  //     price: 150,
-  //     sold: 10,
-  //     icon: Leaf,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     category: 'host'
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Yellow Horned Frog',
-  //     start: 10,
-  //     stock: 1,
-  //     price: 150,
-  //     sold: 9,
-  //     icon: Sun,
-  //     iconBg: 'bg-amber-100/70 text-amber-500',
-  //     category: 'host'
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Brown Horned Frog',
-  //     start: 10,
-  //     stock: 6,
-  //     price: 150,
-  //     sold: 4,
-  //     icon: Mountain,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     category: 'host'
-  //   },
-  //   // P' Kaimook
-  //   {
-  //     id: '4',
-  //     name: 'Japanese turtle (Big)',
-  //     start: 8,
-  //     stock: 3,
-  //     price: 250,
-  //     sold: 5,
-  //     icon: Rabbit,
-  //     iconBg: 'bg-pink-100/70 text-pink-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   {
-  //     id: '5',
-  //     name: 'Japanese turtle (Small)',
-  //     start: 17,
-  //     stock: 10,
-  //     price: 100,
-  //     sold: 7,
-  //     icon: Fish,
-  //     iconBg: 'bg-pink-100/70 text-pink-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   {
-  //     id: '6',
-  //     name: 'Turtle food 500g',
-  //     start: 62,
-  //     stock: 40,
-  //     price: 80,
-  //     sold: 22,
-  //     icon: Grid,
-  //     iconBg: 'bg-amber-100/70 text-amber-500',
-  //     supplier: "P' Kaimook",
-  //     category: 'kaimook'
-  //   },
-  //   // Nong' Japan
-  //   {
-  //     id: '7',
-  //     name: 'Aquarium Moss Ball (Medium)',
-  //     start: 15,
-  //     stock: 8,
-  //     price: 60,
-  //     sold: 7,
-  //     icon: Package,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     supplier: "Nong' Japan",
-  //     category: 'japan'
-  //   },
-  //   {
-  //     id: '8',
-  //     name: 'Mini Terrarium Starter Glass',
-  //     start: 6,
-  //     stock: 3,
-  //     price: 190,
-  //     sold: 3,
-  //     icon: Droplets,
-  //     iconBg: 'bg-purple-100/70 text-purple-600',
-  //     supplier: "Nong' Japan",
-  //     category: 'japan'
-  //   }
-  // ];
+ 
   const expensesList = [
     {
       id: '01',
@@ -357,7 +309,7 @@ export default function SalesRunDetail() {
   ];
   const StockList = [
     {
-      id: '1',
+      id,
       name:"MFU outside night market (MON 14)",
       totalsoldMax:85,
       totalsold:66,
@@ -405,6 +357,7 @@ export default function SalesRunDetail() {
   //เพิ่ม State สำหรับระบบตะกร้า (Cart)
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'mobileBanking' | 'cash'>('mobileBanking');
   const [showUndoNotification, setShowUndoNotification] = useState(false);
 
 
@@ -458,11 +411,13 @@ const ActionTimeAgo = ({ createdAt }: { createdAt: number }) => {
   const [, setTick] = useState(0);
 
   useEffect(() => {
+    // ตั้งค่าภาษาเริ่มต้น
     setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
     // ให้ Re-render ตัวเองทุกๆ 1 วินาที เพื่ออัปเดตเวลาที่นับผ่านไป
     const interval = setInterval(() => {
       setTick((prev) => prev + 1);
     }, 1000);
+    
 
     return () => clearInterval(interval);
   }, []);
@@ -505,51 +460,6 @@ const handleUndo = () => {
 };
 
 
-
-// const handleSell = (id: string) => {
-
-//   // 1. ค้นหาสินค้าจากทุก Supplier
-//   const productToSell = products
-//     .flatMap((supplier) => supplier.products ?? [])
-//     .find((item) => item.id === id);
-
-//   // 2. ตรวจสอบว่าสินค้ามีอยู่และมี Stock
-//   if (!productToSell || productToSell.stock <= 0) {
-//     console.log("Product not found or out of stock");
-//     return;
-//   }
-
-//   // 3. อัปเดต Stock และ Sold โดยสร้าง State ใหม่
-//   setProducts((prev) =>
-//     prev.map((supplier) => ({
-//       ...supplier,
-//       products: (supplier.products ?? []).map((item) => {
-//         if (item.id === id) {
-//           return {
-//             ...item,
-//             stock: item.stock - 1,
-//             sold: item.sold + 1,
-//           };
-//         }
-
-//         return item;
-//       }),
-//     }))
-//   );
-
-//   // 4. บันทึกประวัติการขาย
-//   setPreviousActions((prev) => [
-//     ...prev,
-//     {
-//       supplierId: productToSell.supplierId,
-//       productId: id,
-//       productName: productToSell.name,
-//       quantity: 1,
-//       time: Date.now().toString(),
-//     },
-//   ]);
-// };
-
 const handleSell = (id: string) => {
   const productToSell = products
     .flatMap((supplier) => supplier.products ?? [])
@@ -560,6 +470,7 @@ const handleSell = (id: string) => {
   setCart((prev) => {
     const existing = prev.find((item) => item.productId === id);
     if (existing) {
+      if (existing.quantity >= productToSell.stock) return prev;
       return prev.map((item) =>
         item.productId === id ? { ...item, quantity: item.quantity + 1 } : item
       );
@@ -573,14 +484,45 @@ const handleSell = (id: string) => {
         price: productToSell.price,
         quantity: 1,
         stock: productToSell.stock,
+        supplierName: productToSell.supplierName
       },
     ];
   });
 };
+
+const updateCartQuantity = (productId: string, change: number) => {
+  setCart((prev) =>
+    prev.flatMap((item) => {
+      if (item.productId !== productId) return [item];
+
+      const quantity = item.quantity + change;
+      if (quantity <= 0) return [];
+      if (quantity > item.stock) return [item];
+      return [{ ...item, quantity }];
+    })
+  );
+};
+
 //เพิ่มฟังก์ชัน handleConfirmSale สำหรับกดยืนยันจาก Sidebar วางฟังก์ชันนี้ไว้ใต้ handleSell เพื่อทำหน้าที่หักสต็อกจริงและจับเวลา Undo 10 วินาที
 
-const handleConfirmSale = () => {
+const handleConfirmSale = async () => {
   if (cart.length === 0) return;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/confirm-sale`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body: JSON.stringify(
+      {
+        saleRunId: id,
+        assistanceName: AssistantName,
+        cart:cart
+      }
+    ),
+  });
+  console.log("Confirming sale for items:", await response.text());
+
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
   setProducts((prev) =>
     prev.map((supplier) => {
@@ -596,6 +538,7 @@ const handleConfirmSale = () => {
               ...product,
               stock: product.stock - cartItem.quantity,
               sold: product.sold + cartItem.quantity,
+              supplierName: cartItem.supplierName,
             };
           }
           return product;
@@ -603,6 +546,7 @@ const handleConfirmSale = () => {
       };
     })
   );
+
 // 2. บันทึกประวัติเพื่อใช้สำหรับปุ่ม Undo
   cart.forEach(item => {
     setPreviousActions((prev) => [
@@ -612,6 +556,7 @@ const handleConfirmSale = () => {
         productId: item.productId,
         productName: item.name,
         quantity: item.quantity,
+        supplierName: item.supplierName,
         time: Date.now().toString(),
       },
     ]);
@@ -633,14 +578,14 @@ const handleConfirmSale = () => {
       <Suspense fallback="Loading...">
           <Navbar />
       </Suspense>
-      <main className={`mx-auto w-full max-w-[1280px] flex-1 space-y-5 px-4 pt-16 sm:px-6 ${stepMode === "edit" ? "pb-24" : "pb-6"}`}>
+      <main className={`mx-auto w-full max-w-[1280px] min-w-0 flex-1 space-y-5 overflow-x-clip px-3 pt-16 sm:px-6 ${stepMode === "edit" ? "pb-32 sm:pb-24" : "pb-6"}`}>
         
         {/* TOP HEADER SECTION CARD */}
-        <div className="space-y-3 rounded-2xl border border-[#7C5CFF]/15 bg-white px-4 py-4 shadow-sm sm:px-5">
+        <div className="min-w-0 space-y-3 rounded-2xl border border-[#7C5CFF]/15 bg-white px-3 py-3 shadow-sm sm:px-5 sm:py-4">
           <div className="flex flex-col gap-3 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
             <div className="flex min-w-0 flex-col gap-2">
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-                <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                <h1 className="min-w-0 break-words text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
                   {StockList[0].name}
                 </h1>
                 {stepMode === "edit" ? (
@@ -658,8 +603,9 @@ const handleConfirmSale = () => {
               <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="flex w-fit items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF]"
+                className="flex min-h-11 w-fit max-w-full items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF] sm:min-h-0"
               >
+                
                 <UsersRound className="h-4 w-4 text-[#7C5CFF]" />
                 <span>1 {language === 'EN'?'Assistant':'ผู้ช่วย'}</span>
                 <span className="text-slate-500">•</span>
@@ -667,9 +613,9 @@ const handleConfirmSale = () => {
               </button>
             </div>
 
-            <div className="flex shrink-0 flex-wrap items-center gap-1.5 min-[600px]:self-center">
+            <div className="flex w-full min-w-0 flex-wrap items-center gap-2 min-[600px]:w-auto min-[600px]:shrink-0 min-[600px]:self-center">
               <div
-                className="flex items-center gap-0.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 p-0.5"
+                className="flex min-h-11 flex-1 items-center gap-0.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 p-0.5 min-[600px]:min-h-0 min-[600px]:flex-none"
                 role="group"
                 aria-label="Run mode"
               >
@@ -677,7 +623,7 @@ const handleConfirmSale = () => {
                   type="button"
                   onClick={() => setStepMode("sales")}
                   aria-pressed={stepMode === "sales"}
-                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                  className={`flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
                     stepMode === "sales"
                       ? "bg-[#7C5CFF] text-white shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
@@ -689,7 +635,7 @@ const handleConfirmSale = () => {
                   type="button"
                   onClick={() => setStepMode("edit")}
                   aria-pressed={stepMode === "edit"}
-                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                  className={`flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
                     stepMode === "edit"
                       ? "bg-[#FFB24C] text-[#0B0F4F] shadow-sm"
                       : "text-slate-500 hover:text-slate-800"
@@ -704,7 +650,7 @@ const handleConfirmSale = () => {
                   setIsEndRunConfirmed(false);
                   setIsEndRunOpen(true);
                 }}
-                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15"
+                className="flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15 min-[600px]:min-h-0"
               >
                 <X className="h-3.5 w-3.5" /> {language === 'EN' ? 'End Run' : 'จบกิจกรรม'}
               </button>
@@ -712,9 +658,9 @@ const handleConfirmSale = () => {
           </div>
 
           {/* Key Stat Cards Grid */}
-          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-4 min-[600px]:grid-cols-3 min-[900px]:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-1 gap-3 rounded-2xl bg-[#7C5CFF]/5 p-3 sm:p-4 min-[600px]:grid-cols-[1.2fr_1fr_1fr]">
             {/* Gross Intake */}
-            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Gross Intake' : 'รายได้รวม'}</p>
                 <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
@@ -725,7 +671,7 @@ const handleConfirmSale = () => {
             </div>
 
             {/* Total Sold Units */}
-            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm min-[900px]:col-span-1">
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
@@ -738,40 +684,40 @@ const handleConfirmSale = () => {
               </div>
             </div>
 
-            {/* Latest Action & Undo */}
-            <div className="flex min-h-[76px] min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white py-2.5 pl-3 pr-5 shadow-sm min-[900px]:col-span-2">
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  <History className="h-3 w-3 text-[#F062C0]" />  {language === 'EN' ? 'Lastest Action' : 'รายการล่าสุด'}
+            {/* Remaining Stock */}
+            <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  {language === 'EN' ? 'Remaining Stock' : 'สินค้าคงเหลือ'}
                 </p>
-                <p className="mt-0.5 flex min-w-0 items-center gap-2 truncate text-xs font-semibold text-slate-800">
-                  <span className="min-w-0 truncate">
-                    {previousActions.length > 0 ? `Sold ${previousActions[previousActions.length - 1].quantity}x ${previousActions[previousActions.length - 1].productName} ` : language === 'EN' ? 'No actions yet' : 'ไม่มีการดำเนินการ'}
+                <div className="mt-0.5 flex items-baseline gap-1.5">
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">
+                    {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.stock, 0), 0)}
                   </span>
-                  <span className="shrink-0 rounded-full bg-[#F062C0]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#F062C0]">
-                    {previousActions.length > 0 ? <ActionTimeAgo createdAt={Number(previousActions[previousActions.length - 1].time)} /> : '0'}
+                  <span className="text-xs font-medium text-slate-400">
+                    / {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.start, 0), 0)} {language === 'EN' ? 'starting' : 'เริ่มต้น'}
                   </span>
-                </p>
+                </div>
               </div>
-              <button onClick={()=>handleUndo()} disabled={previousActions.length === 0} className={`flex min-w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold text-[#0B0F4F] transition-colors ${previousActions.length === 0 ? 'cursor-not-allowed bg-gray-400 text-white' : 'bg-gradient-to-r from-[#FFB24C] to-[#F062C0] hover:brightness-95'}`}>
-                <Undo2 className="h-3.5 w-3.5 shrink-0" /> <span className="leading-none">{language === 'EN' ? 'Undo' : 'ย้อนกลับ'}</span>
-              </button>
+              <div className="absolute right-3 top-3 rounded-md bg-emerald-500/10 p-2 text-emerald-600">
+                <Package className="h-4 w-4" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* CONTENT SECTION: SIDEBAR + MAIN TABLES */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-[210px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-12 sm:grid-cols-[210px_minmax(0,1fr)] sm:gap-y-5">
           
           {/* LEFT SIDEBAR / CATALOG INDEX */}
-          <div className="space-y-4">
-            <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(11,15,79,0.025)]">
+          <div className="min-w-0 space-y-4">
+            <div className="mx-auto w-[92%] rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(11,15,79,0.025)] sm:mx-0 sm:w-auto">
               <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]">
                  {language === 'EN' ? 'Catalog Index' : 'ดัชนีแคตตาล็อก'}
               </h3>
               
               <nav className="space-y-0.5">
-                <button className="flex w-full items-center justify-between gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/10 px-1.5 py-1.5 text-left text-xs font-semibold text-[#0B0F4F]">
+                <button className="flex min-h-11 w-full items-center justify-between gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/10 px-2 text-left text-xs font-semibold text-[#0B0F4F] sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <LayoutGrid className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>{language === 'EN' ? 'All Products' : 'ผลิตภัณฑ์ทั้งหมด'}</span>
@@ -779,21 +725,21 @@ const handleConfirmSale = () => {
                   <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">9</span>
                 </button>
 
-                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
+                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <User className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>My Products ({language === 'EN' ? 'Host' : 'เจ้าของ'})</span>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
+                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <Store className="h-2.5 w-2.5 shrink-0 text-[#F062C0]" />
                     <span>P Kaimook</span>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff]">
+                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <Store className="h-2.5 w-2.5 shrink-0 text-[#FFB24C]" />
                     <span>Nong&apos; Japan</span>
@@ -802,7 +748,7 @@ const handleConfirmSale = () => {
               </nav>
 
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
-                <button onClick={()=>setStepMode("expense")} className="flex w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-1.5 py-1.5 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20">
+                <button onClick={()=>setStepMode("expense")} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-2 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20 sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="h-2.5 w-2.5 text-[#FFB24C]" />
                     <span>{language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่ายของบูธ'}</span>
@@ -812,7 +758,7 @@ const handleConfirmSale = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
+            <div className="mx-auto w-[92%] rounded-xl border border-slate-100 bg-white p-2 shadow-sm sm:mx-0 sm:w-auto">
               <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-bold text-[#0B0F4F]">
                 <span className="flex items-center gap-1.5"><UsersRound className="h-3.5 w-3.5 text-[#7C5CFF]" />  {language === 'EN' ? 'Assistants' : 'ผู้ช่วย'}</span>
                 <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• 1 {language === 'EN' ? 'Active' : 'ใช้งาน'}</span>
@@ -827,16 +773,16 @@ const handleConfirmSale = () => {
                 </div>
                 <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• {language === 'EN' ? 'Online' : 'ออนไลน์'}</span>
               </div>
-              <button onClick={() => setIsOpen(true)} className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733]">
+              <button onClick={() => setIsOpen(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
                 <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
-              <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10">
+              <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />{language === 'EN' ? 'Manage Permissions' : 'จัดการสิทธิ์'}
               </button>
             </div>
 
             {/* Quick Tip Box */}
-            <div className="flex gap-1.5 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
+            <div className="mx-auto flex w-[92%] gap-1.5 rounded-xl border border-slate-100 bg-white p-2 shadow-sm sm:mx-0 sm:w-auto">
               <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FFB24C]" />
               <div className="min-w-0 space-y-1 text-xs">
                 <p className="font-bold text-[#0B0F4F]">{language === 'EN' ? 'Quick Tip' : 'คำแนะนำ'}</p>
@@ -846,7 +792,7 @@ const handleConfirmSale = () => {
               </div>
             </div>
 
-            <Link href="/ViewUser/1" className="flex items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-1.5 py-1.5 text-white shadow-sm">
+            <Link href="/ViewUser/1" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5"> {language === 'EN' ? 'Sales Activity Board' : 'บอร์ดกิจกรรมการขาย'}</span><span className="block text-[9px] leading-3 text-white/80"> {language === 'EN' ? 'Enter live sales feed & telemetry' : 'เข้าสู่กระแสการขายสดและข้อมูล telemetry'}</span></span>
@@ -857,7 +803,7 @@ const handleConfirmSale = () => {
 
           {/* RIGHT PRODUCT LIST TABLES */}
           {/* Product cards for each supplier  Edit Mode*/}
-          <div className="min-w-0 space-y-5">
+          <div className="min-w-0 space-y-10 sm:space-y-5">
             
             {/* 1. SECTION: MY PRODUCTS */}
             {stepMode === "edit" && (
@@ -876,6 +822,7 @@ const handleConfirmSale = () => {
       dotColor={accent.dot}
       items={items.products ?? []}
       placeholderText="Item Name (e.g. Linen Coaster Set)"
+      onImageClick={(product) => setImageProduct({ supplierId: items.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })}
       language={language}
     />
   );
@@ -888,11 +835,11 @@ const handleConfirmSale = () => {
                {/* Product cards for each supplier  Sales Mode*/}
                
 {stepMode === "sales" && (
-  <div className="w-full space-y-5">
+  <div className="w-full space-y-10 sm:space-y-5">
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} onImageClick={(product) => setImageProduct({ supplierId: supplier.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
+   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -902,13 +849,13 @@ const handleConfirmSale = () => {
                 <div className="min-h-screen bg-[#f8f9fe] p-4 md:p-8 text-[#0B0F4F] font-sans max-w-5xl mx-auto space-y-5">
       
       {/* 1. HEADER CARD: Booth's Operating Expenses */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-2xs sm:flex-row sm:items-center sm:p-5">
+        <div className="flex min-w-0 items-center space-x-3 sm:space-x-4">
           <div className="w-12 h-12 rounded-2xl bg-[#FFB24C]/15 text-[#FFB24C] flex items-center justify-center shrink-0">
             <Wallet className="w-6 h-6" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-[#0B0F4F] tracking-tight">
+          <div className="min-w-0">
+            <h1 className="break-words text-xl font-bold tracking-tight text-[#0B0F4F]">
               {language === 'EN' ? 'Booth’s Operating Expenses' : 'ค่าใช้จ่ายในการดำเนินงานของบูธ'}
             </h1>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
@@ -918,7 +865,7 @@ const handleConfirmSale = () => {
         </div>
 
         {/* Status Badge */}
-        <div className="bg-[#7C5CFF]/5 text-[#7C5CFF] px-3 py-1.5 rounded-full border border-[#7C5CFF]/20 flex items-center gap-2 text-xs font-semibold">
+        <div className="flex max-w-full items-center gap-2 rounded-full border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-1.5 text-xs font-semibold text-[#7C5CFF]">
           <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span> {language === 'EN' ? 'Synchronized Ledger' : 'บันทึกการเงินที่ซิงโครไนซ์'}</span>
         </div>
@@ -931,7 +878,7 @@ const handleConfirmSale = () => {
 
 
       {/* 2. FAST LOG SHARED EXPENSE CARD */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-2xs space-y-4">
+      <div className="min-w-0 space-y-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-2xs sm:p-6">
         {/* Section Title */}
         <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
           <PlusCircle className="w-4 h-4 text-[#FFB24C]" />
@@ -939,7 +886,7 @@ const handleConfirmSale = () => {
         </div>
 
         {/* Input Form Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+        <div className="grid min-w-0 grid-cols-1 items-end gap-4 md:grid-cols-12">
           
           {/* Expense Title Input */}
           <div className="md:col-span-5 space-y-1.5">
@@ -953,7 +900,7 @@ const handleConfirmSale = () => {
                 value={expenseTitle}
                 placeholder={language === 'EN' ? 'e.g. Stall Supplies' : 'อุปกรณ์บูธ'}
                 onChange={(e) => setExpenseTitle(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-[#7C5CFF] transition-colors"
+                className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 pl-9 pr-3 text-xs font-semibold text-slate-800 transition-colors focus:bg-white focus:outline-[#7C5CFF]"
               />
             </div>
           </div>
@@ -967,7 +914,7 @@ const handleConfirmSale = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 appearance-none focus:bg-white focus:outline-[#7C5CFF] transition-colors pr-8 cursor-pointer"
+                className="min-h-11 w-full min-w-0 cursor-pointer appearance-none rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 pl-3 pr-8 text-xs font-semibold text-slate-800 transition-colors focus:bg-white focus:outline-[#7C5CFF]"
               >
                 <option value="Stall Supplies"> {language === 'EN' ? 'Stall Supplies' : 'อุปกรณ์บูธ'}</option>
                 <option value="Booth Fee">{language === 'EN' ? 'Booth Fee' : 'ค่าใช้จ่ายบูธ'}</option>
@@ -990,14 +937,14 @@ const handleConfirmSale = () => {
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200/80 rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-slate-800 text-right focus:bg-white focus:outline-[#7C5CFF] transition-colors"
+                className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200/80 bg-slate-50 py-2.5 pl-8 pr-3 text-right text-xs font-bold text-slate-800 transition-colors focus:bg-white focus:outline-[#7C5CFF]"
               />
             </div>
           </div>
 
           {/* Record Button */}
           <div className="md:col-span-2">
-            <button className="w-full py-2.5 bg-[#FFB24C] hover:bg-[#f5a733] active:bg-[#e99a2e] text-[#0B0F4F] font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1">
+            <button className="min-h-11 w-full rounded-xl bg-[#FFB24C] py-2.5 text-xs font-bold text-[#0B0F4F] shadow-xs transition-colors hover:bg-[#f5a733] active:bg-[#e99a2e] flex items-center justify-center gap-1">
               <Plus className="w-4 h-4 stroke-[3]" />{language === 'EN' ? 'Record' : 'บันทึก'}
             </button>
           </div>
@@ -1008,19 +955,19 @@ const handleConfirmSale = () => {
       {/* 3. RECORDED EXPENSES CARD */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
         {/* Card Header */}
-        <div className="p-5 flex items-center justify-between border-b border-slate-100">
-          <div className="flex items-center space-x-2 text-[#0B0F4F] font-bold text-base">
+        <div className="flex flex-col items-start justify-between gap-2 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:p-5">
+          <div className="flex items-center space-x-2 text-base font-bold text-[#0B0F4F]">
             <Receipt className="w-5 h-5 text-[#FFB24C]" />
             <span> {language === 'EN' ? 'Recorded Expenses' : 'ที่บันทึกแล้ว'}</span>
           </div>
-          <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
             {language === 'EN' ? 'Active Read-Only Ledger' : 'เล่มบันทึกอ่านได้เฉพาะ'}
           </span>
         </div>
 
         {/* Table Content */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[680px] text-left text-xs">
             <thead>
               <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 <th className="py-3 px-5 w-12">#</th>
@@ -1061,7 +1008,7 @@ const handleConfirmSale = () => {
         </div>
 
         {/* Table Footer / Summary */}
-        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50/50 p-4 text-xs sm:flex-row sm:items-center sm:justify-between">
           <span className="text-slate-400 font-medium">
             {language === 'EN' ? 'Showing' : 'แสดง'} 2  {language === 'EN' ? 'settled market expenses' : 'ค่าใช้จ่ายตลาด'}
           </span>
@@ -1076,14 +1023,14 @@ const handleConfirmSale = () => {
                )}
             {/* ADD NEW SUPPLIER BOTTOM CARD */}
             {stepMode === "edit" &&(
-            <div className="flex items-center justify-between rounded-2xl border-2 border-dashed border-[#DDD6FE] bg-[#EEEEFE] p-5">
+            <div className="flex flex-col items-stretch justify-between gap-3 rounded-2xl border-2 border-dashed border-[#DDD6FE] bg-[#EEEEFE] p-4 sm:flex-row sm:items-center sm:p-5">
               <div className="flex items-center gap-3">
                 <div className="rounded-xl bg-[#6366F1]/10 p-2 text-[#6366F1]">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <span className="font-bold text-slate-800 text-sm">{language === 'EN' ? 'Add New Supplier' : 'เพิ่มซัพพลายเออร์ใหม่'}</span>
               </div>
-              <button className="flex items-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]">
+              <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]">
                 <Plus className="w-4 h-4" /> {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
               </button>
             </div>
@@ -1096,7 +1043,7 @@ const handleConfirmSale = () => {
 
       {/* ---------------- UI: 10s Undo Notification ---------------- */}
 {showUndoNotification && (
-  <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-full bg-white px-5 py-3 shadow-lg border border-slate-100 animate-in fade-in slide-in-from-top-4">
+  <div className="fixed left-3 right-3 top-20 z-50 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-3 py-3 shadow-lg animate-in fade-in slide-in-from-top-4 sm:left-1/2 sm:right-auto sm:top-24 sm:-translate-x-1/2 sm:gap-4 sm:rounded-full sm:px-5">
     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0">
       <Check className="h-4 w-4" />
     </div>
@@ -1109,7 +1056,7 @@ const handleConfirmSale = () => {
         handleUndo();
         setShowUndoNotification(false);
       }} 
-      className="ml-4 flex items-center gap-1.5 rounded-full bg-[#FFB24C]/10 px-4 py-1.5 text-sm font-bold text-[#FFB24C] hover:bg-[#FFB24C]/20"
+      className="ml-auto flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-[#FFB24C]/10 px-4 py-1.5 text-sm font-bold text-[#FFB24C] hover:bg-[#FFB24C]/20"
     >
       <Undo2 className="h-4 w-4" /> Undo
     </button>
@@ -1118,7 +1065,7 @@ const handleConfirmSale = () => {
 
 {/* ---------------- UI: Bottom Cart Bar (Current Sales Cart) ---------------- */}
 {cart.length > 0 && (
-  <div className="fixed bottom-6 right-6 z-40 flex items-center gap-6 rounded-2xl bg-[#0B0F4F] px-5 py-3 text-white shadow-2xl">
+  <div className="fixed bottom-3 left-3 right-3 z-40 flex items-center justify-between gap-3 rounded-2xl bg-[#0B0F4F] px-3 py-3 text-white shadow-2xl sm:bottom-6 sm:left-auto sm:right-6 sm:justify-start sm:gap-6 sm:px-5">
     <div className="flex items-center gap-3">
       <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[#7C5CFF]/20 text-[#7C5CFF]">
         <ShoppingBag className="h-5 w-5" />
@@ -1127,17 +1074,17 @@ const handleConfirmSale = () => {
         </span>
       </div>
       <div>
-        <p className="text-sm font-bold text-white">Current Sales Cart •</p>
-        <p className="text-xs text-slate-300">
+        <p className="text-xs font-bold text-white sm:text-sm">Current Sales Cart •</p>
+        <p className="text-[10px] text-slate-300 sm:text-xs">
           ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US')} • {cart.length} items ready
         </p>
       </div>
     </div>
     <button 
       onClick={() => setIsCartOpen(true)}
-      className="rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:brightness-110 active:scale-95"
+      className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:brightness-110 active:scale-95 sm:gap-2 sm:px-6 sm:text-sm"
     >
-      View Cart →
+      View Cart <ChevronRight className="h-4 w-4" />
     </button>
   </div>
 )}
@@ -1152,53 +1099,154 @@ const handleConfirmSale = () => {
     />
     
     {/* Sidebar Panel */}
-    <div className="relative flex h-full w-[400px] flex-col bg-white shadow-2xl animate-in slide-in-from-right-full">
-      <div className="flex items-center justify-between border-b border-slate-100 p-5">
-        <div>
-          <h2 className="text-lg font-bold text-[#0B0F4F]">Current Sales Cart</h2>
-          <p className="text-xs text-slate-400">{cart.length} items</p>
+    <div className="relative flex h-[100dvh] w-full max-w-[440px] flex-col bg-white shadow-2xl animate-in slide-in-from-right-full">
+      <div className="flex items-center justify-between gap-3 border-b border-[#E8E2FF] bg-[#F8F6FF] p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7C5CFF] text-white shadow-sm">
+            <ShoppingBag className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="truncate text-lg font-extrabold tracking-tight text-[#0B0F4F]">Current Sales Cart</h2>
+              <span className="shrink-0 rounded-full bg-[#EEE9FF] px-2 py-0.5 text-[10px] font-bold text-[#7C5CFF]">{cart.length} items</span>
+            </div>
+            <p className="mt-0.5 truncate text-xs font-medium text-slate-500">In-Cart Checkout</p>
+          </div>
         </div>
-        <button onClick={() => setCart([])} className="text-xs font-bold text-red-500 hover:text-red-600">
-          Clear Cart ✕
+        <button
+          type="button"
+          onClick={() => setCart([])}
+          className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+        >
+          Clear Cart <X className="h-3.5 w-3.5" />
         </button>
       </div>
       
       {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
-        {cart.map((item) => (
-          <div key={item.productId} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-bold text-[#0B0F4F]">{item.name}</p>
-              <p className="text-xs text-slate-400">฿{item.price} each</p>
+      <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
+        {cart.map((item) => {
+          const supplier = products.find((entry) => entry.id === item.supplierId);
+          const product = supplier?.products.find((entry) => entry.id === item.productId);
+          const ProductIcon = product?.icon ?? Package;
+          const supplierBadge = supplier?.category === 'host'
+            ? 'bg-[#EEE9FF] text-[#7C5CFF]'
+            : supplier?.id.includes('kaimook')
+              ? 'bg-[#FCE7F3] text-[#DB2777]'
+              : 'bg-[#FFF2DF] text-[#C66A00]';
+
+          return (
+            <div key={item.productId} className="flex min-h-[76px] flex-wrap items-center gap-2 rounded-xl bg-[#F0F1FF] px-2.5 py-2">
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg ${product?.imageUrl ? 'bg-white' : product?.iconBg ?? 'bg-[#EEE9FF] text-[#7C5CFF]'}`}>
+                {product?.imageUrl ? (
+                  <span
+                    role="img"
+                    aria-label={item.name}
+                    className="h-full w-full bg-cover bg-center"
+                    style={{ backgroundImage: `url("${product.imageUrl}")` }}
+                  />
+                ) : (
+                  <ProductIcon className="h-5 w-5" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold leading-tight text-[#171A2E]">{item.name}</p>
+                <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
+                  <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold leading-none ${supplierBadge}`}>
+                    {supplier?.category === 'host' ? 'Host' : supplier?.name ?? 'Supplier'}
+                  </span>
+                  <span className="text-[11px] text-slate-500">฿{item.price.toFixed(2)} each</span>
+                </div>
+              </div>
+              <div className="flex w-full shrink-0 items-center justify-between gap-2 sm:w-auto sm:justify-start">
+                <div className="flex h-8 items-center gap-2 rounded-full bg-white px-2.5 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => updateCartQuantity(item.productId, -1)}
+                    aria-label={`Decrease ${item.name} quantity`}
+                    className="flex h-11 w-11 items-center justify-center text-sm font-bold text-[#0B0F4F] hover:text-[#7C5CFF]"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <span className="min-w-3 text-center text-sm font-bold text-[#0B0F4F]">{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => updateCartQuantity(item.productId, 1)}
+                    disabled={item.quantity >= item.stock}
+                    aria-label={`Increase ${item.name} quantity`}
+                    className="flex h-11 w-11 items-center justify-center text-sm font-bold text-[#0B0F4F] hover:text-[#7C5CFF] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+                <span className="min-w-[48px] text-right text-sm font-extrabold text-[#171A2E]">฿{item.price * item.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setCart((prev) => prev.filter((cartItem) => cartItem.productId !== item.productId))}
+                  aria-label={`Remove ${item.name} from cart`}
+                  className="flex h-11 w-11 items-center justify-center text-slate-500 transition-colors hover:text-red-500"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-bold text-[#0B0F4F]">x {item.quantity}</p>
-              <p className="text-xs font-bold text-[#7C5CFF]">฿{item.price * item.quantity}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       
       {/* Bottom Total & Confirm Button */}
-      <div className="border-t border-slate-100 p-5 bg-slate-50 space-y-4">
-        <div className="flex items-end justify-between">
-          <p className="text-sm font-semibold text-slate-500">Subtotal in Cart</p>
-          <p className="text-2xl font-extrabold text-[#0B0F4F]">
-            ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US')}
+      <div className="space-y-3 border-t border-[#E8E2FF] bg-white px-4 pb-4 pt-3">
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-extrabold uppercase tracking-wide text-slate-600">Payment Method</p>
+          <div className="flex gap-1 rounded-full bg-[#EEEFFF] p-1" role="group" aria-label="Payment method">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('mobileBanking')}
+              aria-pressed={paymentMethod === 'mobileBanking'}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all ${
+                paymentMethod === 'mobileBanking'
+                  ? 'bg-[#8057F6] text-white shadow-[0_4px_12px_rgba(124,92,255,0.28)]'
+                  : 'text-[#171A2E] hover:bg-white/60'
+              }`}
+            >
+              <QrCode className="h-3.5 w-3.5" />
+              Mobile banking
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cash')}
+              aria-pressed={paymentMethod === 'cash'}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold transition-all ${
+                paymentMethod === 'cash'
+                  ? 'bg-[#8057F6] text-white shadow-[0_4px_12px_rgba(124,92,255,0.28)]'
+                  : 'text-[#171A2E] hover:bg-white/60'
+              }`}
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              Cash
+            </button>
+          </div>
+        </div>
+        <div className="flex items-end justify-between border-t border-slate-100 pt-2">
+          <p className="text-sm font-medium text-slate-500">Subtotal in Cart</p>
+          <p className="text-xl font-extrabold leading-none text-[#171A2E] sm:text-2xl">
+            ฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <button 
             onClick={() => setIsCartOpen(false)}
-            className="flex-1 rounded-xl bg-white border border-slate-200 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"
+            className="min-h-11 w-full rounded-full bg-[#EEEFFF] px-5 py-2.5 text-sm font-semibold text-[#41445A] transition-colors hover:bg-[#E2E4FF] sm:w-auto"
           >
             Cancel
           </button>
           <button 
             onClick={handleConfirmSale}
-            className="flex-[2] rounded-xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] py-3 text-sm font-bold text-white hover:brightness-110 active:scale-95"
+            className="min-h-11 w-full rounded-full bg-gradient-to-r from-[#8057F6] to-[#E84CC5] py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99] sm:flex-1"
           >
-            Confirm & Log Sale
+            <span className="inline-flex items-center justify-center gap-1.5">
+              <Check className="h-4 w-4 rounded-full border border-white p-0.5" />
+              Confirm &amp; Log Sale (฿{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString('en-US', { maximumFractionDigits: 0 })})
+            </span>
           </button>
         </div>
       </div>
@@ -1214,7 +1262,7 @@ const handleConfirmSale = () => {
 
       {stepMode === "edit" && (
         <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
-          <div className="mx-auto flex min-h-[56px] w-full max-w-[1280px] items-center justify-between gap-3 px-4 py-2 sm:px-6">
+          <div className="mx-auto flex min-h-[56px] w-full max-w-[1280px] flex-col items-stretch justify-between gap-2 px-3 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
             <div className="flex min-w-0 items-center gap-2 text-xs">
               <span className="shrink-0 font-bold text-[#7C5CFF]">0  {language === 'EN' ? 'Unsaved changes' : 'การเปลี่ยนแปลงที่ไม่ได้บันทึก'}</span>
               <span className="hidden text-[#d5d7df] sm:inline">•</span>
@@ -1226,14 +1274,14 @@ const handleConfirmSale = () => {
               <button
                 type="button"
                 onClick={() => setStepMode("sales")}
-                className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#BA1A1A] transition-colors hover:bg-[#FEE2E2]"
+                className="min-h-11 flex-1 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs font-semibold text-[#BA1A1A] transition-colors hover:bg-[#FEE2E2] sm:min-h-0 sm:flex-none"
               >
                 {language === 'EN' ? 'Discard Changes' : 'ทิ้งการเปลี่ยนแปลง'}
               </button>
               <button
                 type="button"
                 onClick={() => setStepMode("sales")}
-                className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-4 py-2 text-xs font-bold text-[#111747] shadow-sm transition hover:brightness-105"
+                className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-4 py-2 text-xs font-bold text-[#111747] shadow-sm transition hover:brightness-105 sm:min-h-0 sm:flex-none"
               >
                 <Check className="h-3.5 w-3.5" />  {language === 'EN' ? 'Apply to run' : 'บันทึกการเปลี่ยนแปลง'}
               </button>
@@ -1340,14 +1388,14 @@ type SupplierInviteModalProps = {
 // MODAL COMPONENT: Supplier Invite Modal
 function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
   return (
-    <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+    <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-3 backdrop-blur-sm transition-all animate-in fade-in duration-200 sm:items-center sm:p-4">
       
       {/* MODAL CARD */}
-      <div onClick={(e) => e.stopPropagation()}  className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-100/80 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+      <div onClick={(e) => e.stopPropagation()} className="my-auto flex max-h-[calc(100dvh-1.5rem)] w-full max-w-xl flex-col overflow-y-auto rounded-2xl border border-slate-100/80 bg-white shadow-2xl animate-in zoom-in-95 duration-200 sm:rounded-3xl">
         
         {/* 1. MODAL HEADER */}
-        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100">
-          <div className="flex items-center space-x-3.5">
+        <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4 pb-4 sm:p-6 sm:pb-4">
+          <div className="flex min-w-0 items-center space-x-3.5">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] text-white flex items-center justify-center shrink-0 shadow-sm">
               <UserPlus className="w-6 h-6" />
             </div>
@@ -1370,13 +1418,13 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
         </div>
 
         {/* 2. MODAL BODY */}
-        <div className="p-6 space-y-6">
+        <div className="space-y-5 p-4 sm:space-y-6 sm:p-6">
           
           {/* Top Section: Link/PIN (Left) + QR Code (Right) */}
-          <div className="grid grid-cols-12 gap-4 items-stretch">
+          <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-12">
             
             {/* Left Inputs (8 cols) */}
-            <div className="col-span-7 space-y-4 flex flex-col justify-between">
+            <div className="col-span-1 flex flex-col justify-between space-y-4 sm:col-span-7">
               
               {/* RUN INVITE LINK */}
               <div className="space-y-1.5">
@@ -1410,7 +1458,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
             </div>
 
             {/* Right QR Box (5 cols) */}
-            <div className="col-span-5 bg-slate-50/60 border border-slate-100 rounded-2xl p-3 flex flex-col items-center justify-center text-center space-y-2">
+            <div className="col-span-1 flex flex-col items-center justify-center space-y-2 rounded-2xl border border-slate-100 bg-slate-50/60 p-3 text-center sm:col-span-5">
               <div className="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
                 {/* Simulated QR Code Graphic */}
                 <div className="w-16 h-16 bg-white relative flex items-center justify-center">
@@ -1468,15 +1516,15 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
         </div>
 
         {/* 3. MODAL FOOTER */}
-        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-2.5">
-          <button onClick={onOpenPermissions} className="px-4 py-2 bg-white hover:bg-slate-50 text-[#6366F1] border border-[#6366F1]/20 font-bold text-xs rounded-xl transition-colors shadow-2xs flex items-center gap-1.5">
+        <div className="flex flex-col-reverse items-stretch justify-end gap-2.5 border-t border-slate-100 bg-slate-50/50 p-4 sm:flex-row sm:items-center sm:space-x-2.5">
+          <button onClick={onOpenPermissions} className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#6366F1]/20 bg-white px-4 py-2 text-xs font-bold text-[#6366F1] shadow-2xs transition-colors hover:bg-slate-50">
             <Shield className="w-3.5 h-3.5 text-[#6366F1]" />
             <span>{language === 'EN' ? 'Assistant Permissions' : 'สิทธิ์ของผู้ช่วย'}</span>
           </button>
           
           <button
             onClick={() => onClose()}
-            className="px-5 py-2 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="min-h-11 rounded-xl bg-[#6366F1] px-5 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-[#5558E8]"
           >
             {language === 'EN' ? 'Done' : 'เสร็จสิ้น'}
           </button>
@@ -1511,11 +1559,11 @@ function getSupplierAccent(id: string) {
   };
 }
 
-function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language }:any) {
+function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language, onImageClick }:any) {
   return (
     <div className="space-y-3">
       {/* Group Header */}
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-[#EEE9FF] bg-white px-4 py-3 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#EEE9FF] bg-white px-3 py-3 shadow-sm sm:flex-nowrap sm:gap-3 sm:px-4">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotColor}`}></span>
           <h2 className="truncate font-bold text-[#0B0F4F] text-xl">{title}</h2>
@@ -1530,7 +1578,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
 
       {/* Table Header */}
       <div className="overflow-hidden rounded-2xl border border-[#EEE9FF] bg-white shadow-sm">
-      <div className="grid grid-cols-12 border-b border-[#EEE9FF] bg-[#EEE9FF] px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#0B0F4F]">
+      <div className="hidden grid-cols-12 border-b border-[#EEE9FF] bg-[#EEE9FF] px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#0B0F4F] sm:grid">
         <div className="col-span-5">{language === 'EN' ? 'PRODUCT NAME' : ' ชื่อสินค้า'}</div>
         <div className="col-span-3 text-center">{language === 'EN' ? 'STOCK / QTY' : 'สต๊อก / ปริมาณ'}</div>
         <div className="col-span-2 text-center">{language === 'EN' ? 'PRICE (฿)' : 'ราคา (฿)'}</div>
@@ -1540,81 +1588,105 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
 
       {/* Product Rows */}
       <div>
-        {items.map((item:any) => (
-          <div key={item.id} className="grid grid-cols-12 items-center border-b border-slate-200 px-4 py-3 text-xs font-medium transition-colors last:border-b-0 hover:bg-slate-50/70">
-            <div className="col-span-5 flex items-center gap-2">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
-              <input
-                type="text"
-                defaultValue={item.name}
-                className="w-fit min-w-[50%] max-w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF]"
-              />
-            </div>
+        {items.map((item:any) => {
+          const IconComponent = item.icon;
 
-            {/* Qty Stepper */}
-            <div className="col-span-3 flex w-fit items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-2 py-1">
-              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
-                <Minus className="h-2.5 w-2.5" />
-              </button>
-              <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
-              <button className="flex h-6 w-6 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF]">
-                <Plus className="h-2.5 w-2.5" />
-              </button>
-            </div>
-
-            {/* Price */}
-            <div className="col-span-2 flex items-center justify-center">
-              <div className="flex w-20 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 shadow-2xs">
-                <span className="font-bold text-[#FFB24C]">฿</span>
+          return (
+            <div key={item.id} className="grid grid-cols-12 items-center gap-y-2 border-b border-slate-200 px-3 py-3 text-xs font-medium transition-colors last:border-b-0 hover:bg-slate-50/70 sm:px-4">
+              <div className="col-span-12 flex min-w-0 items-center gap-2.5 sm:col-span-5">
+                <button
+                  type="button"
+                  onClick={() => onImageClick?.(item)}
+                  aria-label={`Edit icon for ${item.name}`}
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 shadow-2xs ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+                >
+                  {item.imageUrl ? (
+                    <span
+                      role="img"
+                      aria-label={item.name}
+                      className="h-full w-full bg-cover bg-center"
+                      style={{ backgroundImage: `url("${item.imageUrl}")` }}
+                    />
+                  ) : (
+                    <IconComponent className="h-5 w-5" />
+                  )}
+                </button>
+                <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
                 <input
                   type="text"
-                  defaultValue={item.price}
-                  className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
+                  defaultValue={item.name}
+                  className="min-h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF] sm:min-h-0 sm:w-fit sm:min-w-[50%]"
                 />
               </div>
-            </div>
 
-            {/* Sold Count */}
-            <div className="col-span-1 text-center font-bold text-slate-700">
-              {item.sold}
-            </div>
+              {/* Qty Stepper */}
+              <div className="col-span-6 flex w-full items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-1 py-1 sm:col-span-3 sm:w-fit sm:px-2">
+                <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Stock' : 'สต็อก'}</span>
+                <button className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] sm:h-6 sm:w-6">
+                  <Minus className="h-2.5 w-2.5" />
+                </button>
+                <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
+                <button className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] sm:h-6 sm:w-6">
+                  <Plus className="h-2.5 w-2.5" />
+                </button>
+              </div>
 
-            {/* Delete Action */}
-            <div className="col-span-1 text-center">
-              <button className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500">
-                <Trash2 className="mx-auto h-3.5 w-3.5" />
-              </button>
+              {/* Price */}
+              <div className="col-span-6 flex min-w-0 items-center justify-center sm:col-span-2">
+                <div className="flex min-h-11 w-full min-w-0 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 shadow-2xs sm:min-h-0 sm:w-20">
+                  <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Price' : 'ราคา'}</span>
+                  <span className="font-bold text-[#FFB24C]">฿</span>
+                  <input
+                    type="text"
+                    defaultValue={item.price}
+                    className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Sold Count */}
+              <div className="col-span-6 flex items-center justify-center gap-1 text-center font-bold text-slate-700 sm:col-span-1">
+                <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Sold' : 'ขาย'}</span>
+                {item.sold}
+              </div>
+
+              {/* Delete Action */}
+              <div className="col-span-6 flex items-center justify-center text-center sm:col-span-1">
+                <button aria-label={`Remove ${item.name}`} className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 sm:h-auto sm:w-auto sm:p-1.5">
+                  <Trash2 className="mx-auto h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       </div>
       {/* Add Item Form Row */}
-      <div className="grid grid-cols-12 items-center gap-2 rounded-2xl border border-[#EEE9FF] bg-[#EEE9FF] p-3">
-        <div className="col-span-6">
+      <div className="grid grid-cols-6 items-center gap-2 rounded-2xl border border-[#EEE9FF] bg-[#EEE9FF] p-3 sm:grid-cols-12">
+        <div className="col-span-6 sm:col-span-6">
           <input
             type="text"
             placeholder={language === 'EN' ? 'Items Name (e.g. T-Shirt)' : 'ชื่อสินค้า (เช่น เสื้อยืด)'}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
+            className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
-        <div className="col-span-2">
+        <div className="col-span-3 sm:col-span-2">
           <input
             type="number"
             placeholder={language === 'EN' ? 'Qty' : 'ปริมาณ'}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
+            className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
-        <div className="col-span-2">
+        <div className="col-span-3 sm:col-span-2">
           <input
             type="number"
             placeholder={language === 'EN' ? 'Price ฿' : 'ราคา (฿)'}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-center transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
+            className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
-        <div className="col-span-2">
-          <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
+        <div className="col-span-6 sm:col-span-2">
+          <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
             <PlusCircle className="w-3.5 h-3.5" />{language === 'EN' ? 'Add Product' : 'เพิ่มสินค้า'}
           </button>
         </div>
@@ -1622,31 +1694,44 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
     </div>
   );
 }
-function ProductCard({ item, onSell, onImageClick, language }: { item: InventoryProduct; onSell: (id: string) => void; onImageClick: (item: InventoryProduct) => void; language: 'EN' | 'TH' }) {
+function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSell: (id: string) => void; language: 'EN' | 'TH' }) {
   const IconComponent = item.icon;
   const isOutOfStock = item.stock === 0;
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   return (
-    <div className="flex min-h-[88px] items-center justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-4 shadow-2xs transition-shadow hover:shadow-md">
+    <div className="flex min-h-[88px] flex-col items-stretch justify-between gap-3 rounded-xl border border-slate-100/80 bg-white p-3 shadow-2xs transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:p-4">
       {/* Left Column: Icon + Name + Stock Info */}
       <div className="flex min-w-0 items-center gap-2">
-        <button
-          type="button"
-          onClick={() => onImageClick(item)}
-          aria-label={`${language === 'EN' ? 'Upload image for' : 'อัปโหลดรูปภาพสำหรับ'} ${item.name}`}
-          className={`flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+        <div
+          className="group relative shrink-0"
+          onMouseMove={(event) => setTooltipPosition({ x: event.clientX, y: event.clientY })}
         >
-          {item.imageUrl ? (
-            <span
-              role="img"
-              aria-label={item.name}
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: `url("${item.imageUrl}")` }}
-            />
-          ) : (
-            <IconComponent className="h-7 w-7" />
-          )}
-        </button>
+          <div
+            aria-hidden="true"
+            className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg ${item.imageUrl ? 'bg-white' : item.iconBg}`}
+          >
+            {item.imageUrl ? (
+              <span
+                role="img"
+                aria-label={item.name}
+                className="h-full w-full bg-cover bg-center"
+                style={{ backgroundImage: `url("${item.imageUrl}")` }}
+              />
+            ) : (
+              <IconComponent className="h-7 w-7" />
+            )}
+          </div>
+          <span
+            role="tooltip"
+            style={{ left: tooltipPosition.x + 12, top: tooltipPosition.y + 12 }}
+            className="pointer-events-none fixed z-50 w-36 rounded-lg bg-[#0B0F4F]/75 px-2 py-1.5 text-center text-[10px] font-medium leading-tight text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+          >
+            Image can be changed
+            <br />
+            in edit mode
+          </span>
+        </div>
 
         <div className="min-w-0 space-y-0.5">
           <h3 className="truncate text-base font-bold tracking-tight text-[#0B0F4F]">
@@ -1663,7 +1748,7 @@ function ProductCard({ item, onSell, onImageClick, language }: { item: Inventory
       </div>
 
       {/* Right Column: Price + Sold Count + Sell Button */}
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-start">
         <div className="text-right">
           <div className="flex items-center justify-end text-lg font-black leading-none text-[#0B0F4F]">
             <span className="mr-0.5 text-sm font-extrabold">฿</span>
@@ -1677,7 +1762,7 @@ function ProductCard({ item, onSell, onImageClick, language }: { item: Inventory
         {/* <button
           onClick={() => onSell(item.id)}
           disabled={isOutOfStock}
-          className={`flex h-9 min-w-[112px] items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
+          className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
             isOutOfStock
               ? 'bg-gray-400 opacity-90 cursor-not-allowed'
               : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
@@ -1689,7 +1774,7 @@ function ProductCard({ item, onSell, onImageClick, language }: { item: Inventory
       <button
     onClick={() => onSell(item.id)}
   disabled={isOutOfStock}
-  className={`flex h-9 min-w-[112px] items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 ${
+  className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
     isOutOfStock
       ? 'bg-gray-400 opacity-90 cursor-not-allowed'
       : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
@@ -1990,14 +2075,14 @@ function EndSalesRunModal({
 
   return (
     // BACKDROP (ฉากหลังมืดโปร่งแสง + เบลอด้วย backdrop-blur-sm)
-    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-200">
+    <div onClick={()=>onClose()} className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-3 backdrop-blur-sm transition-all duration-200 sm:items-center sm:p-4">
       
       {/* MODAL CONTAINER */}
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+      <div onClick={(e) => e.stopPropagation()} className="my-auto flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-2xl animate-in zoom-in-95 duration-200 sm:rounded-3xl">
         
         {/* 1. MODAL HEADER */}
-        <div className="p-6 pb-5 flex items-start justify-between border-b border-slate-100">
-          <div className="flex items-start space-x-3.5">
+        <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4 pb-4 sm:p-6 sm:pb-5">
+          <div className="flex min-w-0 items-start space-x-3.5">
             <div className="w-11 h-11 rounded-2xl bg-[#BE123C]/5 border border-[#BE123C]/15 text-[#BE123C] flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
@@ -2020,7 +2105,7 @@ function EndSalesRunModal({
         </div>
 
         {/* 2. MODAL BODY */}
-        <div className="p-6 space-y-5">
+        <div className="space-y-5 p-4 sm:p-6">
           
           {/* STEP 1: SESSION LOCKDOWN WARNINGS BOX */}
           <div className="bg-[#BE123C]/5 border border-[#BE123C]/15 rounded-2xl p-4 space-y-2">
@@ -2070,10 +2155,10 @@ function EndSalesRunModal({
         </div>
 
         {/* 3. MODAL FOOTER */}
-        <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <div className="flex flex-col-reverse items-stretch justify-end gap-2.5 border-t border-slate-100 bg-slate-50/50 p-4 sm:flex-row sm:items-center sm:space-x-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200/80 transition-colors"
+            className="min-h-11 rounded-xl border border-slate-200/80 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
           >
             {language === 'EN' ? 'Cancel' : 'ยกเลิก'}
           </button>
@@ -2083,7 +2168,7 @@ function EndSalesRunModal({
               if (isReadyToSubmit) onConfirmEndRun();
             }}
             disabled={!isReadyToSubmit}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-xs transition-all flex items-center gap-1.5 ${
+            className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white shadow-xs transition-all ${
               isReadyToSubmit
                 ? 'bg-[#BE123C] hover:bg-[#9F1239] active:bg-[#881337] cursor-pointer'
                 : 'bg-[#BE123C]/40 cursor-not-allowed opacity-70'
@@ -2112,18 +2197,18 @@ function FinalEndRunModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#11152E]/90 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#11152E]/90 p-3 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <section
         role="dialog"
         aria-modal="true"
         aria-labelledby="final-end-run-title"
-        className="w-full max-w-[580px] overflow-hidden rounded-2xl bg-[#FFF2F2] shadow-2xl"
+        className="my-auto w-full max-w-[580px] overflow-hidden rounded-2xl bg-[#FFF2F2] shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
-          <div className="flex items-center gap-3">
+        <header className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
               <AlertTriangle className="h-5 w-5" />
             </span>
@@ -2148,7 +2233,7 @@ function FinalEndRunModal({
           </button>
         </header>
 
-        <div className="flex min-h-[235px] flex-col items-center justify-center gap-12 px-6 py-8">
+        <div className="flex min-h-[200px] flex-col items-center justify-center gap-8 px-4 py-6 sm:min-h-[235px] sm:gap-12 sm:px-6 sm:py-8">
           <h3
             id="final-end-run-title"
             className="text-4xl font-extrabold tracking-tight text-[#BE123C] sm:text-5xl"
@@ -2159,14 +2244,14 @@ function FinalEndRunModal({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 rounded-xl border border-slate-300 bg-white px-5 py-3 text-base font-bold text-slate-500 transition-colors hover:bg-slate-50"
+              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-5 py-3 text-base font-bold text-slate-500 transition-colors hover:bg-slate-50"
             >
               {language === 'EN' ? 'No' : 'ไม่'}
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className="flex-1 rounded-xl bg-red-600 px-5 py-3 text-base font-bold text-white transition-colors hover:bg-red-700"
+              className="min-h-11 flex-1 rounded-xl bg-red-600 px-5 py-3 text-base font-bold text-white transition-colors hover:bg-red-700"
             >
               {language === 'EN' ? 'Yes' : 'ใช่'}
             </button>
@@ -2180,7 +2265,6 @@ function FinalEndRunModal({
 function SaleSection({
   products,
   handleSell,
-  onImageClick,
   Name,
   Role,
   id,
@@ -2188,7 +2272,6 @@ function SaleSection({
 }: {
   products: InventoryProduct[];
   handleSell: (id: string) => void;
-  onImageClick: (item: InventoryProduct) => void;
   Name: string;
   Role: string;
   id: string;
@@ -2228,7 +2311,6 @@ function SaleSection({
           key={cardItem.id}
           item={cardItem}
           onSell={handleSell}
-          onImageClick={onImageClick}
           language={language}
         />
       ))}

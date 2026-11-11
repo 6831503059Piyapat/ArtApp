@@ -150,14 +150,14 @@ export default function ConsignDeskDashboard() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 mx-auto mt-[60px] w-full max-w-[1280px] flex-1 px-4 pb-10 sm:px-6 md:w-[95%] lg:px-8">
+      <main className="relative z-10 mx-auto mt-[60px] w-full max-w-[1280px] min-w-0 flex-1 overflow-x-clip px-3 pb-10 sm:px-6 md:w-[95%] lg:px-8">
 
         {/* Header Section */}
-        <div className="relative isolate mb-6 overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white/90 p-4 shadow-sm md:p-5">
+        <div className="relative isolate mb-6 min-w-0 overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white/90 p-3 shadow-sm sm:p-4 md:p-5">
           <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-[#FFB24C]/30 blur-2xl" />
           <div className="relative flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-start min-[900px]:justify-between">
             <div className="min-w-0">
-              <h1 className="mb-2 flex items-center gap-3 text-xl font-bold tracking-tight text-[#0B0F4F] md:text-2xl">
+              <h1 className="mb-2 flex min-w-0 flex-wrap items-center gap-2 break-words text-xl font-bold tracking-tight text-[#0B0F4F] md:gap-3 md:text-2xl">
                 MFU Outside Night Market (Mon 14)
               </h1>
               <span className="inline-flex items-center gap-1 rounded-md bg-[#7C5CFF]/10 px-2 py-1 text-[10px] font-semibold text-[#7C5CFF]">
@@ -179,14 +179,14 @@ export default function ConsignDeskDashboard() {
                 </span>
               </div>
             </div>
-            <div className="relative flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
-              <button className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-[10px] font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
+            <div className="relative grid w-full grid-cols-1 gap-2 sm:grid-cols-3 min-[900px]:flex min-[900px]:w-auto min-[900px]:shrink-0 min-[900px]:flex-wrap min-[900px]:items-center min-[900px]:min-w-0 min-[900px]:justify-end">
+              <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]">
                 <FileSpreadsheet size={13} className="text-blue-500" /> {language === 'EN' ? 'Download Excel (.xlsx)' : 'ดาวน์โหลด Excel (.xlsx)'}
               </button>
-              <button className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-[10px] font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
+              <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]">
                 <FileText size={13} className="text-[#F062C0]" /> {language === 'EN' ? 'PDF Statement' : 'เอกสารสรุป PDF'}
               </button>
-              <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ED571B] to-[#F062C0] px-3 py-2 text-[10px] font-medium text-white shadow-sm transition hover:opacity-90 whitespace-nowrap">
+              <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-[#ED571B] to-[#F062C0] px-3 py-2 text-center text-xs font-medium text-white shadow-sm transition hover:opacity-90 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]">
                 <Share2 size={13} /> {language === 'EN' ? 'Share PDF File' : 'แชร์ไฟล์ PDF'}
               </button>
             </div>
@@ -194,7 +194,7 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* Stats 4 Columns */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+        <div className="mb-6 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-4">
           {/* Card 1 */}
           <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
@@ -202,9 +202,9 @@ export default function ConsignDeskDashboard() {
               <div className="bg-[#7C5CFF]/10 p-1.5 rounded-md"><Wallet size={16} className="text-[#7C5CFF]" /></div>
             </div>
             <div className="text-2xl font-bold text-[#7C5CFF] mb-3">฿8,490.00</div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>{language === 'EN' ? 'Units: 88 sold / 96 initial' : 'จำนวน: ขายแล้ว 88 / เริ่มต้น 96'}</span>
-              <span className="text-[#7C5CFF] font-medium">{language === 'EN' ? '91.6% sellout' : 'ขายได้ 91.6%'}</span>
+            <div className="mb-1 flex flex-wrap justify-between gap-x-2 gap-y-1 text-xs text-gray-500">
+              <span className="min-w-0 break-words">{language === 'EN' ? 'Units: 88 sold / 96 initial' : 'จำนวน: ขายแล้ว 88 / เริ่มต้น 96'}</span>
+              <span className="font-medium text-[#7C5CFF]">{language === 'EN' ? '91.6% sellout' : 'ขายได้ 91.6%'}</span>
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] h-1.5 rounded-full" style={{ width: '91.6%' }}></div>
@@ -218,9 +218,9 @@ export default function ConsignDeskDashboard() {
               <div className="bg-[#FEF0EA] p-1.5 rounded-md"><Receipt size={16} className="text-[#ED571B]" /></div>
             </div>
             <div className="text-2xl font-bold text-[#ED571B] mb-3">฿70.00</div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>{language === 'EN' ? '1 Stall Expense logged' : 'บันทึกค่าใช้จ่ายร้านค้า 1 รายการ'}</span>
-              <span className="text-[#ED571B] font-medium">{language === 'EN' ? 'Booth Rent' : 'ค่าเช่าบูธ'}</span>
+            <div className="mb-1 flex flex-wrap justify-between gap-x-2 gap-y-1 text-xs text-gray-500">
+              <span className="min-w-0 break-words">{language === 'EN' ? '1 Stall Expense logged' : 'บันทึกค่าใช้จ่ายร้านค้า 1 รายการ'}</span>
+              <span className="font-medium text-[#ED571B]">{language === 'EN' ? 'Booth Rent' : 'ค่าเช่าบูธ'}</span>
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-[#ED571B] h-1.5 rounded-full" style={{ width: `${(70 / 8490) * 100}%` }}></div>
@@ -275,9 +275,9 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex items-center gap-1 overflow-x-auto border-b border-gray-200 px-2">
+        <div className="mb-6 flex w-full flex-nowrap items-center gap-1 overflow-x-auto border-b border-gray-200 px-1 sm:px-2">
           <button onClick={() => setActiveTab('sales')}
-            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 pt-2.5 pb-3 font-medium text-xs transition-colors ${
+            className={`flex min-h-11 shrink-0 items-center justify-start gap-1.5 whitespace-nowrap rounded-t-lg px-2 py-2 text-left text-xs font-medium transition-colors sm:min-h-0 sm:gap-2 sm:px-3 sm:pt-2.5 sm:pb-3 ${
               activeTab === 'sales' ? 'text-[#7C5CFF] bg-[#7C5CFF]/10 border-b-2 border-[#7C5CFF]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
@@ -286,7 +286,7 @@ export default function ConsignDeskDashboard() {
           </button>
           
           <button onClick={() => setActiveTab('expenses')}
-            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 pt-2.5 pb-3 font-medium text-xs transition-colors ${
+            className={`flex min-h-11 shrink-0 items-center justify-start gap-1.5 whitespace-nowrap rounded-t-lg px-2 py-2 text-left text-xs font-medium transition-colors sm:min-h-0 sm:gap-2 sm:px-3 sm:pt-2.5 sm:pb-3 ${
               activeTab === 'expenses' ? 'text-[#ED571B] bg-[#FEF0EA]/70 border-b-2 border-[#ED571B]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
@@ -295,7 +295,7 @@ export default function ConsignDeskDashboard() {
           </button>
 
           <button onClick={() => setActiveTab('changes')}
-            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 pt-2.5 pb-3 font-medium text-xs transition-colors ${
+            className={`flex min-h-11 shrink-0 items-center justify-start gap-1.5 whitespace-nowrap rounded-t-lg px-2 py-2 text-left text-xs font-medium transition-colors sm:min-h-0 sm:gap-2 sm:px-3 sm:pt-2.5 sm:pb-3 ${
               activeTab === 'changes' ? 'text-[#F062C0] bg-[#F062C0]/10 border-b-2 border-[#F062C0]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
@@ -304,7 +304,7 @@ export default function ConsignDeskDashboard() {
           </button>
 
           <button onClick={() => setActiveTab('payouts')}
-            className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 pt-2.5 pb-3 font-medium text-xs transition-colors ${
+            className={`flex min-h-11 shrink-0 items-center justify-start gap-1.5 whitespace-nowrap rounded-t-lg px-2 py-2 text-left text-xs font-medium transition-colors sm:min-h-0 sm:gap-2 sm:px-3 sm:pt-2.5 sm:pb-3 ${
               activeTab === 'payouts' ? 'text-[#7C5CFF] bg-[#7C5CFF]/10 border-b-2 border-[#7C5CFF]' : 'text-gray-500 hover:text-[#0B0F4F]'
             }`}
           >
@@ -322,25 +322,25 @@ export default function ConsignDeskDashboard() {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               
               {/* Top Filter Bar */}
-              <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
-                <div className="relative flex-1 max-w-md">
+              <div className="flex flex-col gap-3 border-b border-gray-100 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4">
+                <div className="relative w-full sm:max-w-md sm:flex-1">
                   <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input 
                     type="text" 
                     value={searchQuery} // <-- เพิ่มตรงนี้
                     onChange={(e) => setSearchQuery(e.target.value)} // <-- เพิ่มตรงนี้ให้รับค่าจากคีย์บอร์ด
                     placeholder={language === 'EN' ? 'Filter by product, supplier, or cashier...' : 'กรองตามสินค้า ซัพพลายเออร์ หรือแคชเชียร์...'} 
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]/20 focus:border-[#7C5CFF] transition-all"
+                    className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm focus:border-[#7C5CFF] focus:outline-none focus:ring-2 focus:ring-[#7C5CFF]/20"
                   />
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex min-w-0 flex-col gap-2 text-xs text-gray-600 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:text-sm">
                   {/* ปุ่ม Supplier Dropdown */}
-                  <div className="flex items-center gap-2 relative">
+                  <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-start">
                     <span className="text-gray-500">{language === 'EN' ? 'Supplier:' : 'ซัพพลายเออร์:'}</span>
                     <div className="relative">
                       <button 
                         onClick={() => setIsSupplierDropdownOpen(!isSupplierDropdownOpen)}
-                        className="flex items-center justify-between min-w-[150px] font-medium bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-100"
+                        className="flex min-h-11 min-w-0 w-[min(62vw,240px)] items-center justify-between gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-left font-medium hover:bg-gray-100 sm:min-h-0 sm:w-auto sm:min-w-[150px]"
                       >
                         {selectedSupplier === 'All Suppliers' ? (language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด') : selectedSupplier} <ChevronDown size={14} className={`transition-transform ${isSupplierDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
@@ -350,25 +350,25 @@ export default function ConsignDeskDashboard() {
                         <div className="absolute right-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10 py-1">
                           <button 
                             onClick={() => { setSelectedSupplier('All Suppliers'); setIsSupplierDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             {language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด'}
                           </button>
                           <button 
                             onClick={() => { setSelectedSupplier('Host (Alex Chen)'); setIsSupplierDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             Host (Alex Chen)
                           </button>
                           <button 
                             onClick={() => { setSelectedSupplier("P' Kaimook"); setIsSupplierDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             P&apos; Kaimook
                           </button>
                           <button 
                             onClick={() => { setSelectedSupplier("Nong' Japan"); setIsSupplierDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             Nong&apos; Japan
                           </button>
@@ -379,12 +379,12 @@ export default function ConsignDeskDashboard() {
               
                
                   {/* ปุ่ม Staff Dropdown */}
-                  <div className="flex items-center gap-2 relative">
+                  <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-start">
                     <span className="text-gray-500">{language === 'EN' ? 'Staff:' : 'พนักงาน:'}</span>
                     <div className="relative">
                       <button 
                         onClick={() => setIsStaffDropdownOpen(!isStaffDropdownOpen)}
-                        className="flex items-center justify-between min-w-[120px] font-medium bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-100"
+                        className="flex min-h-11 min-w-0 w-[min(62vw,240px)] items-center justify-between gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-left font-medium hover:bg-gray-100 sm:min-h-0 sm:w-auto sm:min-w-[120px]"
                       >
                         {selectedStaff === 'All Staff' ? (language === 'EN' ? 'All Staff' : 'พนักงานทั้งหมด') : selectedStaff} <ChevronDown size={14} className={`transition-transform ${isStaffDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
@@ -394,19 +394,19 @@ export default function ConsignDeskDashboard() {
                         <div className="absolute right-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10 py-1">
                           <button 
                             onClick={() => { setSelectedStaff('All Staff'); setIsStaffDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             {language === 'EN' ? 'All Staff' : 'พนักงานทั้งหมด'}
                           </button>
                           <button 
                             onClick={() => { setSelectedStaff('Ploy W.'); setIsStaffDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             Ploy W.
                           </button>
                           <button 
                             onClick={() => { setSelectedStaff('Alex Chen'); setIsStaffDropdownOpen(false); }}
-                            className="w-full text-left px-3 py-2 text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
+                            className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
                           >
                             Alex Chen
                           </button>
@@ -414,13 +414,13 @@ export default function ConsignDeskDashboard() {
                       )}
                     </div>
                   </div>
-                  <span className="text-gray-400 pl-2">{language === 'EN' ? `Showing ${filteredSales.length} of ${salesData.length} receipts` : `แสดง ${filteredSales.length} จาก ${salesData.length} รายการ`}</span>
+                  <span className="break-words text-gray-400 sm:pl-2">{language === 'EN' ? `Showing ${filteredSales.length} of ${salesData.length} receipts` : `แสดง ${filteredSales.length} จาก ${salesData.length} รายการ`}</span>
                 </div>
               </div>
 
               {/* Table */}
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[760px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-400 uppercase bg-gray-50/30">
                       <th className="p-4 font-semibold">{language === 'EN' ? '# / TIME SOLD' : '# / เวลาขาย'}</th>
@@ -481,18 +481,18 @@ export default function ConsignDeskDashboard() {
               </div>
 
               {/* Pagination / Footer */}
-              <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm">
+              <div className="flex flex-col gap-3 border-t border-gray-100 p-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:p-4">
                 <span className="text-gray-500">{language === 'EN' ? `Showing ${filteredSales.length} of ${salesData.length} completed transactions` : `แสดง ${filteredSales.length} จาก ${salesData.length} ธุรกรรมที่เสร็จสิ้น`}</span>
-                <div className="flex items-center gap-1">
-                  <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:bg-gray-50">
+                <div className="flex flex-wrap items-center justify-center gap-1 sm:justify-end">
+                  <button className="flex h-10 w-10 items-center justify-center rounded border border-gray-200 text-gray-400 hover:bg-gray-50 sm:h-8 sm:w-8">
                     <ChevronLeft size={16} />
                   </button>
-                  <button className="w-8 h-8 flex items-center justify-center rounded bg-[#7C5CFF] text-white font-medium">1</button>
-                  <button className="w-8 h-8 flex items-center justify-center rounded border border-transparent text-gray-600 hover:bg-gray-50 font-medium">2</button>
-                  <button className="w-8 h-8 flex items-center justify-center rounded border border-transparent text-gray-600 hover:bg-gray-50 font-medium">3</button>
+                  <button className="flex h-10 w-10 items-center justify-center rounded bg-[#7C5CFF] font-medium text-white sm:h-8 sm:w-8">1</button>
+                  <button className="flex h-10 w-10 items-center justify-center rounded border border-transparent font-medium text-gray-600 hover:bg-gray-50 sm:h-8 sm:w-8">2</button>
+                  <button className="flex h-10 w-10 items-center justify-center rounded border border-transparent font-medium text-gray-600 hover:bg-gray-50 sm:h-8 sm:w-8">3</button>
                   <span className="px-1 text-gray-400">...</span>
-                  <button className="w-8 h-8 flex items-center justify-center rounded border border-transparent text-gray-600 hover:bg-gray-50 font-medium">18</button>
-                  <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50">
+                  <button className="flex h-10 w-10 items-center justify-center rounded border border-transparent font-medium text-gray-600 hover:bg-gray-50 sm:h-8 sm:w-8">18</button>
+                  <button className="flex h-10 w-10 items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50 sm:h-8 sm:w-8">
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -506,12 +506,12 @@ export default function ConsignDeskDashboard() {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               
               {/* Header */}
-              <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
-                <div>
+              <div className="flex flex-col items-start justify-between gap-3 border-b border-gray-100 p-4 sm:flex-row sm:gap-4 sm:p-6">
+                <div className="min-w-0">
                   <h2 className="text-lg font-bold text-[#0B0F4F]">{language === 'EN' ? 'Expenses Log (Booth & Stall Deductions)' : 'รายการค่าใช้จ่าย (ค่าเช่าบูธและร้านค้า)'}</h2>
                   <p className="text-sm text-gray-500 mt-1">{language === 'EN' ? 'Recorded market fees, electrical charges, or shared booth amenities.' : 'บันทึกค่าตลาด ค่าไฟ หรือสิ่งอำนวยความสะดวกร่วมของบูธ'}</p>
                 </div>
-                <div className="bg-[#FEF0EA]/30 border border-[#FEF0EA] px-4 py-2 rounded-full flex items-center gap-2">
+                <div className="flex max-w-full items-center gap-2 rounded-full border border-[#FEF0EA] bg-[#FEF0EA]/30 px-4 py-2">
                   <span className="text-sm text-[#0B0F4F] font-medium">{language === 'EN' ? 'Total Recorded:' : 'บันทึกรวม:'}</span>
                   <span className="text-sm font-bold text-[#ED571B]">฿70.00</span>
                 </div>
@@ -519,7 +519,7 @@ export default function ConsignDeskDashboard() {
 
               {/* Table */}
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[780px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase bg-gray-50/50">
                       <th className="p-4 font-semibold">#</th>
@@ -565,14 +565,14 @@ export default function ConsignDeskDashboard() {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
               
               {/* Header */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="border-b border-gray-100 p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-[#0B0F4F]">{language === 'EN' ? 'Changes Made & Audit Trail' : 'รายการเปลี่ยนแปลงและประวัติการตรวจสอบ'}</h2>
                 <p className="text-sm text-gray-400 mt-1">{language === 'EN' ? 'Immutable record of run configuration adjustments, price updates, and staff additions.' : 'บันทึกถาวรของการตั้งค่าการขาย การปรับราคา และการเพิ่มพนักงาน'}</p>
               </div>
 
               {/* Table */}
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[760px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase bg-gray-50/30">
                       <th className="p-4 pl-6">{language === 'EN' ? 'TIMESTAMP' : 'เวลา'}</th>
@@ -625,10 +625,10 @@ export default function ConsignDeskDashboard() {
 
           {/* ถ้าเลือก Tab Payouts (โค้ดการ์ด 3 ใบของหนูอยู่ตรงนี้ทั้งหมด) */}
           {activeTab === 'payouts' && (
-            <div className="mb-8 overflow-x-auto pb-2">
-              <div className="flex min-w-full gap-5">
+            <div className="mb-8 overflow-x-visible pb-0 sm:overflow-x-auto sm:pb-2">
+              <div className="flex min-w-0 flex-col gap-3 sm:min-w-full sm:flex-row sm:gap-5">
               {/* Card 1 - Host */}
-              <div className="relative flex min-w-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm">
+              <div className="relative flex w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm sm:min-w-[280px]">
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#7C5CFF]/25 via-[#7C5CFF]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
@@ -664,11 +664,11 @@ export default function ConsignDeskDashboard() {
               </div>
 
               {/* Card 2 - Partner 1 */}
-              <div className="relative flex min-w-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm">
+              <div className="relative flex w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm sm:min-w-[280px]">
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#F062C0]/25 via-[#F062C0]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="inline-flex w-20 justify-center bg-[#F062C0]/10 text-[#F062C0] text-xs font-semibold px-2 py-1 rounded-md">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
+                    <span className="inline-flex min-h-8 w-auto min-w-[6.5rem] items-center justify-center whitespace-nowrap rounded-md bg-[#F062C0]/10 px-3 py-1 text-center text-xs font-semibold leading-tight text-[#F062C0] sm:w-20 sm:min-w-0 sm:px-2">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
                     <span className="text-xs text-gray-400 font-medium">28.8% {language === 'EN' ? 'of stall' : 'ของร้าน'}</span>
                   </div>
                   <h3 className="text-lg font-bold text-[#0B0F4F]">P&apos; Kaimook</h3>
@@ -698,11 +698,11 @@ export default function ConsignDeskDashboard() {
               </div>
 
               {/* Card 3 - Partner 2 */}
-              <div className="relative flex min-w-[280px] flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm">
+              <div className="relative flex w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#E9EBF3] bg-white shadow-sm sm:min-w-[280px]">
                 <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-44 w-44 rounded-full bg-gradient-to-br from-[#FFB24C]/30 via-[#FFB24C]/10 to-transparent blur-2xl" />
                 <div className="relative z-10 flex-grow p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="inline-flex w-20 justify-center bg-[#FFB24C]/15 text-[#FFB24C] text-xs font-semibold px-2 py-1 rounded-md">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
+                    <span className="inline-flex min-h-8 w-auto min-w-[6.5rem] items-center justify-center whitespace-nowrap rounded-md bg-[#FFB24C]/15 px-3 py-1 text-center text-xs font-semibold leading-tight text-[#FFB24C] sm:w-20 sm:min-w-0 sm:px-2">{language === 'EN' ? 'Suppliers' : 'ซัพพลายเออร์'}</span>
                     <span className="text-xs text-gray-400 font-medium">17.2% {language === 'EN' ? 'of stall' : 'ของร้าน'}</span>
                   </div>
                   <h3 className="text-lg font-bold text-[#0B0F4F]">Nong&apos; Japan</h3>

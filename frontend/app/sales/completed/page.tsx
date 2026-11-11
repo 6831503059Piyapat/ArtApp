@@ -3,7 +3,7 @@ import Navbar from '@/app/components/navbar';
 import Footer from '@/app/components/footer';
 import React, { useState, useMemo,useEffect } from 'react';
 import Link from 'next/link';
-import { BadgeCheck, Banknote, Clock3, ShoppingBag } from 'lucide-react';
+import { BadgeCheck, Banknote, Clock3, ShoppingBag,Sparkles } from 'lucide-react';
 
 // Mock Data
 const INITIAL_RUNS = [
@@ -62,14 +62,14 @@ useEffect(() => {
       
     <Navbar />
       {/* Main Content */}
-      <main className="mb-8 flex-1 w-full pt-12">
-        <div className="mx-auto w-full max-w-[1280px] px-[18px] pt-[28px] md:w-[85%]">
+      <main className="mb-8 min-w-0 w-full flex-1 overflow-x-hidden pt-12">
+        <div className="mx-auto w-full max-w-[1280px] min-w-0 px-3 pt-5 sm:px-[18px] sm:pt-[28px] md:w-[85%]">
           <div className="flex flex-col w-full gap-4">
             
             {/* Breadcrumb & Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="flex flex-col gap-1">
-                <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight leading-7">
+                <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold tracking-tight leading-7">
                   {language === 'EN' ? 'Completed Sales Runs' : 'การขายที่เสร็จสิ้น'}
                   <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary">3 {language === 'EN' ? 'Archived' : 'การขาย'}</span>
                 </h1>
@@ -78,7 +78,7 @@ useEffect(() => {
 
             {/* Quick Stats Bar */}
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-primary/30">
+              <div className="flex min-h-[96px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-primary/30 md:h-[82px] md:min-h-0">
                 <div className="flex items-center justify-between text-creatory-gray">
                   <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">{language === 'EN' ? 'Settled Runs' : 'การขายที่เสร็จสิ้น'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-creatory-lavender text-primary">
@@ -94,7 +94,7 @@ useEffect(() => {
                 </div>
               </div>
               
-              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-pink/30">
+              <div className="flex min-h-[96px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-pink/30 md:h-[82px] md:min-h-0">
                 <div className="flex items-center justify-between text-creatory-gray">
                   <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]">{language === 'EN' ? 'AVG RUN TIME' : 'เวลาเฉลี่ยต่อการขาย'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-pink-50 text-creatory-pink">
@@ -110,7 +110,7 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-orange/40">
+              <div className="flex min-h-[96px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-border bg-white p-2.5 shadow-[0_4px_16px_rgba(11,15,79,0.03)] transition-all hover:border-creatory-orange/40 md:h-[82px] md:min-h-0">
                 <div className="flex items-center justify-between text-creatory-gray">
                   <span className="text-[9px] font-bold uppercase tracking-wide md:text-[10px]"> {language === 'EN' ? 'Total Items Sold' : 'จำนวนการขาย'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-creatory-orange">
@@ -126,7 +126,7 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div className="flex h-[82px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-pink/40 bg-gradient-to-br from-creatory-lavender to-white p-2.5 shadow-[0_4px_20px_rgba(124,92,255,0.08)]">
+              <div className="flex min-h-[96px] min-w-0 flex-col justify-between rounded-[14px] border border-creatory-pink/40 bg-gradient-to-br from-creatory-lavender to-white p-2.5 shadow-[0_4px_20px_rgba(124,92,255,0.08)] md:h-[82px] md:min-h-0">
                 <div className="flex items-center justify-between text-creatory-gray">
                   <span className="text-[9px] font-bold uppercase tracking-wide text-creatory-navy md:text-[10px]"> {language === 'EN' ? 'Total Revenue' : 'รายได้รวม'}</span>
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-creatory-pink to-creatory-orange text-white shadow-sm">
@@ -143,7 +143,7 @@ useEffect(() => {
             </div>
 
             {/* Search */}
-            <div className="h-[46px] p-[7px] rounded-[14px] bg-white border border-creatory-border shadow-sm">
+            <div className="min-h-12 rounded-[14px] border border-creatory-border bg-white p-[5px] shadow-sm sm:h-[46px] sm:min-h-0 sm:p-[7px]">
               <div className="h-full flex items-center gap-2 bg-creatory-canvas border border-creatory-border rounded-[10px] px-2 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
                 <span className="material-symbols-outlined text-creatory-gray text-[14px]">search </span>
                 <input
@@ -151,10 +151,10 @@ useEffect(() => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={language === 'EN' ? 'Search completed runs by name, location, or date...' : 'ค้นหาการรันที่เสร็จสิ้นโดยชื่อ, สถานที่, หรือวันที่...'} 
-                  className="w-full bg-transparent text-xs font-medium text-creatory-navy placeholder-creatory-gray focus:outline-none"
+                  className="min-w-0 w-full bg-transparent text-sm font-medium text-creatory-navy placeholder-creatory-gray focus:outline-none sm:text-xs"
                 />
                 {searchQuery && (
-                  <button aria-label="Clear search" onClick={() => setSearchQuery('')} className="text-creatory-gray hover:text-creatory-navy">
+                  <button aria-label="Clear search" onClick={() => setSearchQuery('')} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-creatory-gray hover:text-creatory-navy sm:h-auto sm:w-auto">
                     <span className="material-symbols-outlined text-[14px]"> {language === 'EN' ? 'cancel' : 'cancel'}</span>
                   </button>
                 )}
@@ -162,7 +162,7 @@ useEffect(() => {
             </div>
 
             {/* List Header */}
-            <div className="flex items-center justify-between px-0.5 text-[10px] font-semibold leading-4 text-creatory-gray">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-0.5 text-[10px] font-semibold leading-4 text-creatory-gray">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[12px] text-primary">folder_special</span>
                 <span>{language === 'EN' ? 'Archived Runs' : 'รันที่ถูกเก็บรักษา'}</span>
@@ -177,7 +177,7 @@ useEffect(() => {
             <div className="mt-[2px] flex flex-col gap-[10px]">
               {filteredRuns.length > 0 ? (
                 filteredRuns.map((run) => (
-                  <div key={run.id} className="rounded-[14px] border border-creatory-border bg-white px-4 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)]">
+                  <div key={run.id} className="min-w-0 rounded-[14px] border border-creatory-border bg-white px-3 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)] sm:px-4">
                     <div className="flex min-w-0 flex-col gap-3 px-2 py-1 sm:px-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex min-w-0 flex-col gap-1 md:flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -186,12 +186,12 @@ useEffect(() => {
                           {language === 'EN' ? 'Settled & Closed' : 'ปิดแล้ว'}
                         </span>
                       </div>
-                      <h2 className="mt-0.5 text-sm font-bold leading-5 tracking-tight sm:text-base">{run.title} ({run.shortDay})</h2>
+                      <h2 className="mt-0.5 break-words text-sm font-bold leading-5 tracking-tight sm:text-base">{run.title} ({run.shortDay})</h2>
                       <p className="text-[10px] text-creatory-gray">{run.date}</p>
                     </div>
                     
-                    <div className="flex flex-wrap items-center gap-4 md:self-center md:ml-auto">
-                      <div className="flex items-center gap-4">
+                    <div className="flex min-w-0 flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:self-center md:ml-auto">
+                      <div className="grid w-full grid-cols-3 gap-2 md:w-auto md:flex md:items-center md:gap-4">
                         <div className="flex flex-col">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray"> {language === 'EN' ? 'Total Sold' : 'ขายรวม'}</span>
                           <span className="text-xs font-bold">{run.sold} {language === 'EN' ? 'items' : 'ชิ้น'}</span>
@@ -205,7 +205,7 @@ useEffect(() => {
                           <span className="text-xs font-extrabold text-primary">{run.net}</span>
                         </div>
                       </div>
-                      <Link href={`/sales/completed/${run.id}`} className="ml-auto inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-gradient-to-r from-primary to-[#6842FF] px-[10px] py-1.5 text-[10px] font-bold text-white transition-all shadow-sm shadow-primary/30 hover:from-[#6A47F2] hover:to-[#5730EA] md:ml-0">
+                      <Link href={`/sales/completed/${run.id}`} className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-primary to-[#6842FF] px-3 py-2 text-center text-xs font-bold text-white transition-all shadow-sm shadow-primary/30 hover:from-[#6A47F2] hover:to-[#5730EA] md:min-h-0 md:w-auto md:whitespace-nowrap md:px-[10px] md:py-1.5 md:text-[10px]">
                         <span> {language === 'EN' ? 'View Run Breakdown' : 'รายละเอียดการขาย'}</span>
                         <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
                       </Link>

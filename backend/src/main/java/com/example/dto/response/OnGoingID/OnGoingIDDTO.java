@@ -27,8 +27,8 @@ public class OnGoingIDDTO {
     String Sale_run_Name;
     Double Gross_sales;
     List<String> Run_Assistant_Name;
-    Integer Total_Stock;
-    Integer Total_Sale;
+    Long Total_Stock;
+    Long Total_Sale;
     List<String> Supplier_Name;
     List<OnGoingIDProductDTO> Supplier;
 
@@ -56,16 +56,16 @@ public class OnGoingIDDTO {
     public void setRun_Assistant_Name(List<String> run_Assistant_Name) {
         Run_Assistant_Name = run_Assistant_Name;
     }
-    public Integer getTotal_Stock() {
+    public Long getTotal_Stock() {
         return Total_Stock;
     }
-    public void setTotal_Stock(Integer total_Stock) {
+    public void setTotal_Stock(Long total_Stock) {
         Total_Stock = total_Stock;
     }
-    public Integer getTotal_Sale() {
+    public Long getTotal_Sale() {
         return Total_Sale;
     }
-    public void setTotal_Sale(Integer total_Sale) {
+    public void setTotal_Sale(Long total_Sale) {
         Total_Sale = total_Sale;
     }
     public List<String> getSupplier_Name() {

@@ -1,7 +1,7 @@
 package com.example.service;
 import com.example.dto.response.OnGoingDTO;
 import com.example.repository.OnGoing.OnGoingListRepo;
-
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +16,10 @@ public class OnGoingListService {
     }
 
     @Transactional(readOnly = true)
-    public OnGoingDTO getOnGoingListByUserId(String userId) {
-        return onGoingListRepository.findOnGoingListByUserId(userId)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("On-going list not found for user: " + userId));
-    }
+    public List<OnGoingDTO> getOnGoingListByUserId(String uid) {
+    List<OnGoingDTO> result = onGoingListRepository.findOnGoingListByUserId(uid);
+    return result;
+}
 }
 
 

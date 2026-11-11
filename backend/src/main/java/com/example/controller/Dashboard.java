@@ -6,7 +6,7 @@ import com.google.firebase.auth.UserRecord;
 import com.example.dto.response.DashboardDTO;
 import com.example.dto.response.List_RunDTO;
 import com.example.service.DashboardService;
-
+import com.example.dto.DashboardTotalDTO;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +28,10 @@ public class Dashboard {
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardDTO> getTotalSaleRun(Authentication authentication) throws Exception {
         String uid = (String) authentication.getPrincipal();
+    
         UserRecord user = FirebaseAuth.getInstance()
                 .getUser(uid);
-        DashboardDTO dashboardData = dashboardService.getDashboardByUserId(user.getUid());
+        DashboardTotalDTO dashboardData = dashboardService.getDashboardByUserId(user.getUid());
         List<List_RunDTO> dashboardList = dashboardService.getDashboardListByUserId(user.getUid());
 
         DashboardDTO finalDashboardData = new DashboardDTO(

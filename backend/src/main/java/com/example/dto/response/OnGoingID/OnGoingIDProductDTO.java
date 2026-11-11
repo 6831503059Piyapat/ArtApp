@@ -27,7 +27,14 @@ public class OnGoingIDProductDTO {
     String Category;
     String Host_user_Id;
     List<ProductDTO> products;
-
+    public OnGoingIDProductDTO() {}
+    public OnGoingIDProductDTO(String supplier_Id, String supplier_Name, String category, String host_user_Id, List<ProductDTO> products) {
+        Supplier_Id = supplier_Id;
+        Supplier_Name = supplier_Name;
+        Category = category;
+        Host_user_Id = host_user_Id;
+        this.products = products;
+    }
     public String getSupplier_Id() {
         return Supplier_Id;
     }

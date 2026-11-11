@@ -1,6 +1,7 @@
 "use client";
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Footer from "@/app/components/footer";
 import { useState, type FormEvent,useEffect } from "react";
 import {
@@ -17,7 +18,7 @@ import {
   Trash2,
   UserRound,
   UsersRound,
-} from "lucide-react";
+} from "lucide-react";  
 
 type Product = {
   id: number;
@@ -80,10 +81,12 @@ const accentStyles = {
   },
 };
 
-const inputClass ="min-w-0 rounded-lg border  bg-white px-2.5 py-2 text-sm text-[#111747] outline-none transition  placeholder:text-[#8b90a2]";
+const inputClass ="min-h-11 min-w-0 rounded-lg border bg-white px-2.5 py-2 text-sm text-[#111747] outline-none transition placeholder:text-[#8b90a2] sm:min-h-0";
 const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
 export default function CreateSalesRun() {
+  //token 
+  const [token, setToken] = useState<string | null>(null);
   // State for manage sections and expenses
   const [language, setLanguage] = useState<'EN' | 'TH'>('EN');
 
@@ -114,16 +117,7 @@ export default function CreateSalesRun() {
 
   //Not real Function for send to backend, just for test
   async function hamdleSubmit(){
-    // const Response = await fetch("http://localhost:3000/api/salesRun",{
-    //   method: "POST",
-    //   headers: {"Content-Type": "application/json"},
-    //   body: JSON.stringify({
-    //     runName: runName,
-    //     runDate: runDate,
-    //     runLocation: runLocation,
-    //     ownerProduct: ownerProducts
-    //   })
-    // })
+   
     if(!runName ){
       if(!runName) setRunNameError(true);
       if (runName) setRunNameError(false);
@@ -134,6 +128,45 @@ export default function CreateSalesRun() {
       setError("Please fill in all required fields");
       return;
     }
+     const Response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/backend/sale-runs/create",{
+      method: "POST",
+      headers: {"Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+
+      },
+      body: JSON.stringify({
+        runName: runName,
+        runDate: runDate,
+        runLocation: runLocation,
+        runOwnerId:getAuth().currentUser?.uid,
+        runSections: sections,
+        runExpenses: expenses
+      })
+    })
+    console.log(Response.text());
+    // const saleList = 
+    // [{
+    //   accent: "purple",
+    //   id: "host-8466468345",
+    //   name: "My Products",
+    //   placeholder: "Item Name (e.g. Linen Coaster Set)",
+    //   products: [
+    //     {
+    //       id: 1791050351463,
+    //       name: "Linen Coaster Set",
+    //       owner :'',
+    //       price:100,
+    //       quantity:85
+    //     }
+    //   ],
+    //   role:'Host'
+    // }];
+    // const expenseLog = [{
+    //   amount:120,
+    //   category:""
+    // }]
+
+    
     setRunNameError(false);
     setRunDateError(false);
     setRunLocationError(false);
@@ -182,15 +215,27 @@ export default function CreateSalesRun() {
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
 
   useEffect(() => {
-    setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+
+
+    const auth = getAuth();
+  setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
+    const emailName = user?.email?.split('@')[0];
+    const idToken = await user?.getIdToken();
+    setToken(idToken ?? null);
+    }
+    
   })
+  return unsubscribe;
+},[]);
   return (
-    <div className="min-h-screen bg-[#f7f8fc] pb-20 font-sans text-[#111747]">
+    <div className="min-h-screen bg-[#f7f8fc] pb-32 font-sans text-[#111747] sm:pb-20">
       
       
       <Navbar />
       
-      <main className="mx-auto w-full max-w-[1280px] px-4 pt-[84px] sm:px-6 md:w-[85%] lg:px-8">
+      <main className="mx-auto w-full max-w-[1280px] px-3 pt-[72px] sm:px-6 sm:pt-[84px] md:w-[85%] lg:px-8">
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-extrabold tracking-tight text-[#111747]">{language === 'EN' ? 'Create Sales Run' : 'สร้างรายการขาย'}</h1>
           <span className="rounded-full border border-[#ded3ff] bg-[#f1edff] px-3 py-1.5 text-sm font-semibold text-[#7957ff]">
@@ -199,15 +244,15 @@ export default function CreateSalesRun() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 items-start gap-3 sm:grid-cols-[170px_minmax(0,1fr)]">
-          <aside className="space-y-2 sm:sticky sm:top-[54px]">
-            <div className="rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
+          <aside className="mb-6 flex flex-col gap-2 sm:mb-0 sm:sticky sm:top-[54px] sm:gap-0 sm:space-y-2">
+            <div className="mx-auto min-w-0 w-[92%] rounded-xl border border-[#e6e9f2] bg-white p-3 shadow-[0_2px_8px_rgba(17,23,71,0.025)] sm:mx-0 sm:w-auto sm:p-2">
               <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#858ba0]"> {language === 'EN' ? 'Catalog Index' : 'ดัชนีแคตตาล็อก'}</h2>
-              <div className="space-y-0.5">
-                <a href="#run-details" className="flex items-center gap-1.5 rounded-lg border border-[#ded3ff] bg-[#f1edff] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
+              <div className="flex flex-col gap-1 sm:block sm:space-y-0.5">
+                <a href="#run-details" className="flex min-h-11 w-full items-center gap-1.5 rounded-lg border border-[#ded3ff] bg-[#f1edff] px-3 py-1.5 text-xs font-semibold text-[#111747] touch-manipulation sm:min-h-0 sm:px-1.5">
                   <Store className="h-2.5 w-2.5 text-[#7957ff]" />  {language === 'EN' ? 'Run Details' : 'รายละเอียด'}
                 </a>
                 {sections.map((section) => (
-                  <a key={section.id} href={`#${section.id}`} className="flex items-center gap-1.5 rounded-lg px-1.5 py-1.5 text-xs text-[#4c526a] hover:bg-[#f7f5ff]">
+                  <a key={section.id} href={`#${section.id}`} className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-[#4c526a] touch-manipulation hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5">
                     {section.id === "host"
                       ? <UserRound className="h-2.5 w-2.5 text-[#7957ff]" />
                       : <span className={`h-2 w-2 rounded-full ${accentStyles[section.accent].dot}`} />}
@@ -216,7 +261,7 @@ export default function CreateSalesRun() {
                 ))}
                 {supplierFormOpen ? (
                   <form
-                    className="flex gap-1 pt-1"
+                    className="flex w-full gap-1 pt-1"
                     onSubmit={(event) => {
                       event.preventDefault();
                       addSupplier();
@@ -231,25 +276,25 @@ export default function CreateSalesRun() {
                       placeholder="Supplier name"
                       className={`${inputClass} ${inputClass2} flex-1`}
                     />
-                    <button type="submit" aria-label="Add supplier" className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg bg-[#7957ff] text-white hover:bg-[#6642ed]">
+                    <button type="submit" aria-label="Add supplier" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#7957ff] text-white hover:bg-[#6642ed] sm:h-[26px] sm:w-[26px]">
                       <Plus className="h-3 w-3" />
                     </button>
                   </form>
                 ) : (
-                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-2 py-1.5 text-xs font-medium text-[#7957ff] hover:bg-[#ebe4ff]">
+                  <button type="button" onClick={() => setSupplierFormOpen(true)} className="mt-1 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-[#e4dcff] bg-[#f4f0ff] px-3 py-1.5 text-xs font-medium text-[#7957ff] touch-manipulation hover:bg-[#ebe4ff] sm:min-h-0 sm:px-2">
                     <UsersRound className="h-2.5 w-2.5" /> + {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
                   </button>
                 )}
               </div>
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
-                <a href="#booth-expenses" className="flex items-center justify-between rounded-lg bg-[#fff4ef] px-1.5 py-1.5 text-xs font-semibold text-[#111747]">
+                <a href="#booth-expenses" className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#fff4ef] px-3 py-1.5 text-xs font-semibold text-[#111747] touch-manipulation sm:min-h-0 sm:px-1.5">
                   <span className="flex items-center gap-1.5"><Receipt className="h-2.5 w-2.5 text-[#f15a24]" /> {language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่าย'}</span>
                   <ChevronRight className="h-2.5 w-2.5 text-[#858ba0]" />
                 </a>
               </div>
             </div>
 
-            <div className="flex items-start gap-1.5 rounded-xl border border-[#e6e9f2] bg-white p-2 shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
+            <div className="mx-auto flex w-[92%] items-start gap-2 rounded-xl border border-[#e6e9f2] bg-white p-3 shadow-[0_2px_8px_rgba(17,23,71,0.025)] sm:mx-0 sm:w-auto sm:gap-1.5 sm:p-2">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#fff8e5] text-[#edae35]">
                 <Lightbulb className="h-3 w-3" />
               </span>
@@ -261,7 +306,7 @@ export default function CreateSalesRun() {
           </aside>
 
           <div className="min-w-0 space-y-3">
-            <section id="run-details" className="overflow-hidden rounded-xl border border-[#d9ceff] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
+            <section id="run-details" className="scroll-mt-16 overflow-hidden rounded-xl border border-[#d9ceff] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)] sm:scroll-mt-0">
               <div className="h-[3px] bg-gradient-to-r from-[#7957ff] via-[#ed72bd] to-[#ffb84d]" />
               <div className="p-2.5">
                 <h2 className="rounded-md bg-gradient-to-r from-[#ffdb9c] via-[#f5b4cc] to-[#efa2dc] px-3 py-1.5 text-lg font-extrabold leading-tight"> {language === 'EN' ? 'Run’s Information' : 'ข้อมูลรายการขาย'}</h2>
@@ -310,8 +355,8 @@ export default function CreateSalesRun() {
               />
             ))}
 
-            <section id="booth-expenses" className="overflow-hidden rounded-xl border border-[#f5ded7] bg-[#fff5f1]">
-              <div className="flex items-center justify-between gap-2 px-2.5 py-2">
+            <section id="booth-expenses" className="scroll-mt-16 overflow-hidden rounded-xl border border-[#f5ded7] bg-[#fff5f1] sm:scroll-mt-0">
+              <div className="flex flex-col items-start justify-between gap-2 px-3 py-3 sm:flex-row sm:items-center sm:px-2.5 sm:py-2">
                 <div className="flex items-center gap-1.5">
                   <span className="flex h-4 w-4 items-center justify-center rounded-md bg-[#f15a24] text-white"><Receipt className="h-2.5 w-2.5" /></span>
                   <div>
@@ -319,7 +364,7 @@ export default function CreateSalesRun() {
                     <p className="text-xs text-[#858ba0]"> {language === 'EN' ? 'Shared expenses' : 'ค่าใช้จ่ายที่แบ่งปัน'}</p>
                   </div>
                 </div>
-                <span className="rounded-full border border-[#ffd3c5] bg-[#ffe7dc] px-2 py-1 text-xs text-[#e34d1b]">
+                <span className="max-w-full rounded-full border border-[#ffd3c5] bg-[#ffe7dc] px-2 py-1 text-xs text-[#e34d1b]">
                   {language === 'EN' ? 'Total Overhead' : 'ค่าใช้จ่ายรวม'}: <strong className="ml-1">฿{totalExpenses.toLocaleString()}</strong>
                 </span>
               </div>
@@ -336,11 +381,11 @@ export default function CreateSalesRun() {
                   <tbody className="divide-y divide-[#eff0f5]">
                     {expenses.map((expense) => (
                       <tr key={expense.id} className="text-sm hover:bg-[#fffaf8]">
-                        <td className="px-2 py-2 font-medium">{expense.name}</td>
+                        <td className="break-words px-2 py-2 font-medium">{expense.name}</td>
                         <td className="px-2 py-2 text-xs text-[#858ba0]">{expense.category}</td>
                         <td className="px-2 py-2 text-right font-semibold text-[#f15a24]">฿{expense.amount.toLocaleString()}</td>
                         <td className="px-2 py-2 text-center">
-                          <button type="button" aria-label={`Remove ${expense.name}`} onClick={() => setExpenses((current) => current.filter((item) => item.id !== expense.id))} className="text-[#a3a8b6] hover:text-[#e34d1b]">
+                          <button type="button" aria-label={`Remove ${expense.name}`} onClick={() => setExpenses((current) => current.filter((item) => item.id !== expense.id))} className="inline-flex h-11 w-11 touch-manipulation items-center justify-center text-[#a3a8b6] hover:text-[#e34d1b] sm:h-auto sm:w-auto">
                             <Trash2 className="inline h-2.5 w-2.5" />
                           </button>
                         </td>
@@ -360,7 +405,7 @@ export default function CreateSalesRun() {
                   <option>{language === 'EN' ? 'Travel' : 'การเดินทาง'}</option>
                 </select>
                 <input required min="0.01" step="0.01" type="number" value={newExpense.amount} onChange={(event) => setNewExpense({ ...newExpense, amount: event.target.value })} placeholder={language === 'EN' ? 'Amount ฿' : 'จำนวน ฿'} className={`${inputClass} ${inputClass2} flex-[1_1_55px]`} />
-                <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#df4e1c]">
+                <button type="submit" className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-[#f15a24] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#df4e1c] sm:min-h-0 sm:flex-none">
                   <Plus className="h-2.5 w-2.5" /> {language === 'EN' ? 'Add Expense' : 'เพิ่มค่าใช้จ่าย'}
                 </button>
               </form>
@@ -373,8 +418,8 @@ export default function CreateSalesRun() {
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#e9ebf3] bg-white shadow-[0_-3px_12px_rgba(17,23,71,0.04)]">
         
-        <div className="mx-auto flex min-h-[38px] w-full max-w-[1280px] items-center justify-between gap-2 px-[18px] py-1.5 md:w-[85%]">
-          <div className="flex min-w-0 items-center gap-2 text-xs">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-stretch justify-between gap-2 px-3 py-2 sm:min-h-[38px] sm:flex-row sm:items-center sm:gap-2 sm:px-[18px] sm:py-1.5 md:w-[85%]">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs">
             <span className="flex shrink-0 items-center gap-1 font-semibold text-[#7957ff]">
               <Check className="h-2.5 w-2.5" /> {language === 'EN' ? 'All changes saved' : 'บันทึกการเปลี่ยนแปลงแล้ว'}
             </span>
@@ -382,9 +427,9 @@ export default function CreateSalesRun() {
             <span className="hidden truncate text-[#858ba0] sm:inline">{language === 'EN' ? 'Ready for sales at MFU Outside Night Market' : 'พร้อมสำหรับการขายที่ตลาดกลางคืน MFU'}</span>
             {launched && <span role="status" className="truncate font-semibold text-[#159a68]">{language === 'EN' ? 'Run launched' : 'เริ่มต้นแล้ว'}</span>}
           </div>
-          <div className="flex shrink-0 gap-1.5">
-            <button type="button" className="rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-[10px] font-semibold text-[#e34d55] hover:bg-[#ffebeb]">{language === 'EN' ? 'Cancel' : 'ยกเลิก'}</button>
-            <button type="button" onClick={() => hamdleSubmit()} className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm hover:brightness-105">
+          <div className="flex shrink-0 gap-2">
+            <button type="button" className="min-h-11 flex-1 rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-xs font-semibold text-[#e34d55] touch-manipulation hover:bg-[#ffebeb] sm:min-h-0 sm:flex-none sm:text-[10px]">{language === 'EN' ? 'Cancel' : 'ยกเลิก'}</button>
+            <button type="button" onClick={() => hamdleSubmit()} className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm touch-manipulation hover:brightness-105 sm:min-h-0 sm:flex-none">
               <Rocket className="h-2.5 w-2.5" /> {launched ? language === 'EN' ? 'Launched' : 'เริ่มต้นแล้ว' : language === 'EN' ? 'Launch Run' : 'เริ่มต้นการขาย'}
             </button>
           </div>
@@ -426,14 +471,14 @@ function ProductSection({
   };
 
   return (
-    <section id={section.id} className="overflow-hidden rounded-xl border border-[#e6e9f2] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)]">
-      <div className="flex items-center justify-between gap-2 px-2.5 py-2">
+    <section id={section.id} className="scroll-mt-16 overflow-hidden rounded-xl border border-[#e6e9f2] bg-white shadow-[0_2px_8px_rgba(17,23,71,0.025)] sm:scroll-mt-0">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-3 sm:flex-nowrap sm:px-2.5 sm:py-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${accent.number}`}>{index}</span>
           <h2 className="truncate text-base font-extrabold">{section.name}</h2>
           <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium ${accent.badge}`}>{section.role}</span>
         </div>
-        <button type="button" className="flex shrink-0 items-center gap-1 rounded-full border border-[#e7ddff] bg-[#f7f3ff] px-2 py-1.5 text-xs font-semibold text-[#7957ff] hover:bg-[#eee7ff]">
+        <button type="button" className="flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-[#e7ddff] bg-[#f7f3ff] px-3 py-1.5 text-xs font-semibold text-[#7957ff] touch-manipulation hover:bg-[#eee7ff] sm:min-h-0 sm:px-2">
           <FileDown className="h-2 w-2" /> Import CSV
         </button>
       </div>
@@ -452,14 +497,14 @@ function ProductSection({
               <tr key={product.id} className="text-sm hover:bg-[#fcfbff]">
                 <td className="px-2 py-2">
                   <span className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${accent.dot}`} />
-                  <span className="font-medium">{product.name}</span>
+                  <span className="break-words font-medium">{product.name}</span>
                 </td>
                 <td className="px-2 py-2 text-center">
                   <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${accent.badge}`}>{product.quantity}</span>
                 </td>
                 <td className="px-2 py-2 text-right font-semibold">฿{product.price.toLocaleString()}</td>
                 <td className="px-2 py-2 text-center">
-                  <button type="button" aria-label={`Remove ${product.name}`} onClick={() => onRemove(product.id)} className="text-[#a3a8b6] transition hover:text-[#e34d55]">
+                  <button type="button" aria-label={`Remove ${product.name}`} onClick={() => onRemove(product.id)} className="inline-flex h-11 w-11 touch-manipulation items-center justify-center text-[#a3a8b6] transition hover:text-[#e34d55] sm:h-auto sm:w-auto">
                     <Trash2 className="inline h-2.5 w-2.5" />
                   </button>
                 </td>
@@ -476,7 +521,7 @@ function ProductSection({
         <input required min="1" step="1" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} placeholder={language === 'EN' ? 'Qty' : 'จำนวน'} className={`${inputClass} ${inputClass2} flex-[1_1_42px]`} />
         <input required min="0" step="0.01" type="number" value={price} onChange={(event) => setPrice(event.target.value)} placeholder={language === 'EN' ? 'Price ฿' : 'ราคา (฿)'} className={`${inputClass} ${inputClass2} flex-[1_1_52px]`} />
         <input hidden value={section.id} onChange={(e)=>setOwnerP(e.target.value)}/>
-        <button type="submit" className="flex items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#6642ed]">
+        <button type="submit" className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#6642ed] sm:min-h-0 sm:flex-none">
           <Plus className="h-2.5 w-2.5" /> {language === 'EN' ? 'Add Product' : 'เพิ่มสินค้า'}
         </button>
       </form>

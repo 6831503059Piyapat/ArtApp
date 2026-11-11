@@ -1,37 +1,57 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import org.springframework.data.domain.Persistable;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "Sale_logs")
-public class SaleLogsEntity {
+public class SaleLogsEntity implements Persistable<String>{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Sale_logs_Id")
     private String Sale_logs_id;
+     @Transient
+    private boolean isNew = true;
+
+    @Override
+    public String getId() {
+        return Sale_logs_id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    public void markNotNew() {
+        this.isNew = false;
+    }
+
     // Getters & Setters
-    @Column(name = "Sale_run_Id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Sale_run_Id", nullable = false)
     private String Sale_run_id;
-    @Column(name = "Product_name", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Product_name", nullable = false)
     private String Product_name;
     @Column(name = "Run_Assistant_Name", nullable = false)
     private String Run_Assistant_Name;
     @Column(name = "Quantity_sold", nullable = false)
-    private int Quantity_sold;
+    private Integer Quantity_sold;
     @Column(name = "Product_Unit_Price", nullable = false)
-    private double Product_Unit_Price;
+    private Double Product_Unit_Price;
     @Column(name = "Time_Stamp", nullable = false)
-    private String Time_Stamp;
-    @Column(name ="Supplier_Name", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime Time_Stamp;
+    @Column(name ="Supplier_Name", nullable = false)
     private String Supplier_Name;
     @Column(name = "Total_Price", nullable = false)
-    private double Total_Price;
-
-    
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id")
+    private Double Total_Price;
+  
+        @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id" , insertable = false, updatable = false)
     private SaleRunEntity saleRun;
     
 
@@ -66,22 +86,22 @@ public class SaleLogsEntity {
     public void setRun_Assistant_Name(String Run_Assistant_Name) {
         this.Run_Assistant_Name = Run_Assistant_Name;
     }
-    public int getQuantity() {
+    public Integer getQuantity() {
         return Quantity_sold;
     }
-    public void setQuantity(int Quantity_sold) {
+    public void setQuantity(Integer Quantity_sold) {
         this.Quantity_sold = Quantity_sold;
     }
-    public double getUnit_price() {
+    public Double getUnit_price() {
         return Product_Unit_Price;
     }
-    public void setUnit_price(double Product_Unit_Price) {
+    public void setUnit_price(Double Product_Unit_Price) {
         this.Product_Unit_Price = Product_Unit_Price;
     }
-    public String getTime_sold() {
+    public LocalDateTime getTime_sold() {
         return Time_Stamp;
     }
-    public void setTime_sold(String Time_Stamp) {
+    public void setTime_sold(LocalDateTime Time_Stamp) {
         this.Time_Stamp = Time_Stamp;
     }
     public SaleRunEntity getSaleRun() {
@@ -97,10 +117,10 @@ public class SaleLogsEntity {
         this.Supplier_Name = Supplier_Name;
     }
 
-    public double getTotal_Price() {
+    public Double getTotal_Price() {
         return Total_Price;
     }
-    public void setTotal_Price(double Total_Price) {
+    public void setTotal_Price(Double Total_Price) {
         this.Total_Price = Total_Price;
     }
 }
