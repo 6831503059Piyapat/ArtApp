@@ -38,6 +38,7 @@ const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 const [runCode, setRunCode] = useState('');
 const [saleRunId, setSaleRunId] = useState();
 const router = useRouter();
+const [dataFetched,setDataFetched] = useState();
 
 async function fetchDashboardData(idToken:any) {
   try{
@@ -52,6 +53,9 @@ async function fetchDashboardData(idToken:any) {
     });
     const data = await response.json();
     console.log("Response:", data);
+    setDataFetched(data);
+
+
   }catch(err){
     console.error("Error fetching dashboard data:", err);
   }
@@ -143,6 +147,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               <h2 className="text-lg font-bold tracking-tight sm:text-2xl">
                 MFU Outside Night Market <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
               </h2>
+              
             </div>
             <div className="relative z-10 my-3 rounded-xl border border-[#f0f1f6] bg-[#f8f9fc] p-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-1 text-xs sm:text-sm">
