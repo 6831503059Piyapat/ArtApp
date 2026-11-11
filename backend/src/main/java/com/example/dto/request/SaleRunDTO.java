@@ -37,6 +37,7 @@ public class SaleRunDTO {
 //         runExpenses: expenses
     private String runName;
     private String runDate;
+    private String runOwnerName;
     private String runLocation;
     private String runOwnerId;
     @JsonProperty("runSections")
@@ -45,13 +46,14 @@ public class SaleRunDTO {
     private List<SaleRunExpenseDTO> expenses;
     
 
-    public SaleRunDTO(String runName, String runDate, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections) {
+    public SaleRunDTO(String runName, String runDate, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections, String runOwnerName) {
         this.runName = runName;
         this.runDate = runDate;
         this.runLocation = runLocation;
         this.runOwnerId = runOwnerId;
         this.expenses = expenses;
         this.sections = sections;
+        this.runOwnerName = runOwnerName;
     }
     public String getRunName() {
         return runName;
@@ -90,5 +92,11 @@ public class SaleRunDTO {
         this.expenses = expenses;
     }
     public SaleRunDTO() {}
+    public String getRunOwnerName() {
+        return runOwnerName;
+    }
+    public void setRunOwnerName(String runOwnerName) {
+        this.runOwnerName = runOwnerName;
+    }
 
 }

@@ -139,6 +139,7 @@ export default function CreateSalesRun() {
         runDate: runDate,
         runLocation: runLocation,
         runOwnerId:getAuth().currentUser?.uid,
+        runOwnerName:getAuth().currentUser?.displayName,
         runSections: sections,
         runExpenses: expenses
       })
