@@ -73,6 +73,23 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
         INSERT INTO sale_logs(sale_logs_id, product_unit_price,product_name,quantity_sold,run_assistant_name,sale_run_id,supplier_name,time_stamp,total_price) VALUES (:sale_logs_id,:product_unit_price,:product_name,:quantity_sold,:run_assistant_name,:sale_run_id,:supplier_name,:time_stamp,:total_price)
         """,nativeQuery = true)
         void addSaleLog(@Param ("sale_logs_id") String sale_logs_id, @Param ("product_unit_price") Double product_unit_price, @Param ("product_name") String product_name, @Param ("quantity_sold") Integer quantity_sold, @Param ("run_assistant_name") String run_assistant_name, @Param ("sale_run_id") String sale_run_id, @Param ("supplier_name") String supplier_name, @Param ("time_stamp") String time_stamp, @Param ("total_price") Double total_price);
+    //Edit Product
+    @Modifying
+    @Transactional
+    @Query(
+        value = """
+        UPDATE Product SET product_name = :name, product_unit_price = :price,current_stock = :current_stock, start_stock = :start_stock WHERE product_id = :id
+        """,
+        nativeQuery = true
+    )
+    void editProduct(@Param("id") String id, @Param("name") String name, @Param("price") Double price, @Param("current_stock") Integer current_stock, @Param("start_stock") Integer start_stock);
     
-    
+    @Modifying 
+    @Transactional 
+    @Query(
+        value = """
+        DELETE FROM Product WHERE product_id = :id
+        """,nativeQuery = true
+    )
+    void deleteProductById(@Param("id") String id);
 }

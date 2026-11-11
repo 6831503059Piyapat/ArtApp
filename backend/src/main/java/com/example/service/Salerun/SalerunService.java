@@ -50,8 +50,9 @@ public class SalerunService {
         String runName = saleRunDTO.getRunName();
         String runDate = saleRunDTO.getRunDate();
         String runLocation = saleRunDTO.getRunLocation();
+        String runOwnerName = saleRunDTO.getRunOwnerName();
         String runOwnerId = saleRunDTO.getRunOwnerId();
-     
+        
          Random random = new Random();
         StringBuilder sb = new StringBuilder(15);
        
@@ -110,7 +111,7 @@ public class SalerunService {
                 expense.setAmount(expenseDTO.getAmount().doubleValue());
                 expense.setCategory(expenseDTO.getCategory());
                 expense.setDescription(expenseDTO.getName());
-                expense.setPaid_by_User_Name(runOwnerId);
+                expense.setPaid_by_User_Name(runOwnerName);
                 expense.setTimestamp(LocalDateTime.now());
                 expense.setSaleRun(saleRun);
                 expenses.add(expense);

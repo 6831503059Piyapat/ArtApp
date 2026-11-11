@@ -1,5 +1,6 @@
 
 package com.example.controller.OnGoing;
+import com.example.dto.request.OnGoing.OngoingID.ProductSell.SellItemDTO;
 // import com.google.firebase.auth.FirebaseToken;
 import com.example.dto.response.OnGoingDTO;
 import com.example.service.OnGoingListService;
@@ -7,15 +8,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
-
+import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductRequestSaveDTO;
+import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductFixDTO;
+import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductAddDTO;
+import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductDeleteDTO;
 import com.example.service.OnGoing.OnGoingIDService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
-import com.example.dto.request.OnGoing.OngoingID.SellItemDTO;
 
 // import java.util.Map;
 // import java.util.HashMap;
@@ -46,6 +50,20 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
         onGoingIDService.confirmSale(sellItemDTO);
 
         return ResponseEntity.ok("Sale confirmed successfully");
+    }
+   
+    @PutMapping("/ongoing/save-changes")
+    public ResponseEntity<String> saveChanges(@RequestBody ProductRequestSaveDTO productRequestSaveDTO) {
+        String saleRunId = productRequestSaveDTO.getSaleRunId();
+        String assistanceName = productRequestSaveDTO.getAssistanceName();
+        if (saleRunId == null || assistanceName == null) {
+            return ResponseEntity.badRequest().body("SaleRunId and AssistanceName are required");
+        }
+        List<ProductFixDTO> fixStock = productRequestSaveDTO.getFixStock();
+        List<ProductAddDTO> add = productRequestSaveDTO.getAdd();
+        List<ProductDeleteDTO> delete = productRequestSaveDTO.getDelete();
+        onGoingIDService.saveChanges(saleRunId, assistanceName, fixStock, add, delete);
+        return ResponseEntity.ok("Changes saved successfully");
     }
    
     
