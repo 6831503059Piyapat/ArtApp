@@ -22,7 +22,24 @@ import {
 import Navbar from '@/app/components/navbar';
 
 type SessionFilter = 'All Sessions' | 'Active' | 'Completed';
+type RunData = {
+  Best_revenue :number;
 
+  List_Run:{
+    Date_closed: string;
+    Date_created: string;
+    Gross_sale:number;
+    Id:string;
+    Total_Item_sold:number;
+    Total_stock:number;
+    isActive:boolean;
+  }[];
+  Total_active:number;
+  Total_completed:number;
+  Total_create:number;
+  Total_item_sold:number;
+
+}
 const completedRuns = [
   { name: 'Sunday Craft Fair', date: '15/09/2026', revenue: '฿8,420' },
   { name: 'Artisan Weekend Pop-up', date: '10/09/2026', revenue: '฿12,350' },
@@ -37,8 +54,10 @@ export default function DashboardPage() {
 const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 const [runCode, setRunCode] = useState('');
 const [saleRunId, setSaleRunId] = useState();
+const [dataFetch,setDataFetch] = useState<RunData | null>(null);
 const router = useRouter();
-const [dataFetched,setDataFetched] = useState();
+//เพิ่ม 3 บรรทัดขึ้นมา
+
 
 async function fetchDashboardData(idToken:any) {
   try{
@@ -52,8 +71,9 @@ async function fetchDashboardData(idToken:any) {
 
     });
     const data = await response.json();
+    setDataFetch(data);
     console.log("Response:", data);
-    setDataFetched(data);
+    setDataFetch(data);
 
 
   }catch(err){
@@ -186,26 +206,26 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl border border-[#eceef5] bg-[#f8f9fc] px-2 py-1.5">
                 <p className="text-[10px] text-[#858ba0] sm:text-xs"> {language === 'EN'? 'Created' : 'สร้างแล้ว'}</p>
-                <p className="text-base font-bold sm:text-lg"> 14{language === 'EN' ? ' Total' : ' รายการ'}</p>
+                <p className="text-base font-bold sm:text-lg"> {dataFetch?.Total_create || 0}{language === 'EN' ? ' Total' : ' รายการ'}</p>
               </div>
               <div className="rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-1.5">
                 <p className="text-[10px] text-[#7C5CFF] sm:text-xs"> {language === 'EN' ? 'Completed' : 'สำเร็จแล้ว'}</p>
-                <p className="text-base font-bold text-[#7C5CFF] sm:text-lg">12 {language === 'EN' ? 'Runs' : 'รายการ'}</p>
+                <p className="text-base font-bold text-[#7C5CFF] sm:text-lg"> {dataFetch?.Total_completed || 0} {language === 'EN' ? 'Runs' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-pink-100 bg-pink-50/80 px-2 py-1.5">
                 <p className="text-[10px] text-pink-500 sm:text-xs"> {language === 'EN' ? 'Active' : 'กำลังดำเนินการ'}</p>
-                <p className="text-base font-bold text-pink-500 sm:text-lg">1 {language === 'EN' ? 'Run' : 'รายการ'}</p>
+                <p className="text-base font-bold text-pink-500 sm:text-lg"> {dataFetch?.Total_active || 0} {language === 'EN' ? 'Run' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-[#FFE7C0] bg-[#FFFDF1] px-2 py-1.5">
                 <p className="text-[10px] text-[#FFB24C] sm:text-xs"> {language === 'EN' ? 'Products Sold' : 'รายการขายแล้ว'}</p>
-                <p className="text-base font-bold text-[#FFB24C] sm:text-lg">88 {language === 'EN' ? 'items sold' : 'รายการขายแล้ว'}</p>
+                <p className="text-base font-bold text-[#FFB24C] sm:text-lg"> {dataFetch?.Total_item_sold || 0} {language === 'EN' ? 'items sold' : 'รายการขายแล้ว'}</p>
               </div>
             </div>
             <div className="flex flex-col items-start gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
               <span className="flex items-center gap-2 bg-gradient-to-r from-[#F062C0] to-[#7C5CFF] bg-clip-text text-xs font-extrabold text-transparent sm:text-sm">
                 <Star size={15} className="fill-[#F062C0] text-[#F062C0]" /> {language === 'EN' ? 'Best Run Revenue' : 'กำไรสูงสุดจากการขาย'}:
               </span>
-              <span className="text-lg font-extrabold text-[#0B0F4F]">฿4,250</span>
+              <span className="text-lg font-extrabold text-[#0B0F4F]">฿{dataFetch?.Best_revenue || 0}</span>
             </div>
           </article>
           </section>
@@ -230,7 +250,16 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                       : 'text-[#858ba0] hover:bg-[#7C5CFF]/5 hover:text-[#7C5CFF]'
                   }`}
                 >
-                  {filter === 'All Sessions' ? 'All Sessions (3)' : filter === 'Active' ? '● Active (1)' : 'Completed (2)'}
+                  {/* อันเก่า {filter === 'All Sessions' ? 'All Sessions (3)' : filter === 'Active' ? '● Active (1)' : 'Completed (2)'}  */
+                  
+                  filter === 'All Sessions' 
+                   ? `All Sessions (${dataFetch?.Total_create || 0})` 
+                   : filter === 'Active' 
+                   ? `Active (${dataFetch?.Total_active || 0})` 
+                   : `Completed (${dataFetch?.Total_completed || 0})`
+
+          
+                  }
                 </button>
               ))}
             </div>
@@ -245,7 +274,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="min-w-0">
                   <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
                   <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
-                    MFU Outside Night Market <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                    MFU Outside Night Market 
+                    <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
                   </h4>
                   <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> 2 assistants active in booth
