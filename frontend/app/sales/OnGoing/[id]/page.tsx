@@ -83,6 +83,33 @@ type CartItem = {
   quantity: number;
   stock: number;
 };
+type ProductFixStock = {
+  id:string;
+  name:string;
+  stock:number;
+  price:number;
+  supplierId:string;
+  supplierName:string;
+  productId:string;
+  AssistantName:string;
+
+}
+type ProductAdd = {
+  id:string;
+  stock:number;
+  image_url?:string;
+  productname:string;
+  productprice:number;
+  supplierId:string;
+}
+type ProductDelete = {
+  id: string;
+  productId: string;
+  productname: string;
+  supplierId: string;
+  supplierName: string;
+  AssistantName: string;
+}
 export default function SalesRunDetail() {
   return (
    
@@ -316,6 +343,9 @@ function SalesRunDetailContent() {
       grossIntake:8490,
     }
   ];
+  const [ProductsFixStock, setProductsFixStock] = useState<ProductFixStock[]>([]);
+  const [ProductsAdd, setProductsAdd] = useState<ProductAdd[]>([]);
+  const [ProductsDelete, setProductsDelete] = useState<ProductDelete[]>([]);
   const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
@@ -570,7 +600,34 @@ const handleConfirmSale = async () => {
 };
 
 
+async function handleSaveChanges(){
+  if (ProductsFixStock.length === 0 && ProductsAdd.length === 0 && ProductsDelete.length === 0) return;
 
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/save-changes`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body: JSON.stringify({
+      saleRunId: id,
+      assistanceName: AssistantName,
+      fixStock: ProductsFixStock,
+      add: ProductsAdd,
+      delete: ProductsDelete,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error("Error saving changes");
+    return;
+  }
+  console.log(ProductsFixStock, ProductsAdd, ProductsDelete);
+  // Clear the arrays after successful save
+  setProductsFixStock([]);
+  setProductsAdd([]);
+  setProductsDelete([]);
+}
 
 
   return (
@@ -822,7 +879,139 @@ const handleConfirmSale = async () => {
       dotColor={accent.dot}
       items={items.products ?? []}
       placeholderText="Item Name (e.g. Linen Coaster Set)"
-      onImageClick={(product) => setImageProduct({ supplierId: items.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })}
+      onProductChange={(productId: string, changes: Partial<Pick<InventoryProduct, 'name' | 'stock' | 'price'>>) => {
+        const product = items.products.find((currentProduct) => currentProduct.id === productId);
+        if (!product) return;
+
+        const updatedProduct = { ...product, ...changes };
+        setProducts((currentProducts) =>
+          currentProducts.map((supplier) =>
+            supplier.id !== items.id
+              ? supplier
+              : {
+                  ...supplier,
+                  products: supplier.products.map((currentProduct) =>
+                    currentProduct.id === productId ? { ...currentProduct, ...changes } : currentProduct
+                  ),
+                }
+          )
+        );
+        if (ProductsAdd.some((addedProduct) => addedProduct.supplierId === items.id && addedProduct.id === productId)) {
+          setProductsAdd((currentProductsAdd) =>
+            currentProductsAdd.map((addedProduct) =>
+              addedProduct.supplierId === items.id && addedProduct.id === productId
+                ? {
+                    ...addedProduct,
+                    stock: updatedProduct.stock,
+                    productname: updatedProduct.name,
+                    productprice: updatedProduct.price,
+                  }
+                : addedProduct
+            )
+          );
+        } else {
+          setProductsFixStock((currentFixes) => {
+            const updatedFix = {
+              id: updatedProduct.id,
+              name: updatedProduct.name,
+              stock: updatedProduct.stock,
+              price: updatedProduct.price,
+              supplierId: items.id,
+              supplierName: items.name,
+              productId,
+              AssistantName,
+            };
+            const existingFix = currentFixes.find(
+              (fix) => fix.supplierId === items.id && fix.productId === productId
+            );
+            return existingFix
+              ? currentFixes.map((fix) =>
+                  fix.supplierId === items.id && fix.productId === productId ? updatedFix : fix
+                )
+              : [...currentFixes, updatedFix];
+          });
+        }
+      }}
+      onAddProduct={(product: Omit<InventoryProduct, 'id' | 'supplierId' | 'supplierName'>) => {
+        const productId = `product-${Date.now()}`;
+        const newProduct = {
+          ...product,
+          id: productId,
+          supplierId: items.id,
+          supplierName: items.name,
+        };
+        setProducts((currentProducts) =>
+          currentProducts.map((supplier) =>
+            supplier.id !== items.id
+              ? supplier
+              : {
+                  ...supplier,
+                  products: [
+                    ...supplier.products,
+                    newProduct,
+                  ],
+                }
+          )
+        );
+        setProductsAdd((currentProductsAdd) => [
+          ...currentProductsAdd,
+          {
+            id: productId,
+            stock: product.stock,
+            productname: product.name,
+            productprice: product.price,
+            supplierId: items.id,
+          },
+        ]);
+      }}
+      onDeleteProduct={(productId: string) => {
+        const product = items.products.find((currentProduct) => currentProduct.id === productId);
+        if (!product) return;
+
+        const isAddedProduct = ProductsAdd.some(
+          (addedProduct) => addedProduct.supplierId === items.id && addedProduct.id === productId
+        );
+        if (!isAddedProduct) {
+          setProductsDelete((currentDeletes) => {
+            const deletedProduct = {
+              id: product.id,
+              productId: product.id,
+              productname: product.name,
+              supplierId: items.id,
+              supplierName: items.name,
+              AssistantName,
+            };
+            const alreadyDeleted = currentDeletes.some(
+              (deleted) => deleted.supplierId === items.id && deleted.productId === productId
+            );
+            return alreadyDeleted
+              ? currentDeletes.map((deleted) =>
+                  deleted.supplierId === items.id && deleted.productId === productId
+                    ? deletedProduct
+                    : deleted
+                )
+              : [...currentDeletes, deletedProduct];
+          });
+        }
+        setProducts((currentProducts) =>
+          currentProducts.map((supplier) =>
+            supplier.id !== items.id
+              ? supplier
+              : { ...supplier, products: supplier.products.filter((product) => product.id !== productId) }
+          )
+        );
+        setProductsAdd((currentProductsAdd) =>
+          currentProductsAdd.filter(
+            (product) => !(product.supplierId === items.id && product.id === productId)
+          )
+        );
+        setProductsFixStock((currentFixes) =>
+          currentFixes.filter(
+            (fix) => !(fix.supplierId === items.id && fix.productId === productId)
+          )
+        );
+      }}
+      onImageClick={(product: any) => setImageProduct({ supplierId: items.id, productId: product.id, name: product.name, imageUrl: product.imageUrl })}
       language={language}
     />
   );
@@ -1280,7 +1469,7 @@ const handleConfirmSale = async () => {
               </button>
               <button
                 type="button"
-                onClick={() => setStepMode("sales")}
+                onClick={() => handleSaveChanges()}
                 className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-4 py-2 text-xs font-bold text-[#111747] shadow-sm transition hover:brightness-105 sm:min-h-0 sm:flex-none"
               >
                 <Check className="h-3.5 w-3.5" />  {language === 'EN' ? 'Apply to run' : 'บันทึกการเปลี่ยนแปลง'}
@@ -1559,7 +1748,34 @@ function getSupplierAccent(id: string) {
   };
 }
 
-function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language, onImageClick }:any) {
+function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCount, dotColor, items, placeholderText, language, onImageClick, onProductChange, onAddProduct, onDeleteProduct }:any) {
+  const [name, setName] = useState('');
+  const [stock, setStock] = useState('');
+  const [price, setPrice] = useState('');
+
+  const handleAddProduct = () => {
+    const trimmedName = name.trim();
+    const parsedStock = Number(stock);
+    const parsedPrice = Number(price);
+
+    if (!trimmedName || stock === '' || price === '' || !Number.isInteger(parsedStock) || parsedStock < 0 || !Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      return;
+    }
+
+    onAddProduct({
+      name: trimmedName,
+      start: parsedStock,
+      stock: parsedStock,
+      price: parsedPrice,
+      sold: 0,
+      icon: Package,
+      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
+    });
+    setName('');
+    setStock('');
+    setPrice('');
+  };
+
   return (
     <div className="space-y-3">
       {/* Group Header */}
@@ -1614,7 +1830,8 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
                 <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}></span>
                 <input
                   type="text"
-                  defaultValue={item.name}
+                  value={item.name}
+                  onChange={(event) => onProductChange(item.id, { name: event.target.value })}
                   className="min-h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:outline-[#7C5CFF] sm:min-h-0 sm:w-fit sm:min-w-[50%]"
                 />
               </div>
@@ -1622,11 +1839,11 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
               {/* Qty Stepper */}
               <div className="col-span-6 flex w-full items-center justify-center gap-1.5 justify-self-center rounded-lg border border-[#EEE9FF] bg-[#EEE9FF] px-1 py-1 sm:col-span-3 sm:w-fit sm:px-2">
                 <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Stock' : 'สต็อก'}</span>
-                <button className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] sm:h-6 sm:w-6">
+                <button type="button" onClick={() => onProductChange(item.id, { stock: Math.max(0, item.stock - 1) })} disabled={item.stock === 0} className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] disabled:cursor-not-allowed disabled:opacity-40 sm:h-6 sm:w-6">
                   <Minus className="h-2.5 w-2.5" />
                 </button>
                 <span className="w-7 text-center text-xs font-bold text-[#7C5CFF]">{item.stock}</span>
-                <button className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] sm:h-6 sm:w-6">
+                <button type="button" onClick={() => onProductChange(item.id, { stock: item.stock + 1 })} className="flex h-11 w-11 items-center justify-center rounded-md border border-[#EEE9FF] bg-white text-[#7C5CFF] shadow-2xs hover:bg-[#F8F7FF] sm:h-6 sm:w-6">
                   <Plus className="h-2.5 w-2.5" />
                 </button>
               </div>
@@ -1638,7 +1855,13 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
                   <span className="font-bold text-[#FFB24C]">฿</span>
                   <input
                     type="text"
-                    defaultValue={item.price}
+                    value={item.price}
+                    onChange={(event) => {
+                      const nextPrice = Number(event.target.value);
+                      if (Number.isFinite(nextPrice) && nextPrice >= 0) {
+                        onProductChange(item.id, { price: nextPrice });
+                      }
+                    }}
                     className="w-full bg-transparent text-center text-xs font-bold text-slate-800 focus:outline-none"
                   />
                 </div>
@@ -1652,7 +1875,7 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
 
               {/* Delete Action */}
               <div className="col-span-6 flex items-center justify-center text-center sm:col-span-1">
-                <button aria-label={`Remove ${item.name}`} className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 sm:h-auto sm:w-auto sm:p-1.5">
+                <button type="button" onClick={() => onDeleteProduct(item.id)} aria-label={`Remove ${item.name}`} className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 sm:h-auto sm:w-auto sm:p-1.5">
                   <Trash2 className="mx-auto h-3.5 w-3.5" />
                 </button>
               </div>
@@ -1668,6 +1891,8 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
           <input
             type="text"
             placeholder={language === 'EN' ? 'Items Name (e.g. T-Shirt)' : 'ชื่อสินค้า (เช่น เสื้อยืด)'}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
             className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
@@ -1675,6 +1900,10 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
           <input
             type="number"
             placeholder={language === 'EN' ? 'Qty' : 'ปริมาณ'}
+            min="0"
+            step="1"
+            value={stock}
+            onChange={(event) => setStock(event.target.value)}
             className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
@@ -1682,11 +1911,15 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
           <input
             type="number"
             placeholder={language === 'EN' ? 'Price ฿' : 'ราคา (฿)'}
+            min="0"
+            step="0.01"
+            value={price}
+            onChange={(event) => setPrice(event.target.value)}
             className="min-h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-[11px] transition-all placeholder:text-slate-500 focus:outline-[#6366F1]"
           />
         </div>
         <div className="col-span-6 sm:col-span-2">
-          <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
+          <button type="button" onClick={handleAddProduct} className="flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-[#7C5CFF] py-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-[#6847e8]">
             <PlusCircle className="w-3.5 h-3.5" />{language === 'EN' ? 'Add Product' : 'เพิ่มสินค้า'}
           </button>
         </div>

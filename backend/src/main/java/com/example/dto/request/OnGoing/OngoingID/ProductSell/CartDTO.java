@@ -1,4 +1,4 @@
-package com.example.dto.request.OnGoing.OngoingID;
+package com.example.dto.request.OnGoing.OngoingID.ProductSell;
 
 public class CartDTO {
     private String name;

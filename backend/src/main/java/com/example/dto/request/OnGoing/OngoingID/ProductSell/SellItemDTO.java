@@ -1,4 +1,4 @@
-package com.example.dto.request.OnGoing.OngoingID;
+package com.example.dto.request.OnGoing.OngoingID.ProductSell;
 import java.util.List;
 public class SellItemDTO {
     private String saleRunId;
