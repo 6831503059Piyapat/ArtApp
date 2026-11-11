@@ -40,14 +40,14 @@ public class ExpenseLogEntity implements Persistable<String> {
     // Getters & Setters
     public ExpenseLogEntity() {
     }
-    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_Name, LocalDateTime timestamp, String description, String category, Double amount) {
+    public ExpenseLogEntity(String Expense_id, String Sale_run_id, String Paid_by_User_Name, LocalDateTime Time_Stamp, String Description, String Category, Double Amount) {
         this.Expense_id = Expense_id;
         this.Sale_run_id = Sale_run_id;
         this.Paid_by_User_Name = Paid_by_User_Name;
-        this.Time_Stamp = timestamp;
-        this.Description = description;
-        this.Category = category;
-        this.Amount = amount;
+        this.Time_Stamp = Time_Stamp;
+        this.Description = Description;
+        this.Category = Category;
+        this.Amount = Amount;
     }
     public String getExpense_id() {
         return Expense_id;

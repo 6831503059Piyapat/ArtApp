@@ -18,6 +18,7 @@ import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductDeleteDTO;
 import com.example.service.OnGoing.OnGoingIDService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.entity.ExpenseLogEntity;
 import org.springframework.http.ResponseEntity;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 
@@ -65,7 +66,17 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
         onGoingIDService.saveChanges(saleRunId, assistanceName, fixStock, add, delete);
         return ResponseEntity.ok("Changes saved successfully");
     }
-   
-    
+   @GetMapping("/ongoing/{id}/expenses-list")
+    public ResponseEntity<List<ExpenseLogEntity>> fetchExpensesById(@PathVariable("id") String sale_id) throws Exception {
+        // Implement the logic to fetch expenses by sale run ID here
+        List<ExpenseLogEntity> expenses = onGoingIDService.getExpensesBySaleRunId(sale_id);
+        return ResponseEntity.ok(expenses);
+    }
+    @PostMapping ("/ongoing/{id}/add-expense")
+    public ResponseEntity<String> addExpense(@PathVariable("id") String sale_run_id, @RequestBody ExpenseLogEntity expenseLog) {
+        // Implement the logic to add a new expense here
+        onGoingIDService.addExpenseLog(expenseLog,sale_run_id);
+        return ResponseEntity.ok("Expense added successfully");
+    }
     
 }

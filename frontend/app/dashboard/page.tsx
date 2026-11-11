@@ -30,6 +30,7 @@ type RunData = {
     Date_created: string;
     Gross_sale:number;
     Id:string;
+    Sale_run_name:string;
     Total_Item_sold:number;
     Total_stock:number;
     isActive:boolean;
@@ -165,7 +166,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 </span>
               </div>
               <h2 className="text-lg font-bold tracking-tight sm:text-2xl">
-                MFU Outside Night Market <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                {dataFetch?.List_Run.at(0)?.Sale_run_name || 'MFU Outside Night Market'} <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
               </h2>
               
             </div>
@@ -274,7 +275,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="min-w-0">
                   <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
                   <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
-                    MFU Outside Night Market 
+                    {/* MFU Outside Night Market  */  }
                     <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
                   </h4>
                   <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">

@@ -15,13 +15,13 @@ public class ChangesHistoryEntity  implements Persistable<String> {
     private String History_id;
 
     
-    @Column(name = "Sale_run_Id", nullable = false, insertable = false, updatable = false) 
+    @Column(name = "Sale_run_Id", nullable = false)
     private String Sale_run_id;
 
-    @Column(name = "Change_by_Username", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Change_by_Username", nullable = false)
     private String Change_by_Username;
 
-    @Column(name = "Run_Assistant_Name", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Run_Assistant_Name", nullable = false)
     private String Run_Assistant_Name;
 
     @Column(name = "Time_Stamp", nullable = false)
@@ -36,18 +36,18 @@ public class ChangesHistoryEntity  implements Persistable<String> {
    
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id")
+    @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id", insertable = false, updatable = false)
     private SaleRunEntity SaleRun;
     public ChangesHistoryEntity() {
     }
-    public ChangesHistoryEntity(String History_id, String Sale_run_id, String Change_by_Username, String Run_Assistant_Name, LocalDateTime timestamp, String action, String details) {
+    public ChangesHistoryEntity(String History_id, String Sale_run_id, String Change_by_Username, String Run_Assistant_Name, LocalDateTime Time_Stamp, String Action, String Details) {
         this.History_id = History_id;
         this.Sale_run_id = Sale_run_id;
         this.Change_by_Username = Change_by_Username;
         this.Run_Assistant_Name = Run_Assistant_Name;
-        this.Time_Stamp = timestamp;
-        this.Action_Type = action;
-        this.Details = details;
+        this.Time_Stamp = Time_Stamp;
+        this.Action_Type = Action;
+        this.Details = Details;
     }
     public String getHistory_id() {
         return History_id;
