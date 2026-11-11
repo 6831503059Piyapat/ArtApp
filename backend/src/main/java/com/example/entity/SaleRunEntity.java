@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Table(name = "SaleRun")
@@ -41,14 +42,14 @@ public class SaleRunEntity {
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
     private List<SupplierEntity> Supplier = new ArrayList<>();
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
     private List<RunSupplierPayoutEntity> runSupplierPayouts = new ArrayList<>();
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
     private List<ChangesHistoryEntity> changesHistories = new ArrayList<>();
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @JsonManagedReference("saleRun-assistance")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
     private List<RunAssistanceEntity> runAssistants = new ArrayList<>();
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)   

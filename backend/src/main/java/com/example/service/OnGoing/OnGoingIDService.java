@@ -16,34 +16,50 @@ import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductDeleteDTO;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import com.example. entity.ExpenseLogEntity;
 import com.example.dto.response.OnGoingID.SupplierOnGoingDTO;
 import com.example.dto.response.OnGoingID.OnGoingSaleDTO;
 import com.example.entity.SaleLogsEntity;
 import java.util.List;
+import java.util.Random;
+
 import com.example.entity.ChangesHistoryEntity;
 import com.example.repository.OnGoing.ProductRepo;
 import java.util.ArrayList;
 
 import com.example.repository.SaleLog.SaleLogRepo;
 import com.example.repository.Salerun.SalerunRepo;
+import com.example.repository.SupplierRepo;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.http.HttpStatus;
+import com.example.repository.ExpenseRepo;
+import com.example.repository.ExpensesLogRepo;
+import com.example.repository.ChangeHistoryRepo;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class OnGoingIDService {
-
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private final OnGoingIDRepo onGoingIDRepository;
     private final SaleLogRepo saleLogRepository;
+    private final ChangeHistoryRepo changesHistoryRepository;
     private final AssistantRepo assistantRepository;
     private final SalerunRepo saleRunRepository;
     private final ProductRepo productRepository;
+    private final SupplierRepo supplierRepository;
+    private final ExpensesLogRepo expenseLogRepository;
 
-    public OnGoingIDService(OnGoingIDRepo onGoingIDRepository, SaleLogRepo saleLogRepository, AssistantRepo assistantRepository, ProductRepo productRepository, SalerunRepo saleRunRepository) {
+    public OnGoingIDService(OnGoingIDRepo onGoingIDRepository, SaleLogRepo saleLogRepository, ChangeHistoryRepo changesHistoryRepository, AssistantRepo assistantRepository, ProductRepo productRepository, SalerunRepo saleRunRepository, SupplierRepo supplierRepository, ExpensesLogRepo expenseLogRepository) {
         this.onGoingIDRepository = onGoingIDRepository;
         this.saleLogRepository = saleLogRepository;
+        this.changesHistoryRepository = changesHistoryRepository;
         this.assistantRepository = assistantRepository;
         this.productRepository = productRepository;
         this.saleRunRepository = saleRunRepository;
+        this.supplierRepository = supplierRepository;
+        this.expenseLogRepository = expenseLogRepository;
     }
 
     @Transactional(readOnly = true)
@@ -127,7 +143,8 @@ public class OnGoingIDService {
         if (fixStock != null){
             String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             for (ProductFixDTO product : fixStock) {
-               ProductEntity productEntityFind = productRepository.findById(product.getProductId()).orElse(null);
+                
+               ProductEntity productEntityFind = productRepository.findById(product.getProductId()).orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + product.getProductId()));
                ProductEntity productEntity = new ProductEntity();
                Integer startStockFind = productEntityFind.getStart_Stock();
                Integer currentStockFind = productEntityFind.getCurrent_Stock();
@@ -139,7 +156,7 @@ public class OnGoingIDService {
                     if(currentStockFind < product.getStock()){
                         // increase start stock by the difference between current stock and new stock
                         newStartStock = startStockFind + (product.getStock() - currentStockFind);
-                        changesLog.add(new ChangesHistoryEntity("CHL-" + timestampStr + "-" + product.getProductId(), saleRunId, product.getAssistantName(),product.getAssistantName(),LocalDateTime.now(),"Restock", "Stock adjusted +  " + (product.getStock() - currentStockFind) + "units"));
+                        changesLog.add(new ChangesHistoryEntity("CHL-Stock" + timestampStr + "-" + product.getProductId(), saleRunId, product.getAssistantName(),product.getAssistantName(),LocalDateTime.now(),"Restock", "Stock adjusted +  " + (product.getStock() - currentStockFind) + "units"));
                     }
                     else if(currentStockFind > product.getStock()){
                         // decrease start stock by the difference between current stock and new stock
@@ -150,22 +167,17 @@ public class OnGoingIDService {
                     else{
                         
                         newStartStock = startStockFind;
-                        if(productEntity.getProduct_UnitPrice() != product.getPrice()){
-                            changesLog.add(new ChangesHistoryEntity("CHL-" + timestampStr + "-" + product.getProductId(), saleRunId, product.getAssistantName(),product.getAssistantName(),LocalDateTime.now(),"Price Update", "Adjusted price from " + productEntity.getProduct_UnitPrice() + " to " + product.getPrice()));
-                        }
                     }
+                     if(productEntityFind.getProduct_UnitPrice() != product.getPrice()){
+                            changesLog.add(new ChangesHistoryEntity("CHL-Price" + timestampStr + "-" + product.getProductId(), saleRunId, product.getAssistantName(),product.getAssistantName(),LocalDateTime.now(),"Price Update", "Adjusted price from " + productEntityFind.getProduct_UnitPrice() + " to " + product.getPrice()));
+                        }
                     productRepository.editProduct(product.getProductId(), product.getName(), product.getPrice(), product.getStock(), newStartStock);
                 }
                 
             }
         }
         if (add != null){
-    //         private String id;
-    // private Integer stock;
-    // private String image_url;
-    // private String productname;
-    // private Double productprice;
-    // private String supplierId;
+
             List<ProductEntity> newProducts = new ArrayList<>();
             String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             for (ProductAddDTO product : add) {
@@ -177,19 +189,55 @@ public class OnGoingIDService {
                 productEntity.setImage_url("");
                 productEntity.setProduct_UnitPrice(product.getProductprice());
                 productEntity.setProduct_Name(product.getProductname());
-                productEntity.setSupplier(productRepository.getReferenceById(product.getSupplierId()).getSupplier());
+                productEntity.setSupplier_id(product.getSupplierId());
+                productEntity.setSupplier(
+                        supplierRepository.findById(product.getSupplierId())
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                        "Supplier not found with ID: " + product.getSupplierId()
+                                ))
+                );
 
 
                 newProducts.add(productEntity);
+                changesLog.add(new ChangesHistoryEntity("CHL-ADD" + timestampStr + "-" + generatedIdProduct + add.indexOf(product), saleRunId, assistanceName,assistanceName,LocalDateTime.now(),"ADD", "ADD Product: " + product.getProductname()));
 
             }
             productRepository.saveAllAndFlush(newProducts);
         }
         if (delete != null){
+            String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             for (ProductDeleteDTO product : delete) {
                 productRepository.deleteProductById(product.getProductId());
+                
+                changesLog.add(new ChangesHistoryEntity("CHL-DELETE" + timestampStr + "-" + product.getProductId(), saleRunId, assistanceName,assistanceName,LocalDateTime.now(),"DELETE", "DELETE Product: " + product.getProductname()));
+
             }
         }
+        changesHistoryRepository.saveAllAndFlush(changesLog);
+
+    }
+    public List<ExpenseLogEntity> getExpensesBySaleRunId(String saleRunId) {
+        return expenseLogRepository.findBySaleRunId(saleRunId);
+    }
+
+    public void addExpenseLog(ExpenseLogEntity expenseLog,String sale_run_id) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(5);
+       
+        for (int i = 0; i < 5; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(randomIndex));
+        }
+        
+        String generatedId = sb.toString() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+        expenseLog.setExpense_id("expenseLog-" + generatedId + "-" + sale_run_id);
+        expenseLog.setTimestamp(LocalDateTime.now());
+        expenseLog.setSaleRun(
+            saleRunRepository.getReferenceById(sale_run_id)
+        );
+        expenseLogRepository.save(expenseLog);
+        changesHistoryRepository.save(new ChangesHistoryEntity("CHL-EXPENSE" + generatedId + "-" + sale_run_id, sale_run_id, expenseLog.getPaid_by_User_Name(),expenseLog.getPaid_by_User_Name(),LocalDateTime.now(),"Expense Add", "ADD Expense: " + expenseLog.getDescription()));
 
     }
 }
