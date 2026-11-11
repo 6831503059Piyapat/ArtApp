@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public record List_RunDTO(
 
     String Id,
+    String Sale_run_name,
     BigDecimal Total_stock,
     BigDecimal Total_Items_sold,
     LocalDateTime Date_created,

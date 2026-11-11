@@ -12,7 +12,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
 
     @Column(name = "User_Id")
-    private String Userid;
+    private String userid;
     
     @Column(name = "Email")
     private String email;
@@ -29,15 +29,15 @@ public class UserEntity {
     public UserEntity() {
     }
     public UserEntity(String userid, String email, String displayName) {
-        this.Userid = userid;
+        this.userid = userid;
         this.email = email;
         this.displayName = displayName;
     }
     public String getUserid() {
-        return Userid;
+        return userid;
     }
     public void setUserid(String userid) {
-        this.Userid = userid;
+        this.userid = userid;
     }
     public String getEmail() {
         return email;

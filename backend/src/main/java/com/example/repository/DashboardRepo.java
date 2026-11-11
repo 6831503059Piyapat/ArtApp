@@ -56,6 +56,7 @@ public interface DashboardRepo extends JpaRepository<UserEntity, String> {
     @Query(value = """
     SELECT 
         CAST(sr.Sale_run_id AS CHAR) AS Id,
+        sr.sale_run_name AS Sale_run_name,
         COALESCE(stock_summary.Total_stock, 0) AS Total_stock,
         COALESCE(sales_summary.Total_Items_sold, 0) AS Total_Items_sold,
         CAST(sr.Date_created AS DATETIME) AS Date_created,
