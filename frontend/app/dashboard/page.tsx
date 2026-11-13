@@ -173,15 +173,15 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             <div className="relative z-10 my-3 rounded-xl border border-[#f0f1f6] bg-[#f8f9fc] p-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-1 text-xs sm:text-sm">
                 <span className="font-semibold">{language === 'EN' ? 'Stock Cleared' : 'สต๊อกที่เคลียร์แล้ว'}</span>
-                <span className="font-bold text-[#7C5CFF]">5.8% {language === 'EN' ? 'Cleared' : 'เคลียร์แล้ว'}</span>
+                <span className="font-bold text-[#7C5CFF]">{ ( (dataFetch?.List_Run.at(0)?.Total_Items_sold || 0) / (dataFetch?.List_Run.at(0)?.Total_stock || 1) ) * 100} % {language === 'EN' ? 'Cleared' : 'เคลียร์แล้ว'}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-[#e9ebf3]">
                 <div className="h-full w-[5.8%] rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400" />
               </div>
               <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
-                <span className="font-semibold text-[#0B0F4F]">6/103 {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
-                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} 14/09/2026</span>
-              </div>
+                <span className="font-semibold text-[#0B0F4F]">{dataFetch?.List_Run.at(0)?.Total_Items_sold || 0} / {dataFetch?.List_Run.at(0)?.Total_stock || 0}  {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
+                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} {dataFetch?.List_Run.at(0)?.Date_created}</span>
+              </div>  
             </div>
             <div className="relative z-10 mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
               <div>

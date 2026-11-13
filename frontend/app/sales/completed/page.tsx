@@ -2,6 +2,7 @@
 import Navbar from '@/app/components/navbar';
 import Footer from '@/app/components/footer';
 import React, { useState, useMemo,useEffect } from 'react';
+import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import Link from 'next/link';
 import { BadgeCheck, Banknote, Clock3, ShoppingBag,Sparkles } from 'lucide-react';
 
@@ -42,6 +43,18 @@ const INITIAL_RUNS = [
 export default function CompletedRunsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); // Default to English
+  async function fetchListCompleteRun(idToken: string){
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/complete-list',{
+      headers: {
+        'Authorization': `Bearer ${idToken}`,
+        'Content-Type': 'application/json',
+       
+      },
+      method: 'GET',
+
+    });
+    console.log("Response from backend:", await response.json());
+  }
   // Filter Logic
   const filteredRuns = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -54,7 +67,16 @@ export default function CompletedRunsPage() {
     );
   }, [searchQuery]);
 useEffect(() => {
+  const auth = getAuth();
   setLanguage(localStorage.getItem('language') === 'TH' ? 'TH' : 'EN');
+   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
+    const idToken = await user?.getIdToken();
+    fetchListCompleteRun(idToken);
+    }
+    
+  });
+  return () => unsubscribe(); // Cleanup subscription on unmount
 },[])
   return (
     <div className="flex min-h-screen flex-col bg-creatory-canvas text-creatory-navy font-sans antialiased">

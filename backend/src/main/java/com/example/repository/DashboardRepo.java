@@ -24,22 +24,48 @@ public interface DashboardRepo extends JpaRepository<UserEntity, String> {
 // Total_item_sold:number;
 // Best_revenue:number;
     @Query(value = """
-        SELECT COUNT(sr.Sale_run_id) AS Total_create,COUNT(CASE WHEN sr.sale_run_status = FALSE THEN 1 END) AS Total_complete,
-    COUNT(CASE WHEN sr.sale_run_status = TRUE THEN 1 END) AS Total_active,
-    COALESCE(SUM(sl.quantity_sold), 0) AS Total_item_sold,
-    COALESCE(MAX(run_summary.Total_Revenue), 0) AS Best_revenue
-    FROM Sale_Run sr
-    LEFT JOIN Sale_logs sl 
-    ON sr.Sale_run_id = sl.Sale_run_id
-    LEFT JOIN (
-    SELECT 
-        Sale_run_id, 
-        SUM(quantity_sold * product_unit_price) AS Total_Revenue
+       
+SELECT
+    COUNT(sr.sale_run_id) AS Total_create,
+
+    COUNT(
+        CASE WHEN sr.sale_run_status = FALSE
+        THEN 1 END
+    ) AS Total_complete,
+
+    COUNT(
+        CASE WHEN sr.sale_run_status = TRUE
+        THEN 1 END
+    ) AS Total_active,
+
+    COALESCE(
+        SUM(run_summary.Total_item_sold), 0
+    ) AS Total_item_sold,
+
+    COALESCE(
+        MAX(run_summary.Total_Revenue), 0
+    ) AS Best_revenue
+
+FROM Sale_Run sr
+
+LEFT JOIN (
+    SELECT
+        Sale_run_id,
+
+        SUM(quantity_sold) AS Total_item_sold,
+
+        SUM(quantity_sold * product_unit_price)
+            AS Total_Revenue
+
     FROM Sale_logs
-    
     GROUP BY Sale_run_id
-) run_summary 
-    ON sr.Sale_run_id = run_summary.Sale_run_id WHERE sr.host_user_id = :uid;
+
+) run_summary
+    ON sr.Sale_run_id = run_summary.Sale_run_id
+
+WHERE sr.host_user_id =
+    :uid;
+
     """,nativeQuery = true)
     List<DashboardTotalDTO> findTotalDashboardByUserId(@Param("uid") String uid);
 

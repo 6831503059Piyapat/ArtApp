@@ -92,6 +92,7 @@ public class OnGoingIDService {
         onGoingIDDTO.setGross_sales(onGoingSaleDTO.getGross_sales());
         onGoingIDDTO.setTotal_Stock(onGoingSaleDTO.getTotal_Stock());
         onGoingIDDTO.setTotal_Sale(onGoingSaleDTO.getTotal_Sale());
+        onGoingIDDTO.setJoin_code(onGoingSaleDTO.getCode_join());
         List<String> supplierNames = new ArrayList<>();
         for (SupplierOnGoingDTO supplier : supplierDTO) {
             supplierNames.add(supplier.getSupplier_Name());
@@ -120,12 +121,24 @@ public class OnGoingIDService {
             saleLog.setRun_Assistant_Name(sellItemDTO.getAssistanceName());
             saleLog.setSale_run_id(sale_run_Id);
             saleLog.setSupplier_Name(item.getSupplierName());
+            
+            saleLog.setSupplier(
+                    supplierRepository.findById(item.getSupplierId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Supplier not found with ID: " + item.getSupplierId()
+                            ))
+            );
             saleLog.setTime_sold(LocalDateTime.parse(DateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             saleLog.setTotal_Price(item.getPrice() * item.getQuantity());
+            saleLog.setPaymentMethod(sellItemDTO.getPaymentMethod());
             saleLogs.add(saleLog);
+
             saleLog.setSaleRun(
             saleRunRepository.getReferenceById(sale_run_Id)
 );
+            saleLog.setSupplier(
+            supplierRepository.getReferenceById(item.getSupplierId())
+            );
             ///
             //Update Product Stock
             productRepository.updateProductCurrentStock(item.getProductId(),item.getQuantity());

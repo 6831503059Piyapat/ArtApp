@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 const subscribeToOrigin = () => () => undefined;
 const getOrigin = () => window.location.origin;
 const getServerOrigin = () => "";
@@ -92,6 +93,9 @@ function QrCodeDialog({
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [onClose, url]);
+ 
+
+
 
   return (
     <div
@@ -244,9 +248,17 @@ const splitAllocation = [
   { label: "Nong' Japan", amount: "฿297.50", color: "bg-[#ed72bd]" },
   { label: "Host Cut", amount: "฿150.00", color: "bg-[#ffb84d]" },
 ];
-
+interface SensorData {
+  deviceId: string;
+  temperature: number;
+  humidity: number;
+  status: string;
+  timestamp: string;
+}
 export default function ConsignDesk() {
   const { id } = useParams<{ id: string }>();
+  const [sensorData, setSensorData] = useState<SensorData | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const origin = useSyncExternalStore(subscribeToOrigin, getOrigin, getServerOrigin);
   const viewerUrl = origin
     ? new URL(`/ViewUser/${encodeURIComponent(id)}`, origin).toString()
@@ -273,6 +285,41 @@ export default function ConsignDesk() {
     }
   }
 
+  useEffect(() => {
+    // 1. สร้าง STOMP Client โดยชี้ไปที่ Endpoint /ws ของ Spring Boot
+    const client = new Client({
+      webSocketFactory: () => new SockJS(process.env.NEXT_PUBLIC_API_URL + "/ws"),
+      reconnectDelay: 5000, // ถ้าหลุดให้ต่อใหม่ทุก 5 วินาทีอัตโนมัติ
+      onConnect: () => {
+        setIsConnected(true);
+        console.log("Connected to WebSocket!");
+
+        // 2. Subscribe เฉพาะ Topic ของ Parameter (deviceId) นี้
+        client.subscribe(`/viewLive/${id}`, (message) => {
+          if (message.body) {
+            console.log("Received message:", message.body);
+            const parsedObject: SensorData = JSON.parse(message.body);
+            setSensorData(parsedObject); // อัปเดต State ทันทีเมื่อมีข้อมูลใหม่
+            console.log("Received sensor data:", parsedObject);
+          }
+        });
+      },
+      onDisconnect: () => {
+        setIsConnected(false);
+        console.log("Disconnected");
+      },
+    });
+
+    // เริ่มการเชื่อมต่อ
+    client.activate();
+
+    // 3. Cleanup: ตัดการเชื่อมต่อเมื่อเปลี่ยนหน้าหรือเปลี่ยน deviceId
+    return () => {
+      client.deactivate();
+    };
+  }, [id]); // ถ้า deviceId เปลี่ยน จะตัดสายเก่าแล้วต่อสาย topic ใหม่ให้อัตโนมัติ
+
+ 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#111747]">
       <nav className="flex h-14 shrink-0 items-center justify-between border-b border-[#eeeafc] bg-white px-3 sm:px-5">

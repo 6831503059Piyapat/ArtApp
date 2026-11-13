@@ -22,7 +22,7 @@ public class FirebaseFilter extends OncePerRequestFilter {
                 String path = request.getServletPath();
 
         // 1. กำหนด Path ของ WebSocket ที่ต้องการยกเว้น
-        if (path.startsWith("/ws-public")) {
+        if (path.startsWith("/ws")) {
             filterChain.doFilter(request, response);
             return;
         }
