@@ -387,7 +387,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="hidden grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] bg-[#7C5CFF]/5 px-4 py-2.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0F4F] sm:grid sm:px-5">
                   <span> {language === 'EN' ? 'Market event & location' : 'เหตุการณ์และสถานที่'}</span>
                   <span>{language === 'EN' ? 'Date closed' : 'วันที่ปิดรายการ'}</span>
-                  <span>{language === 'EN' ? 'Total revenue' : 'รายได้รวม'}</span>
+                  <span>{language === 'EN' ? 'Gross sales' : 'ยอดขายรวม'}</span>
                   <span className="text-right ">{language === 'EN' ? 'Settlement summary' : 'สรุปการชำระเงิน'}</span>
                 </div>
                 {completedRuns.map((run) => (
