@@ -19,7 +19,7 @@ import {
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-
+import { useRouter } from "next/navigation";
 type LiveStatsDTO = {
   LiveID: string;
   saleRunName: string;
@@ -364,14 +364,13 @@ export default function ConsignDesk() {
   const [dataFetchSale, setDataFetchSale] = useState<LiveStatsSaleDTO | null>(null);
   const [dataFetchSplitAllocation, setDataFetchSplitAllocation] = useState<LiveStatsSplitAllocationDTO | null>(null);
   const [dataFetchSupplier, setDataFetchSupplier] = useState<LiveStatsSupplierDTO| null>(null);
-  
+  const [language, setLanguage] = useState<"EN" | "TH">("TH");
+  const router = useRouter();
   const origin = useSyncExternalStore(subscribeToOrigin, getOrigin, getServerOrigin);
   const viewerUrl = origin
     ? new URL(`/ViewUser/${encodeURIComponent(id)}`, origin).toString()
     : "";
-  const [language] = useState<"EN" | "TH">(() =>
-    typeof window !== "undefined" && localStorage.getItem("language") === "EN" ? "EN" : "TH"
-  );
+
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const qrButtonRef = useRef<HTMLButtonElement>(null);
@@ -391,12 +390,16 @@ export default function ConsignDesk() {
   };
 
   async function fetchData(){
-  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/live-status/viewLive/" + id,{
+  try{
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/live-status/viewLive/" + id,{
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
   });
+  if (response.status === 404) {
+    router.replace("/not-found");
+  }
   const data = await response.json();
   setDataAfterFetch(data);
   setDataFetchSale(data.saleLogs);
@@ -410,7 +413,9 @@ export default function ConsignDesk() {
   }
   setTotalSold(totalSold);
   setTotalIntake(totalIntake);
-  console.log(data);
+  }catch(err){}
+  
+
 }
 
 
@@ -427,6 +432,11 @@ export default function ConsignDesk() {
   }
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem("language");
+
+    if (savedLanguage) {
+      setLanguage(localStorage.getItem("language") as "EN" | "TH");
+    }
     fetchData();
     // 1. สร้าง STOMP Client โดยชี้ไปที่ Endpoint /ws ของ Spring Boot
     const client = new Client({
@@ -576,7 +586,7 @@ export default function ConsignDesk() {
               </span>
             </div>
 
-            {dataAfterFetch?.Supplier?.map((supplier) => {
+            {dataAfterFetch?.Supplier?.map((supplier,index) => {
               // const Icon = supplier.icon;
               // const themeClasses = supplierThemes[supplier.theme];
 
@@ -584,7 +594,7 @@ export default function ConsignDesk() {
                 <article key={supplier.Id_supplier} className="min-w-0 rounded-2xl border border-[#eeeafd] bg-white px-3.5 py-3 shadow-[0_4px_14px_rgba(93,76,166,0.035)] sm:px-4">
                   <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap sm:gap-3">
                     <div className="flex min-w-0 items-center gap-2.5 ">
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border `}>
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border `} style={{ borderColor: colorMap[index] }}>
                         <Bug className="h-4 w-4" />
                       </span>
                       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
