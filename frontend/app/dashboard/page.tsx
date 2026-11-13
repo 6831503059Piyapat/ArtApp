@@ -49,6 +49,7 @@ export default function DashboardPage() {
   const [sessionFilter, setSessionFilter] = useState<SessionFilter>('All Sessions');
   const showOngoing = sessionFilter !== 'Completed';
   const showCompleted = sessionFilter !== 'Active';
+  const [token, setToken] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
 const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -56,7 +57,28 @@ const [runCode, setRunCode] = useState('');
 const [saleRunId, setSaleRunId] = useState();
 const [dataFetch,setDataFetch] = useState<RunData | null>(null);
 const router = useRouter();
+async function handleJoinRunSubmit(){
+  if (!runCode.trim()) return;
 
+  try{
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/join-sale', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${token}` // ส่ง token ของผู้ใช้ปัจจุบันไปยัง backend
+      
+    },
+    body: JSON.stringify({ 
+      code_join: runCode,
+      user_id : getAuth().currentUser?.uid
+      
+     })
+  });
+}catch(err){
+    console.error("Error joining run:", err);
+}
+
+}
 async function fetchDashboardData(idToken:any) {
   try{
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/dashboard', {
@@ -84,7 +106,7 @@ useEffect(() => {
     const emailName = user?.email?.split('@')[0];
     setDisplayName(user?.displayName?.trim() || emailName || '');
     const idToken = await user?.getIdToken();
-    // setToken(idToken ?? null);
+    setToken(idToken ?? null);
     fetchDashboardData(idToken);
     }
     
@@ -433,7 +455,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           </button>
 
           <button
-            type="submit"
+            type="button"
+            onClick={()=>handleJoinRunSubmit()}
             className="inline-flex h-11 items-center justify-center
               gap-2 rounded-full bg-[#7C5CFF] px-6
               text-sm font-bold text-white shadow-lg
