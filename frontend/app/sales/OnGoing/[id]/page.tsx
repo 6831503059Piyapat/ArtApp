@@ -123,6 +123,7 @@ function SalesRunDetailContent() {
   const { id } = useParams<{ id: string }>();
   const [AssistantName, setAsistantName] = useState<string>('');
   async function fetchSalesRunData(saleRunId: string, idToken: string) {
+    // setProducts([]);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
       method: 'GET',
       headers: {
@@ -133,7 +134,35 @@ function SalesRunDetailContent() {
 
     }
   );
-   console.log(response.json());
+    if (!response.ok) {
+      throw new Error(`Failed to load sale run: ${response.status}`);
+    }
+
+    const data = await response.json();
+    // setProducts(
+    //   (data.Supplier ?? []).map((supplier: any) => ({
+    //     id: supplier.supplier_Id,
+    //     name: supplier.supplier_Name,
+    //     role: supplier.category === 'host' ? "Host's inventory" : 'Supplier inventory',
+    //     accent: getSupplierAccent(supplier.supplier_Id).dot,
+    //     category: supplier.category ?? 'supplier',
+    //     placeholder: 'Item Name (e.g. Linen Coaster Set)',
+    //     products: (supplier.products ?? []).map((product: any) => ({
+    //       id: product.product_Id,
+    //       name: product.product_Name,
+    //       start: product.start_Stock ?? 0,
+    //       stock: product.current_Stock ?? 0,
+    //       price: product.product_Unit_Price ?? 0,
+    //       sold: 0,
+    //       icon: Package,
+    //       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
+    //       supplierId: product.supplier_Id ?? supplier.supplier_Id,
+    //       supplierName: supplier.supplier_Name,
+    //       imageUrl: product.image_url || undefined,
+    //     })),
+    //   }))
+    // );
+    console.log("Fetched Sales Run Data:", data);
   }
   
   useEffect(() => {
@@ -151,7 +180,7 @@ function SalesRunDetailContent() {
   }, [id]);
   const Suppliers: Supplier[] = [
     {
-    id: "host-8466468345",
+    id: "supplier0-up73mVrzGH6Lfm7-20261113094945",
     name: "My Products",
     role: "Host's inventory",
     accent: "purple",
@@ -160,7 +189,7 @@ function SalesRunDetailContent() {
 
     products: [
       {
-      id: 'product-0-20261109115632-qx4hjObfR9rBeyY-20261109115632-0',
+      id: "product-0-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
       name: 'Green Horned Frog',
       start: 13,
       stock: 3,
@@ -168,7 +197,7 @@ function SalesRunDetailContent() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
+      supplierId: "supplier0-up73mVrzGH6Lfm7-20261113094945",
       supplierName:"My Products"
     },
     {
@@ -180,7 +209,7 @@ function SalesRunDetailContent() {
       sold: 9,
       icon: Sun,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
+      supplierId: "supplier0-qx4hjObfR9rBeyY-20261109115632",
       supplierName:"My Products"
     },
     {
@@ -192,14 +221,14 @@ function SalesRunDetailContent() {
       sold: 4,
       icon: Mountain,
       iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
+      supplierId: "supplier0-qx4hjObfR9rBeyY-20261109115632",
       supplierName:"My Products"
      
     },
     ],
   },
    {
-    id: "kaimook-8466468345",
+    id: "supplier1-up73mVrzGH6Lfm7-20261113094945",
     name: "P Kaimook",
     role: "Host's inventory",
     accent: "purple",
@@ -207,7 +236,7 @@ function SalesRunDetailContent() {
     category: "supplier",
     products: [
       {
-      id: '1',
+      id: "product-1-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
       name: 'Green Horned Frog',
       start: 13,
       stock: 3,
@@ -215,7 +244,7 @@ function SalesRunDetailContent() {
       sold: 10,
       icon: Leaf,
       iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345",
+      supplierId: "supplier1-up73mVrzGH6Lfm7-20261113094945",
       supplierName:"P Kaimook"
      
     },
@@ -247,7 +276,7 @@ function SalesRunDetailContent() {
     ],
   },
   {
-    id: "nong-japan-8466468345",
+    id: "supplier2-up73mVrzGH6Lfm7-20261113094945",
     name: "Nong' Japan",
     role: "Supplier inventory",
     accent: "yellow",
@@ -255,7 +284,7 @@ function SalesRunDetailContent() {
     category: "supplier",
     products: [
       {
-        id: 'nong-japan-1',
+        id: "product-2-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
         name: 'Aquarium Moss Ball (Medium)',
         start: 15,
         stock: 8,
@@ -263,7 +292,7 @@ function SalesRunDetailContent() {
         sold: 7,
         icon: Package,
         iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345",
+        supplierId: "supplier2-up73mVrzGH6Lfm7-20261113094945",
         supplierName:"Nong' Japan"
       },
       {
@@ -391,7 +420,19 @@ function SalesRunDetailContent() {
   const [showUndoNotification, setShowUndoNotification] = useState(false);
 
 
+async function getExpenses(){
+  setStepMode("expense");
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/${id}/expenses-list`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
 
+  });
+  const data = await response.json();
+  console.log("Fetched Expenses Data:", data);
+}
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -414,6 +455,8 @@ function SalesRunDetailContent() {
     );
     setImageProduct(null);
   };
+  
+ 
   const handleCopy = () => {
     navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
@@ -628,8 +671,53 @@ async function handleSaveChanges(){
   setProductsAdd([]);
   setProductsDelete([]);
 }
+ async function handleAddExpense() {
+   
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/${id}/add-expense`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+      },
+      body: JSON.stringify({
+        Expense_id: `expense-${Date.now()}`,
+        Sale_run_id: id,
+        Paid_by_User_Name: AssistantName,
+        Time_Stamp: new Date().toISOString(),
+        Description: expenseTitle,
+        Category: category,
+        Amount: parseFloat(amount),
 
+      })
+    });
+    if (!response.ok) {
+      console.error("Error adding expense");
+      return;
+    }
+    setExpenseTitle('');
+    setCategory('Stall Supplies');
+    setAmount('70');
+    console.log("Adding expense:", await response.text());
+  }
+async function endRunSendRequest() {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/sale-runs/end`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body: JSON.stringify({
+      saleRunId: id,
+      assistanceName: AssistantName,
+    }),
+  });
 
+  if (!response.ok) {
+    console.error("Error ending sales run");
+    return;
+  }
+  console.log("Ending sales run:", await response.text());
+}
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
       <Suspense fallback="Loading...">
@@ -805,7 +893,7 @@ async function handleSaveChanges(){
               </nav>
 
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
-                <button onClick={()=>setStepMode("expense")} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-2 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20 sm:min-h-0 sm:px-1.5 sm:py-1.5">
+                <button onClick={()=>getExpenses()} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-2 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20 sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="h-2.5 w-2.5 text-[#FFB24C]" />
                     <span>{language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่ายของบูธ'}</span>
@@ -1133,7 +1221,7 @@ async function handleSaveChanges(){
 
           {/* Record Button */}
           <div className="md:col-span-2">
-            <button className="min-h-11 w-full rounded-xl bg-[#FFB24C] py-2.5 text-xs font-bold text-[#0B0F4F] shadow-xs transition-colors hover:bg-[#f5a733] active:bg-[#e99a2e] flex items-center justify-center gap-1">
+            <button onClick={()=>handleAddExpense()} className="min-h-11 w-full rounded-xl bg-[#FFB24C] py-2.5 text-xs font-bold text-[#0B0F4F] shadow-xs transition-colors hover:bg-[#f5a733] active:bg-[#e99a2e] flex items-center justify-center gap-1">
               <Plus className="w-4 h-4 stroke-[3]" />{language === 'EN' ? 'Record' : 'บันทึก'}
             </button>
           </div>
@@ -1509,6 +1597,7 @@ async function handleSaveChanges(){
           onRequestConfirmation={() => setIsFinalEndRunOpen(true)}
           onUnconfirm={() => setIsEndRunConfirmed(false)}
           onConfirmEndRun={() => {
+            endRunSendRequest();
             setIsEndRunOpen(false);
             setIsEndRunConfirmed(false);
           }}
