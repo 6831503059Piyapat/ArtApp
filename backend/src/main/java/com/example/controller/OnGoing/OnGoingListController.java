@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.entity.ExpenseLogEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.example.dto.LiveStatsDTO;
+import com.example.service.LiveStatusService;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
-
+import java.util.Map;
 // import java.util.Map;
 // import java.util.HashMap;
 @RestController
@@ -29,10 +32,15 @@ import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 public class OnGoingListController {
     private final OnGoingListService onGoingListService;
     private final OnGoingIDService onGoingIDService;
+    private final LiveStatusService liveStatusService;
+        private final SimpMessagingTemplate messagingTemplate;
 
-    public OnGoingListController(OnGoingListService onGoingListService, OnGoingIDService onGoingIDService) {
+
+    public OnGoingListController(OnGoingListService onGoingListService, OnGoingIDService onGoingIDService, SimpMessagingTemplate messagingTemplate, LiveStatusService liveStatusService) {
         this.onGoingListService = onGoingListService;
         this.onGoingIDService = onGoingIDService;
+        this.liveStatusService = liveStatusService;
+        this.messagingTemplate = messagingTemplate;
     }
 @GetMapping("/ongoing-list")
 public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentication) {
@@ -45,11 +53,19 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
                       
         return ResponseEntity.ok(onGoingIDService.getOnGoingListBySalesId(id));
     }
+
     @PostMapping("/confirm-sale")
     public ResponseEntity<String> confirmSale(@RequestBody SellItemDTO sellItemDTO) {
         // Call the service method to handle the sale confirmation logic
+         
         onGoingIDService.confirmSale(sellItemDTO);
-
+        LiveStatsDTO payload =  liveStatusService.updateLiveStatus(sellItemDTO.getSaleRunId());
+        payload.setLiveID(sellItemDTO.getSaleRunId());
+        
+        messagingTemplate.convertAndSend(
+            "/viewLive/" + sellItemDTO.getSaleRunId(),
+            payload
+        );
         return ResponseEntity.ok("Sale confirmed successfully");
     }
    

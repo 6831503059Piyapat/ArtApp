@@ -10,6 +10,7 @@ import jakarta.persistence.PersistenceContext;
 import com.example.dto.request.SaleRunDTO;
 import com.example.dto.request.SaleRunExpenseDTO;
 
+import com.example.dto.System.SupplierFindDTO;
 import java.time.LocalDate;
 
 import java.util.Random;
@@ -23,10 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.ArrayList;
 import com.example.repository.SupplierRepo;
+import com.example.repository.RunSupplierPayoutRepo;
 import com.example.entity.ProductEntity;
+import com.example.entity.RunSupplierPayoutEntity;
 import com.example.repository.OnGoing.ProductRepo;
+import com.example.entity.ChangesHistoryEntity;
+import com.example.repository.ChangeHistoryRepo;
 import com.example.repository.ExpenseRepo;
+import com.example.repository.Assistant.AssistantRepo;
 import com.example.entity.ExpenseLogEntity;
+import jakarta.persistence.EntityNotFoundException;
 @Service
 public class SalerunService {
 
@@ -34,12 +41,18 @@ public class SalerunService {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private final SupplierRepo supplierRepository;
     private final ProductRepo productRepository;
+    private final AssistantRepo assistantRepository;
     private final ExpenseRepo expensesRepository;
-    public SalerunService(SalerunRepo salerunRepository, SupplierRepo supplierRepository, ProductRepo productRepository, ExpenseRepo expensesRepository) {
+    private final RunSupplierPayoutRepo runSupplierPayoutRepository;
+    private final ChangeHistoryRepo changeHistoryRepository;
+    public SalerunService(SalerunRepo salerunRepository, SupplierRepo supplierRepository, ProductRepo productRepository, ExpenseRepo expensesRepository, ChangeHistoryRepo changeHistoryRepository, RunSupplierPayoutRepo runSupplierPayoutRepository, AssistantRepo assistantRepository) {
         this.salerunRepository = salerunRepository;
         this.supplierRepository = supplierRepository;
         this.productRepository = productRepository;
         this.expensesRepository = expensesRepository;
+        this.changeHistoryRepository = changeHistoryRepository;
+        this.runSupplierPayoutRepository = runSupplierPayoutRepository;
+        this.assistantRepository = assistantRepository;
     }
     @PersistenceContext
     private EntityManager entityManager; 
@@ -62,10 +75,17 @@ public class SalerunService {
         }
         
         String sale_run_id = sb.toString() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-
+        StringBuilder sbc = new StringBuilder(7);
+       
+        for (int i = 0; i < 7; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sbc.append(CHARACTERS.charAt(randomIndex));
+        }
+        String code_join = sbc.toString();
         java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(LocalDateTime.now());
         String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        salerunRepository.createSaleRun(sale_run_id,null,runDate,runOwnerId,true,runLocation,runName);
+
+        salerunRepository.createSaleRun(sale_run_id,null,runDate,runOwnerId,true,runLocation,code_join,runName  );
         SaleRunEntity saleRun = entityManager.getReference(SaleRunEntity.class, sale_run_id);
         
         if (saleRunDTO.getSections() != null && !saleRunDTO.getSections().isEmpty()) {
@@ -121,13 +141,64 @@ public class SalerunService {
             
             
         }
+         StringBuilder sbca = new StringBuilder(7);
+       
+        for (int i = 0; i < 7; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sbca.append(CHARACTERS.charAt(randomIndex));
+        }
+        String runassistanIDGenrate = sbca.toString();
         
-    
+        assistantRepository.addRunAssistant(runassistanIDGenrate + "-" + runOwnerId, sale_run_id, runOwnerId, true, true, true, true, true);
     }
 
     @Transactional
-    public void endSaleRun(String saleId) {
-        salerunRepository.endSaleRun(saleId);
+    public void endSaleRun(String saleId,String assistantName) {
+        salerunRepository.endSaleRun(saleId, LocalDateTime.now());
+            // public RunSupplierPayoutEntity(String Payout_id,String Sale_run_id,String Supplier_id , double Gross_sale, int Total_item_sold, double Stall_deductions, double Net_payout, boolean Is_settled) {
+
+        
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(15);
+       
+        for (int i = 0; i < 15; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(randomIndex));
+        }
+        Double totalExpenses = expensesRepository.findTotalExpensesBySaleRunId(saleId);
+        SaleRunEntity saleRun = salerunRepository.findById(saleId)
+                .orElseThrow(() -> new EntityNotFoundException("Sale run not found with ID: " + saleId));
+
+        List<RunSupplierPayoutEntity> runSupplierPayouts = new ArrayList<>();
+        List<String> suplierIds = supplierRepository.findSupplierBySaleRunId(saleId);
+        for(String supplierId : suplierIds){
+           RunSupplierPayoutEntity runSupplierPayout = new RunSupplierPayoutEntity();
+           SupplierFindDTO supplierFindDTO = supplierRepository.findBySaleRunIdAndProductName(supplierId);
+           runSupplierPayout.setGross_sale(supplierFindDTO.getTotal_products().doubleValue());
+           runSupplierPayout.setTotal_item_sold(supplierFindDTO.getQuantity().intValue());
+           runSupplierPayout.setStall_deductions(totalExpenses / suplierIds.size());
+           runSupplierPayout.setNet_payout(runSupplierPayout.getGross_sale() - runSupplierPayout.getStall_deductions());
+           runSupplierPayout.setSale_run_id(saleId);
+           runSupplierPayout.setSupplier_id(supplierId);
+           runSupplierPayout.setSaleRun(saleRun);
+           runSupplierPayout.setSupplier(
+                   supplierRepository.findById(supplierId)
+                           .orElseThrow(() -> new EntityNotFoundException(
+                                   "Supplier not found with ID: " + supplierId)));
+           runSupplierPayout.setIs_settled(false);
+           StringBuilder sbp = new StringBuilder(15);
+              for (int i = 0; i < 15; i++) {
+                 int randomIndex = random.nextInt(CHARACTERS.length());
+                 sbp.append(CHARACTERS.charAt(randomIndex));
+                }
+           runSupplierPayout.setPayout_id("Payout-" + sbp.toString() + supplierId.indexOf(supplierId) + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+            runSupplierPayouts.add(runSupplierPayout);
+        }
+
+        String generatedId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        changeHistoryRepository.save(new ChangesHistoryEntity("CHL-ENDSALERUN" + generatedId + "-" + saleId, saleId, assistantName,assistantName,LocalDateTime.now(),"End Run", "End Sale Run: "));
+        runSupplierPayoutRepository.saveAllAndFlush(runSupplierPayouts);
+
     }
 }
 

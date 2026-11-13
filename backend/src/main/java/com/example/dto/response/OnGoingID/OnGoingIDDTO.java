@@ -26,6 +26,7 @@ public class OnGoingIDDTO {
     String Sale_run_Id;
     String Sale_run_Name;
     Double Gross_sales;
+    String Join_code;
     List<String> Run_Assistant_Name;
     Long Total_Stock;
     Long Total_Sale;
@@ -79,6 +80,12 @@ public class OnGoingIDDTO {
     }
     public void setSupplier(List<OnGoingIDProductDTO> supplier) {
         Supplier = supplier;
+    }
+    public String getJoin_code() {
+        return Join_code;
+    }
+    public void setJoin_code(String join_code) {
+        Join_code = join_code;
     }
 
 

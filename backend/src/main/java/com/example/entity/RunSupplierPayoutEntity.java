@@ -1,13 +1,15 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
+
+import org.springframework.data.domain.Persistable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "Run_Supplier_Payouts")
-public class RunSupplierPayoutEntity {
+public class RunSupplierPayoutEntity implements Persistable<String> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Payout_Id")
     private String payoutId;
 
@@ -59,7 +61,15 @@ public class RunSupplierPayoutEntity {
     public String getSale_run_id() {
         return saleRunId;
     }
+ @Override
+    public String getId() {
+        return payoutId;
+    }
 
+    @Override
+    public boolean isNew() {
+        return true;
+    }
     public String getSupplier_id() {
         return supplierId;
     }
