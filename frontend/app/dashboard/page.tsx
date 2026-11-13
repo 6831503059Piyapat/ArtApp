@@ -266,7 +266,9 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             </div>
           </div>
 
-          {/* {showOngoing && (
+          
+
+          {/* {showOngoing &&  (
             <div className="mb-4">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-pink-500">
                 <span className="h-2 w-2 rounded-full bg-pink-500" /> Ongoing runs
@@ -276,8 +278,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="min-w-0">
                   <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
                   <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
-                    {/* MFU Outside Night Market  */  }
-                     
+                    {/* MFU Outside Night Market  */  } 
+
                     {/* <span className="text-sm font-medium text-[#858ba0]">{dataFetch?.List_Run.at(0)?.Sale_run_name || 'No run active'}</span>
                   </h4>
                   <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
@@ -300,14 +302,12 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 {/* <div className="flex flex-col gap-2">
                   <Link href="/sales/OnGoing" className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#ffb84d] text-[11px] font-extrabold transition hover:bg-[#ffad32] sm:h-8 sm:text-[10px]">
                     <Wallet size={13} /> Resume Selling
-                  </Link> */}
-
-                  {/* <div className="grid grid-cols-2 gap-2">
+                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
                     <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:h-7 sm:text-[9px]">
                       <ListFilter size={12} /> Edit Run
-                    </Link> */}
-
-                    {/* <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-pink-100 bg-pink-50 text-[10px] font-extrabold text-pink-500 transition hover:bg-pink-100 sm:h-7 sm:text-[9px]">
+                    </Link>
+                    <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-pink-100 bg-pink-50 text-[10px] font-extrabold text-pink-500 transition hover:bg-pink-100 sm:h-7 sm:text-[9px]">
                       <Link2 size={12} /> Live Link
                     </Link>
                   </div>
@@ -315,6 +315,69 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               </article>
             </div>
           )} */}
+
+          {showOngoing && (dataFetch?.List_Run?.length ?? 0) > 0 && (
+  <div className="mb-4">
+    <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-pink-500">
+      <span className="h-2 w-2 rounded-full bg-pink-500" /> Ongoing runs
+    </h3>
+
+    {/* 1. เพิ่ม div คลุมรายการเพื่อเว้นช่องว่างเวลามีหลาย Ongoing run */}
+    <div className="flex flex-col gap-3">
+      {/* 2. วนลูปข้อมูลใน List_Run */}
+      {dataFetch?.List_Run?.map((run, index) => (
+        <article 
+          key={run.Id || index} // อย่าลืมใส่ key
+          className="grid min-w-0 gap-3 rounded-2xl border border-[#eceef5] bg-white/90 p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:grid-cols-[minmax(0,1.15fr)_minmax(0,.9fr)_minmax(130px,.7fr)] sm:items-center"
+        >
+          <div className="min-w-0">
+            <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
+            <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
+              {/* 3. เปลี่ยนจากการใช้ .at(0) มาเป็น run (ตัวแปรจาก map) */}
+              <span className="text-sm font-medium text-[#858ba0]">
+                {run.Sale_run_name || 'No run active'}
+              </span>
+            </h4>
+            <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> 2 assistants active in booth
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f8f9fc] p-2">
+            <div>
+              <p className="text-[9px] font-bold uppercase text-[#858ba0]">Items sold</p>
+              <p className="mt-0.5 text-base font-extrabold">
+                {run.Total_Items_sold || 0} <span className="text-xs font-medium text-[#858ba0]">/{run.Total_stock || 0}</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[9px] font-bold uppercase text-[#858ba0]">Gross sales</p>
+              <p className="mt-0.5 text-base font-extrabold text-[#7C5CFF]">
+                {run.Gross_sale || 0}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <Link href="/sales/OnGoing" className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#ffb84d] text-[11px] font-extrabold transition hover:bg-[#ffad32] sm:h-8 sm:text-[10px]">
+              <Wallet size={13} /> Resume Selling
+            </Link>
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:h-7 sm:text-[9px]">
+                <ListFilter size={12} /> Edit Run
+              </Link>
+              <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-pink-100 bg-pink-50 text-[10px] font-extrabold text-pink-500 transition hover:bg-pink-100 sm:h-7 sm:text-[9px]">
+                <Link2 size={12} /> Live Link
+              </Link>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+)}
+
+
 
           
 
