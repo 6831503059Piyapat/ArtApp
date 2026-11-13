@@ -36,7 +36,10 @@ public interface SalerunRepo extends JpaRepository<SaleRunEntity, String> {
                        @Param("booth_location") String booth_location,
                        @Param("code_join") String code_join,
                        @Param("sale_run_name") String sale_run_name);
-
+    @Query(value = """
+        SELECT sale_run_id FROM sale_run WHERE code_join = :code_join AND sale_run_status = 1
+    """, nativeQuery = true)
+    String existsByCode_JoinId(@Param("code_join") String code_join);
 
 
 

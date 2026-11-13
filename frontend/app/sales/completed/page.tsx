@@ -4,7 +4,7 @@ import Footer from '@/app/components/footer';
 import React, { useState, useMemo,useEffect } from 'react';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import Link from 'next/link';
-import { BadgeCheck, Banknote, Clock3, ShoppingBag } from 'lucide-react';
+import { BadgeCheck, Banknote, Clock3, ShoppingBag,Sparkles } from 'lucide-react';
 
 // Mock Data
 const INITIAL_RUNS = [

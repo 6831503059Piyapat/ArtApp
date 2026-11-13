@@ -30,7 +30,8 @@ type RunData = {
     Date_created: string;
     Gross_sale:number;
     Id:string;
-    Total_Item_sold:number;
+    Sale_run_name:string;
+    Total_Items_sold:number;
     Total_stock:number;
     isActive:boolean;
   }[];
@@ -41,8 +42,8 @@ type RunData = {
 
 }
 const completedRuns = [
-  { name: 'Sunday Craft Fair', date: '15/09/2026', revenue: '฿8,420' },
-  { name: 'Artisan Weekend Pop-up', date: '10/09/2026', revenue: '฿12,350' },
+  { Sale_run_name: 'Sunday Craft Fair', Date_closed: '15/09/2026', Gross_sale: '฿8,420' },
+  { Sale_run_name: 'Artisan Weekend Pop-up', Date_closed: '10/09/2026', Gross_sale: '฿12,350' },
 ];
 
 export default function DashboardPage() {
@@ -57,6 +58,9 @@ const [runCode, setRunCode] = useState('');
 const [saleRunId, setSaleRunId] = useState();
 const [dataFetch,setDataFetch] = useState<RunData | null>(null);
 const router = useRouter();
+//เพิ่ม 3 บรรทัดขึ้นมา
+
+
 async function handleJoinRunSubmit(){
   if (!runCode.trim()) return;
 
@@ -93,6 +97,9 @@ async function fetchDashboardData(idToken:any) {
     const data = await response.json();
     setDataFetch(data);
     console.log("Response:", data);
+    setDataFetch(data);
+
+
   }catch(err){
     console.error("Error fetching dashboard data:", err);
   }
@@ -182,21 +189,22 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 </span>
               </div>
               <h2 className="text-lg font-bold tracking-tight sm:text-2xl">
-                MFU Outside Night Market <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                {dataFetch?.List_Run.at(0)?.Sale_run_name || 'MFU Outside Night Market'} <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
               </h2>
+              
             </div>
             <div className="relative z-10 my-3 rounded-xl border border-[#f0f1f6] bg-[#f8f9fc] p-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-1 text-xs sm:text-sm">
                 <span className="font-semibold">{language === 'EN' ? 'Stock Cleared' : 'สต๊อกที่เคลียร์แล้ว'}</span>
-                <span className="font-bold text-[#7C5CFF]">5.8% {language === 'EN' ? 'Cleared' : 'เคลียร์แล้ว'}</span>
+                <span className="font-bold text-[#7C5CFF]">{ ( (dataFetch?.List_Run.at(0)?.Total_Items_sold || 0) / (dataFetch?.List_Run.at(0)?.Total_stock || 1) ) * 100} % {language === 'EN' ? 'Cleared' : 'เคลียร์แล้ว'}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-[#e9ebf3]">
                 <div className="h-full w-[5.8%] rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400" />
               </div>
               <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
-                <span className="font-semibold text-[#0B0F4F]">6/103 {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
-                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} 14/09/2026</span>
-              </div>
+                <span className="font-semibold text-[#0B0F4F]">{dataFetch?.List_Run.at(0)?.Total_Items_sold || 0} / {dataFetch?.List_Run.at(0)?.Total_stock || 0}  {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
+                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} {dataFetch?.List_Run.at(0)?.Date_created}</span>
+              </div>  
             </div>
             <div className="relative z-10 mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
               <div>
@@ -226,15 +234,15 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               </div>
               <div className="rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-1.5">
                 <p className="text-[10px] text-[#7C5CFF] sm:text-xs"> {language === 'EN' ? 'Completed' : 'สำเร็จแล้ว'}</p>
-                <p className="text-base font-bold text-[#7C5CFF] sm:text-lg">12 {language === 'EN' ? 'Runs' : 'รายการ'}</p>
+                <p className="text-base font-bold text-[#7C5CFF] sm:text-lg"> {dataFetch?.Total_completed || 0} {language === 'EN' ? 'Runs' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-pink-100 bg-pink-50/80 px-2 py-1.5">
                 <p className="text-[10px] text-pink-500 sm:text-xs"> {language === 'EN' ? 'Active' : 'กำลังดำเนินการ'}</p>
-                <p className="text-base font-bold text-pink-500 sm:text-lg">1 {language === 'EN' ? 'Run' : 'รายการ'}</p>
+                <p className="text-base font-bold text-pink-500 sm:text-lg"> {dataFetch?.Total_active || 0} {language === 'EN' ? 'Run' : 'รายการ'}</p>
               </div>
               <div className="rounded-xl border border-[#FFE7C0] bg-[#FFFDF1] px-2 py-1.5">
                 <p className="text-[10px] text-[#FFB24C] sm:text-xs"> {language === 'EN' ? 'Products Sold' : 'รายการขายแล้ว'}</p>
-                <p className="text-base font-bold text-[#FFB24C] sm:text-lg">88 {language === 'EN' ? 'items sold' : 'รายการขายแล้ว'}</p>
+                <p className="text-base font-bold text-[#FFB24C] sm:text-lg"> {dataFetch?.Total_item_sold || 0} {language === 'EN' ? 'items sold' : 'รายการขายแล้ว'}</p>
               </div>
             </div>
             <div className="flex flex-col items-start gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
@@ -266,38 +274,55 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                       : 'text-[#858ba0] hover:bg-[#7C5CFF]/5 hover:text-[#7C5CFF]'
                   }`}
                 >
-                  {filter === 'All Sessions' ? 'All Sessions (3)' : filter === 'Active' ? '● Active (1)' : 'Completed (2)'}
+                  {/* อันเก่า {filter === 'All Sessions' ? 'All Sessions (3)' : filter === 'Active' ? '● Active (1)' : 'Completed (2)'}  */
+                  
+                  filter === 'All Sessions' 
+                   ? `All Sessions (${dataFetch?.Total_create || 0})` 
+                   : filter === 'Active' 
+                   ? `Active (${dataFetch?.Total_active || 0})` 
+                   : `Completed (${dataFetch?.Total_completed || 0})`
+
+          
+                  }
                 </button>
               ))}
             </div>
           </div>
 
-          {showOngoing && (
+          
+
+          {/* {showOngoing &&  (
             <div className="mb-4">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-pink-500">
                 <span className="h-2 w-2 rounded-full bg-pink-500" /> Ongoing runs
-              </h3>
-              <article className="grid min-w-0 gap-3 rounded-2xl border border-[#eceef5] bg-white/90 p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:grid-cols-[minmax(0,1.15fr)_minmax(0,.9fr)_minmax(130px,.7fr)] sm:items-center">
+              </h3> */}
+
+              {/* <article className="grid min-w-0 gap-3 rounded-2xl border border-[#eceef5] bg-white/90 p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:grid-cols-[minmax(0,1.15fr)_minmax(0,.9fr)_minmax(130px,.7fr)] sm:items-center">
                 <div className="min-w-0">
                   <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
                   <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
-                    MFU Outside Night Market <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                    {/* MFU Outside Night Market  */  } 
+
+                    {/* <span className="text-sm font-medium text-[#858ba0]">{dataFetch?.List_Run.at(0)?.Sale_run_name || 'No run active'}</span>
                   </h4>
                   <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> 2 assistants active in booth
                   </p>
-                </div>
-                <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f8f9fc] p-2">
+                </div> */}
+
+                {/* <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f8f9fc] p-2">
                   <div>
                     <p className="text-[9px] font-bold uppercase text-[#858ba0]">Items sold</p>
-                    <p className="mt-0.5 text-base font-extrabold">6 <span className="text-xs font-medium text-[#858ba0]">/103</span></p>
-                  </div>
-                  <div>
+                    <p className="mt-0.5 text-base font-extrabold">{dataFetch?.List_Run.at(0)?.Total_Items_sold || 0} <span className="text-xs font-medium text-[#858ba0]">/{dataFetch?.List_Run.at(0)?.Total_stock || 0}</span></p>
+                  </div> */}
+
+                  {/* <div>
                     <p className="text-[9px] font-bold uppercase text-[#858ba0]">Gross sales</p>
-                    <p className="mt-0.5 text-base font-extrabold text-[#7C5CFF]">฿980</p>
+                    <p className="mt-0.5 text-base font-extrabold text-[#7C5CFF]">{dataFetch?.List_Run.at(0)?.Gross_sale || 0}</p>
                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
+                </div> */}
+
+                {/* <div className="flex flex-col gap-2">
                   <Link href="/sales/OnGoing" className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#ffb84d] text-[11px] font-extrabold transition hover:bg-[#ffad32] sm:h-8 sm:text-[10px]">
                     <Wallet size={13} /> Resume Selling
                   </Link>
@@ -312,9 +337,70 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
               </article>
             </div>
-          )}
+          )} */}
 
-          {showCompleted && (
+          {showOngoing && (dataFetch?.List_Run?.length ?? 0) > 0 && (
+  <div className="mb-4">
+    <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-pink-500">
+      <span className="h-2 w-2 rounded-full bg-pink-500" /> Ongoing runs
+    </h3>
+
+    {/* 1. เพิ่ม div คลุมรายการเพื่อเว้นช่องว่างเวลามีหลาย Ongoing run */}
+    <div className="flex flex-col gap-3">
+      {/* 2. วนลูปข้อมูลใน List_Run */}
+      {dataFetch?.List_Run?.map((run, index) => (
+        <article 
+          key={run.Id || index} // อย่าลืมใส่ key
+          className="grid min-w-0 gap-3 rounded-2xl border border-[#eceef5] bg-white/90 p-3 shadow-[0_5px_22px_rgba(17,23,71,0.04)] sm:grid-cols-[minmax(0,1.15fr)_minmax(0,.9fr)_minmax(130px,.7fr)] sm:items-center"
+        >
+          <div className="min-w-0">
+            <span className="rounded-full bg-gradient-to-r from-[#7C5CFF] to-pink-400 px-2 py-0.5 text-[9px] font-bold text-white">LIVE NOW</span>
+            <h4 className="mt-1 break-words text-sm font-bold tracking-tight sm:text-base">
+              {/* 3. เปลี่ยนจากการใช้ .at(0) มาเป็น run (ตัวแปรจาก map) */}
+              <span className="text-sm font-medium text-[#858ba0]">
+                {run.Sale_run_name || 'No run active'}
+              </span>
+            </h4>
+            <p className="mt-1 flex flex-wrap items-center gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CFF]" /> 2 assistants active in booth
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f8f9fc] p-2">
+            <div>
+              <p className="text-[9px] font-bold uppercase text-[#858ba0]">Items sold</p>
+              <p className="mt-0.5 text-base font-extrabold">
+                {run.Total_Items_sold || 0} <span className="text-xs font-medium text-[#858ba0]">/{run.Total_stock || 0}</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[9px] font-bold uppercase text-[#858ba0]">Gross sales</p>
+              <p className="mt-0.5 text-base font-extrabold text-[#7C5CFF]">
+                {run.Gross_sale || 0}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <Link href="/sales/OnGoing" className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[#ffb84d] text-[11px] font-extrabold transition hover:bg-[#ffad32] sm:h-8 sm:text-[10px]">
+              <Wallet size={13} /> Resume Selling
+            </Link>
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:h-7 sm:text-[9px]">
+                <ListFilter size={12} /> Edit Run
+              </Link>
+              <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-pink-100 bg-pink-50 text-[10px] font-extrabold text-pink-500 transition hover:bg-pink-100 sm:h-7 sm:text-[9px]">
+                <Link2 size={12} /> Live Link
+              </Link>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+)}   
+
+          {showCompleted && ( 
             <div className="mt-6">
               <div className="mb-1.5 flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
                 <h3 className="text-sm font-bold text-[#7C5CFF]"> {language === 'EN' ? 'Past Completed Runs' : 'รายการขายที่เสร็จสิ้นแล้ว'}</h3>
@@ -324,17 +410,17 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="hidden grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] bg-[#7C5CFF]/5 px-4 py-2.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0F4F] sm:grid sm:px-5">
                   <span> {language === 'EN' ? 'Market event & location' : 'เหตุการณ์และสถานที่'}</span>
                   <span>{language === 'EN' ? 'Date closed' : 'วันที่ปิดรายการ'}</span>
-                  <span>{language === 'EN' ? 'Gross sales' : 'ยอดขายรวม'}</span>
+                  <span>{language === 'EN' ? 'Gross sales': 'ยอดขายรวม'}</span>
                   <span className="text-right ">{language === 'EN' ? 'Settlement summary' : 'สรุปการชำระเงิน'}</span>
                 </div>
-                {completedRuns.map((run) => (
-                  <div key={run.name} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
+                {completedRuns.map((run,index) => (
+                  <div key={index} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <span className="shrink-0 rounded-full bg-[#f1f2f6] px-2 py-1 text-[9px] font-semibold text-[#858ba0]">• Archived</span>
-                      <span className="min-w-0 break-words font-bold">{run.name}</span>
+                      <span className="min-w-0 break-words font-bold">{run.Sale_run_name}</span>
                     </div>
-                    <span className="whitespace-nowrap text-[#858ba0]">{run.date}</span>
-                    <span className="text-sm font-extrabold">{run.revenue}</span>
+                    <span className="whitespace-nowrap text-[#858ba0]">{run.Date_closed}</span>
+                    <span className="text-sm font-extrabold">{run.Gross_sale}</span>
                     <Link href="/sales/completed" className="inline-flex min-h-10 items-center justify-center gap-1.5 justify-self-stretch rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2 text-[11px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:min-h-0 sm:justify-self-end sm:text-[10px]">
                        {language === 'EN' ? 'View Summary' : 'ดูสรุป'} <ChevronRight size={12} />
                     </Link>

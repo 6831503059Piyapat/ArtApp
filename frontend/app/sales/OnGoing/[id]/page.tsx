@@ -2098,8 +2098,6 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
         </button>
       </div> */}
       <button
-    // เปลี่ยนจาก onSell(item.id) เป็นฟังก์ชันเพิ่มลงตะกร้า 
-    // แนะนำให้ส่งไปทั้ง item เพื่อให้ตะกร้ารู้ชื่อและราคา
     onClick={() => onSell(item.id)}
   disabled={isOutOfStock}
   className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
