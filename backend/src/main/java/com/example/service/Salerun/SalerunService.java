@@ -61,7 +61,7 @@ public class SalerunService {
     public void createSaleRun(SaleRunDTO saleRunDTO) {
         
         String runName = saleRunDTO.getRunName();
-        String runDate = saleRunDTO.getRunDate();
+        LocalDateTime runDate = saleRunDTO.getRunDate();
         String runLocation = saleRunDTO.getRunLocation();
         String runOwnerName = saleRunDTO.getRunOwnerName();
         String runOwnerId = saleRunDTO.getRunOwnerId();

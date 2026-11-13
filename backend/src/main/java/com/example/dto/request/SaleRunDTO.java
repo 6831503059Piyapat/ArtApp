@@ -1,7 +1,9 @@
 package com.example.dto.request;
 
   
- // const saleList = 
+ import java.time.LocalDateTime;
+
+// const saleList = 
     // [{
     //   accent: "purple",
     //   id: "host-8466468345",
@@ -36,7 +38,7 @@ public class SaleRunDTO {
 //         runSections: sections,
 //         runExpenses: expenses
     private String runName;
-    private String runDate;
+    private LocalDateTime runDate;
     private String runOwnerName;
     private String runLocation;
     private String runOwnerId;
@@ -46,7 +48,7 @@ public class SaleRunDTO {
     private List<SaleRunExpenseDTO> expenses;
     
 
-    public SaleRunDTO(String runName, String runDate, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections, String runOwnerName) {
+    public SaleRunDTO(String runName, LocalDateTime runDate, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections, String runOwnerName) {
         this.runName = runName;
         this.runDate = runDate;
         this.runLocation = runLocation;
@@ -61,10 +63,10 @@ public class SaleRunDTO {
     public void setRunName(String runName) {
         this.runName = runName;
     }
-    public String getRunDate() {
+    public LocalDateTime getRunDate() {
         return runDate;
     }
-    public void setRunDate(String runDate) {
+    public void setRunDate(LocalDateTime runDate) {
         this.runDate = runDate;
     }
     public String getRunLocation() {

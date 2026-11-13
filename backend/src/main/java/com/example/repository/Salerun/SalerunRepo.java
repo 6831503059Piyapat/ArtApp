@@ -29,8 +29,8 @@ public interface SalerunRepo extends JpaRepository<SaleRunEntity, String> {
         INSERT INTO sale_run (sale_run_id,date_closed,date_created,host_user_id,sale_run_status,booth_location,sale_run_name,code_join) VALUES (:sale_run_id, :date_closed, :date_created, :host_user_id, :sale_run_status, :booth_location, :sale_run_name, :code_join);
     """,nativeQuery = true)
     void createSaleRun(@Param("sale_run_id") String sale_run_id,
-                       @Param("date_closed") String date_closed,
-                       @Param("date_created") String date_created,
+                       @Param("date_closed") LocalDateTime date_closed,
+                       @Param("date_created") LocalDateTime date_created,
                        @Param("host_user_id") String host_user_id,
                        @Param("sale_run_status") boolean sale_run_status,
                        @Param("booth_location") String booth_location,

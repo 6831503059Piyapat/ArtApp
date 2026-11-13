@@ -209,10 +209,10 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             <div className="relative z-10 mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#858ba0]"> {language === 'EN' ? 'Live booth revenue' : 'กำไรขณะปัจจุบัน'}</p>
-                <p className="mt-0.5 text-2xl font-extrabold tracking-tight">฿980</p>
+                <p className="mt-0.5 text-2xl font-extrabold tracking-tight">฿{dataFetch?.List_Run.at(0)?.Gross_sale || 0}</p>
               </div>
               <Link
-                href="/sales/OnGoing"
+                href={`/sales/OnGoing/${dataFetch?.List_Run.at(0)?.Id || ''}`}
                 className="inline-flex min-h-9 items-center gap-1 whitespace-nowrap rounded-full bg-[#eee9ff] px-3 py-1.5 text-[11px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10"
               >
                 <Wallet size={13} />  {language === 'EN' ? 'Run Selling' : 'ดำเนินการขายต่อ'}
