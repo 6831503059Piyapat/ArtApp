@@ -16,13 +16,119 @@ import {
   Store,
   Zap,
 } from "lucide-react";
-
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+
+type LiveStatsDTO = {
+  LiveID: string;
+  saleRunName: string;
+  dateCreated: string;
+  Supplier:{
+    Id_supplier:string;
+    Name_supplier:string;
+    gross_sales:number;
+    total_sale:number;
+    total_stock:number;
+
+  }[];
+  saleLogs:{
+    Assistant_name:string;
+    Price:number;
+    Product_name:string;
+    Quantity:number;
+    Sale_logs_Id:string;
+    Sale_run_id:string;
+    Supplier_name:string;
+    Time_Stamp:string;
+    Unit_price:number;
+  }[];
+  timestamp:string;
+}
+
+type LiveStatsSplitAllocationDTO = {
+label:string;
+amount:string;
+color:string
+ 
+  }[];
+
+type LiveStatsSupplierDTO = {
+  Id_supplier:string;
+  Name_supplier:string;
+  gross_sales:number;
+  total_sale:number;
+  total_stock:number;
+}
+type LiveStatsSaleDTO={
+  Assistant_name: string;
+  Price: number;
+  Product_name: string;
+  Quantity: number;
+  Sale_logs_Id: string;
+  Sale_run_id: string;
+  Supplier_name: string;
+  Time_Stamp: string;
+  Unit_price: number;
+}[];
+
+function formatDateTime(value?: string) {
+  if (!value) return null;
+
+  const [date, time = "00:00:00"] = value.split("T");
+  const [year, month, day] = date.split("-");
+  const [hours = "00", minutes = "00", seconds = "00"] = time.split(":");
+
+  if (!year || !month || !day) return null;
+
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
+function formatTime(value?: string) {
+  if (!value) return null;
+
+  const time = value.includes("T") ? value.split("T")[1] : value;
+  return time.split(":").slice(0, 3).join(":");
+}
+
+function getCurrentDateLabel(language: "EN" | "TH") {
+  const formattedDate = new Intl.DateTimeFormat(language === "EN" ? "en-US" : "th-TH", {
+    timeZone: "Asia/Bangkok",
+    weekday: "long",
+    day: "numeric",
+  }).format(new Date());
+
+  return language === "EN"
+    ? `SALES STATS ${formattedDate.toUpperCase()}`
+    : `สถิติการขาย ${formattedDate}`;
+}
+
 const subscribeToOrigin = () => () => undefined;
 const getOrigin = () => window.location.origin;
 const getServerOrigin = () => "";
+
+function SupplierSalesProgress({
+  sold,
+  stock,
+}: {
+  sold: number;
+  stock: number;
+}) {
+  const targetWidth = stock > 0 ? Math.min((sold / stock) * 100, 100) : 0;
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setWidth(targetWidth));
+    return () => cancelAnimationFrame(frame);
+  }, [targetWidth]);
+
+  return (
+    <div
+      className="h-full rounded-full bg-gradient-to-r from-[#7957ff] to-[#ff9f55] transition-[width] duration-700 ease-out"
+      style={{ width: `${width}%` }}
+    />
+  );
+}
 
 async function copyTextToClipboard(text: string) {
   let clipboardError: unknown;
@@ -181,15 +287,7 @@ const BoothSyncTime = ({ language }: { language: "EN" | "TH" }) => {
     </section>
   );
 };
-async function fetchData(){
-  // const response = await fetch("https://api.example.com/data",{
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   method: "GET",
-  // });
-  // console.log(response);
-}
+
 const suppliers = [
   {
     name: "My awesome amazing products",
@@ -259,6 +357,14 @@ export default function ConsignDesk() {
   const { id } = useParams<{ id: string }>();
   const [sensorData, setSensorData] = useState<SensorData | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [colorMap, setColorMap] = useState<string[]>([]);
+  const [totalIntake, setTotalIntake] = useState<number>(0);
+  const [totalSold,setTotalSold] = useState<number>(0);
+  const [dataAfterFetch, setDataAfterFetch] = useState<LiveStatsDTO | null>(null);
+  const [dataFetchSale, setDataFetchSale] = useState<LiveStatsSaleDTO | null>(null);
+  const [dataFetchSplitAllocation, setDataFetchSplitAllocation] = useState<LiveStatsSplitAllocationDTO | null>(null);
+  const [dataFetchSupplier, setDataFetchSupplier] = useState<LiveStatsSupplierDTO| null>(null);
+  
   const origin = useSyncExternalStore(subscribeToOrigin, getOrigin, getServerOrigin);
   const viewerUrl = origin
     ? new URL(`/ViewUser/${encodeURIComponent(id)}`, origin).toString()
@@ -275,6 +381,41 @@ export default function ConsignDesk() {
     requestAnimationFrame(() => qrButtonRef.current?.focus());
   }, []);
 
+   // Random Color Generator Function
+  const generateColor = () => {
+    const random = "#" + Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0");
+
+    return random;
+  };
+
+  async function fetchData(){
+  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/live-status/viewLive/" + id,{
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+  });
+  const data = await response.json();
+  setDataAfterFetch(data);
+  setDataFetchSale(data.saleLogs);
+  setDataFetchSupplier(data.supplierLogs);
+  let totalSold = 0;
+  let totalIntake = 0;
+  for (const supplier of data?.Supplier || []) {
+    totalSold += supplier.total_sale;
+    totalIntake += supplier.gross_sales;
+    setColorMap((prev) => [...prev, generateColor()]);
+  }
+  setTotalSold(totalSold);
+  setTotalIntake(totalIntake);
+  console.log(data);
+}
+
+
+
+
   async function handleCopyLink() {
     try {
       await copyTextToClipboard(viewerUrl);
@@ -286,6 +427,7 @@ export default function ConsignDesk() {
   }
 
   useEffect(() => {
+    fetchData();
     // 1. สร้าง STOMP Client โดยชี้ไปที่ Endpoint /ws ของ Spring Boot
     const client = new Client({
       webSocketFactory: () => new SockJS(process.env.NEXT_PUBLIC_API_URL + "/ws"),
@@ -297,10 +439,16 @@ export default function ConsignDesk() {
         // 2. Subscribe เฉพาะ Topic ของ Parameter (deviceId) นี้
         client.subscribe(`/viewLive/${id}`, (message) => {
           if (message.body) {
-            console.log("Received message:", message.body);
-            const parsedObject: SensorData = JSON.parse(message.body);
-            setSensorData(parsedObject); // อัปเดต State ทันทีเมื่อมีข้อมูลใหม่
-            console.log("Received sensor data:", parsedObject);
+            setDataAfterFetch(JSON.parse(message.body));
+           
+            let totalSold = 0;
+            let totalIntake = 0;
+            for (const supplier of JSON.parse(message.body)?.Supplier || []) {
+              totalSold += supplier.total_sale;
+              totalIntake += supplier.gross_sales;
+            }
+            setTotalSold(totalSold);
+            setTotalIntake(totalIntake);
           }
         });
       },
@@ -317,6 +465,7 @@ export default function ConsignDesk() {
     return () => {
       client.deactivate();
     };
+     // เรียกฟังก์ชัน fetchData() เพื่อดึงข้อมูลจาก REST API
   }, [id]); // ถ้า deviceId เปลี่ยน จะตัดสายเก่าแล้วต่อสาย topic ใหม่ให้อัตโนมัติ
 
  
@@ -349,20 +498,20 @@ export default function ConsignDesk() {
               </span>
               <span className="flex items-center gap-1 text-[10px] font-medium text-[#111747]">
                 <Store className="h-3 w-3 text-[#7957ff]" />
-                MFU Outside Night Market (Mon 14)
+                {dataAfterFetch?.saleRunName || "Loading..."}
               </span>
             </div>
             <h1 className="break-words text-xl font-black leading-tight tracking-tight sm:text-2xl">
-              {language === "EN" ? "SALES STATS MONDAY 14" : "สถิติการขาย วันจันทร์ที่ 14"}
+              {getCurrentDateLabel(language)}
             </h1>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[9px] text-[#858ba0]">
               <span className="flex items-center gap-1">
                 <RefreshCcw className="h-2.5 w-2.5" />
-                {language === "EN" ? "Run created:" : "สร้างการขายเมื่อ:"} <strong className="font-semibold text-[#111747]">14/9/26 11:48:30</strong>
+                {language === "EN" ? "Run created:" : "สร้างการขายเมื่อ:"} <strong className="font-semibold text-[#111747]">{formatDateTime(dataAfterFetch?.dateCreated) || "Loading..."}</strong>
               </span>
               <span className="flex items-center gap-1">
                 <Activity className="h-2.5 w-2.5" />
-                {language === "EN" ? "Auto-refresh:" : "รีเฟรชอัตโนมัติ:"} <strong className="font-semibold text-[#7957ff]">3s polling</strong>
+                {language === "EN" ? "Auto-refresh:" : "รีเฟรชอัตโนมัติ:"} <strong className="font-semibold text-[#7957ff]">5s polling</strong>
               </span>
             </div>
           </div>
@@ -427,21 +576,21 @@ export default function ConsignDesk() {
               </span>
             </div>
 
-            {suppliers.map((supplier) => {
-              const Icon = supplier.icon;
-              const themeClasses = supplierThemes[supplier.theme];
+            {dataAfterFetch?.Supplier?.map((supplier) => {
+              // const Icon = supplier.icon;
+              // const themeClasses = supplierThemes[supplier.theme];
 
               return (
-                <article key={supplier.name} className="min-w-0 rounded-2xl border border-[#eeeafd] bg-white px-3.5 py-3 shadow-[0_4px_14px_rgba(93,76,166,0.035)] sm:px-4">
+                <article key={supplier.Id_supplier} className="min-w-0 rounded-2xl border border-[#eeeafd] bg-white px-3.5 py-3 shadow-[0_4px_14px_rgba(93,76,166,0.035)] sm:px-4">
                   <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 sm:flex-nowrap sm:gap-3">
-                    <div className="flex min-w-0 items-center gap-2.5">
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${themeClasses.icon}`}>
-                        <Icon className="h-4 w-4" />
+                    <div className="flex min-w-0 items-center gap-2.5 ">
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border `}>
+                        <Bug className="h-4 w-4" />
                       </span>
                       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                        <h3 className="break-words text-[11px] font-bold leading-tight">{supplier.name}</h3>
-                        <span className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${themeClasses.badge}`}>
-                          {language === "EN" ? supplier.kind : supplier.kind === "Host" ? "เจ้าของร้าน" : "ซัพพลายเออร์"}
+                        <h3 className="break-words text-[11px] font-bold leading-tight">{supplier.Name_supplier}</h3>
+                        <span className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${supplier.Name_supplier === "My Products" ? "bg-[#f0eaff] text-[#7957ff]" : "bg-[#fff0e5] text-[#ff9f55]"} `}>
+                          {language === "EN" ? supplier.Name_supplier === "My Products" ? "Owner" : "Supplier" : supplier.Name_supplier === "My Products" ? "เจ้าของร้าน" : "ซัพพลายเออร์"}
                         </span>
                       </div>
                     </div>
@@ -449,7 +598,7 @@ export default function ConsignDesk() {
                       <div className="text-[8px] font-semibold uppercase tracking-wide text-[#858ba0]">
                         {language === "EN" ? "Intake Value" : "มูลค่ารับเข้า"}
                       </div>
-                      <div className="text-sm font-extrabold leading-tight">{supplier.intake}</div>
+                      <div className="text-sm font-extrabold leading-tight">฿{supplier.gross_sales}</div>
                     </div>
                   </div>
                   <div className="mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[9px] font-medium text-[#858ba0] sm:flex-nowrap">
@@ -458,17 +607,17 @@ export default function ConsignDesk() {
                       <span className="truncate">
                         <strong className="text-[#111747]">{language === "EN" ? "REMAINING STOCK" : "สต็อกคงเหลือ"}</strong>
                         {" • "}
-                        {supplier.stock} {language === "EN" ? "in booth storage" : "ในพื้นที่บูธ"}
+                        {supplier.total_stock - supplier.total_sale} {language === "EN" ? "in booth storage" : "ในพื้นที่บูธ"}
                       </span>
                     </span>
                     <span className="shrink-0 text-[8px]">
-                      <strong className="text-[11px] font-bold text-[#7957ff]">{supplier.sold}/{supplier.total}</strong>
+                      <strong className="text-[11px] font-bold text-[#7957ff]">{supplier.total_sale}/{supplier.total_stock}</strong>
                       {" "}
-                      {language === "EN" ? "SOLD" : "ขายแล้ว"} ({supplier.soldLabel})
+                      {language === "EN" ? "SOLD" : "ขายแล้ว"} ({supplier.total_sale / supplier.total_stock * 100}%)
                     </span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-[#eee9ff]">
-                    <div className="h-full rounded-full bg-gradient-to-r from-[#7957ff] to-[#ff9f55]" style={{ width: supplier.progress }} />
+                    <SupplierSalesProgress sold={supplier.total_sale} stock={supplier.total_stock} />
                   </div>
                 </article>
               );
@@ -506,24 +655,24 @@ export default function ConsignDesk() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f4f2f8]">
-                    {sales.map((sale) => (
-                      <tr key={sale.number} className={sale.latest ? "bg-[#fcfaff]" : "hover:bg-[#fcfbff]"}>
-                        <td className={`px-2.5 py-2 text-[8px] font-semibold ${sale.latest ? "text-[#7957ff]" : "text-[#858ba0]"}`}>
-                          {sale.latest && <span className="mr-1 inline-block h-1 w-1 rounded-full bg-[#7957ff] align-middle" />}
-                          {sale.number}
+                    {dataAfterFetch?.saleLogs?.map((sale,index) => (
+                      <tr key = {index} className={index === 0 ? "bg-[#fcfaff]" : "hover:bg-[#fcfbff]"}>
+                        <td className={`px-2.5 py-2 text-[8px] font-semibold ${index === 0 ? "text-[#7957ff]" : "text-[#858ba0]"}`}>
+                          {index === 0 && <span className="mr-1 inline-block h-1 w-1 rounded-full bg-[#7957ff] align-middle" />}
+                          {totalSold - index}
                         </td>
                         <td className="px-1.5 py-2">
-                          <div className="truncate text-[9px] font-bold text-[#111747]">{sale.name}</div>
-                          <div className="truncate text-[8px] text-[#858ba0]">{sale.seller} • {sale.price}</div>
+                          <div className="truncate text-[9px] font-bold text-[#111747]">{sale.Product_name}</div>
+                          <div className="truncate text-[8px] text-[#858ba0]">{sale.Supplier_name} • {sale.Unit_price} ฿</div>
                         </td>
                         <td className="px-1.5 py-2 text-center">
-                          <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-bold ${sale.latest ? "bg-[#ed72bd] text-white" : "bg-[#f0eaff] text-[#7957ff]"}`}>
-                            {sale.quantity}
+                          <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-bold ${index === 0 ? "bg-[#ed72bd] text-white" : "bg-[#f0eaff] text-[#7957ff]"}`}>
+                            {sale.Quantity}
                           </span>
                         </td>
                         <td className="px-2.5 py-2 text-right">
-                          <span className={`rounded-full px-1.5 py-1 font-mono text-[7px] ${sale.latest ? "bg-[#f0eaff] font-bold text-[#111747]" : "bg-[#f5f4f9] text-[#858ba0]"}`}>
-                            {sale.time}
+                          <span className={`rounded-full px-1.5 py-1 font-mono text-[7px] ${index === 0 ? "bg-[#f0eaff] font-bold text-[#111747]" : "bg-[#f5f4f9] text-[#858ba0]"}`}>
+                            {formatTime(sale.Time_Stamp) || "--:--:--"}
                           </span>
                         </td>
                       </tr>
@@ -533,7 +682,7 @@ export default function ConsignDesk() {
               </div>
               <div className="border-t border-[#f0eef7] bg-[#faf9fd] px-3 py-2 text-[9px] font-medium text-[#858ba0]">
                 {language === "EN" ? "Total Sold This Session:" : "ยอดขายรวมในรอบนี้:"}{" "}
-                <strong className="font-bold text-[#111747]">6 {language === "EN" ? "Units" : "ชิ้น"}</strong>
+                <strong className="font-bold text-[#111747]">{totalSold} {language === "EN" ? "Units" : "ชิ้น"}</strong>
               </div>
             </div>
 
@@ -542,16 +691,17 @@ export default function ConsignDesk() {
                 <h3 className="text-[9px] font-bold">{language === "EN" ? "Current Split Allocation" : "สัดส่วนการแบ่งเงินปัจจุบัน"}</h3>
                 <span className="text-[8px] text-[#858ba0]">{language === "EN" ? "Calculated at 20:45" : "คำนวณเมื่อ 20:45"}</span>
               </div>
-              <div className="mb-2 flex h-2 w-full overflow-hidden rounded-full">
-                <div className="h-full bg-[#7957ff]" style={{ width: "60%" }} />
-                <div className="h-full bg-[#ed72bd]" style={{ width: "25%" }} />
-                <div className="h-full bg-[#ffb84d]" style={{ width: "15%" }} />
+              <div className="mb-2 flex h-2 w-full overflow-hidden rounded-full bg-[#f0eaff]">
+                {dataAfterFetch?.Supplier?.map((supplier,index)=>(
+                  <div key={index} className={`h-full`} style={{ width: supplier.gross_sales / totalIntake * 100 + "%" ,backgroundColor: colorMap[index] }} />
+                ))}
+           
               </div>
               <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[8px]">
-                {splitAllocation.map((split) => (
-                  <div key={split.label} className="flex items-center gap-1">
-                    <span className={`h-1.5 w-1.5 rounded-full ${split.color}`} />
-                    <span className="text-[#858ba0]">{split.label}: <strong className="font-semibold text-[#111747]">{split.amount}</strong></span>
+                {dataAfterFetch?.Supplier.map((split,index) => (
+                  <div key={index} className="flex items-center gap-1">
+                    <span className={`h-1.5 w-1.5 rounded-full `} style={{ backgroundColor: colorMap[index] }} />
+                    <span className="text-[#858ba0]">{split.Name_supplier}: <strong className="font-semibold text-[#111747]">{split.gross_sales} ฿</strong></span>
                   </div>
                 ))}
               </div>
