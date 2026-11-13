@@ -34,6 +34,7 @@ import com.example.repository.SupplierRepo;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.HttpStatus;
+import com.example.dto.response.Assistant.AssistantDTO;
 import com.example.repository.ExpenseRepo;
 import com.example.repository.ExpensesLogRepo;
 import com.example.repository.ChangeHistoryRepo;
@@ -77,7 +78,7 @@ public class OnGoingIDService {
             onGoingIDProductDTO.add(new OnGoingIDProductDTO(Supplier_id, supplier.getSupplier_Name(), null, null, products));
 
         }
-        List<String> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
+        List<AssistantDTO> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
  
         OnGoingSaleDTO onGoingSaleDTO = onGoingIDRepository.findOnGoingIDListBySalesId(Sale_run_Id);
         if (onGoingSaleDTO == null) {

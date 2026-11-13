@@ -1,5 +1,6 @@
 package com.example.dto.response.OnGoingID;
 import java.util.List;
+import com.example.dto.response.Assistant.AssistantDTO;
 public class OnGoingIDDTO {
 
 //  {
@@ -27,7 +28,7 @@ public class OnGoingIDDTO {
     String Sale_run_Name;
     Double Gross_sales;
     String Join_code;
-    List<String> Run_Assistant_Name;
+    List<AssistantDTO> Run_Assistant_Name;
     Long Total_Stock;
     Long Total_Sale;
     List<String> Supplier_Name;
@@ -51,10 +52,10 @@ public class OnGoingIDDTO {
     public void setGross_sales(Double gross_sales) {
         Gross_sales = gross_sales;
     }
-    public List<String> getRun_Assistant_Name() {
+    public List<AssistantDTO> getRun_Assistant_Name() {
         return Run_Assistant_Name;
     }
-    public void setRun_Assistant_Name(List<String> run_Assistant_Name) {
+    public void setRun_Assistant_Name(List<AssistantDTO> run_Assistant_Name) {
         Run_Assistant_Name = run_Assistant_Name;
     }
     public Long getTotal_Stock() {
