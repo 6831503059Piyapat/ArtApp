@@ -590,10 +590,14 @@ const handleConfirmSale = async () => {
       {
         saleRunId: id,
         assistanceName: AssistantName,
+        paymentMethod: paymentMethod === 'cash' ? 'CASH' : 'MOBILE_BANKING',
         cart:cart
       }
     ),
   });
+  if (!response.ok) {
+    throw new Error(`Sale confirmation failed: ${await response.text()}`);
+  }
   console.log("Confirming sale for items:", await response.text());
 
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
