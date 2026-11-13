@@ -42,8 +42,8 @@ type RunData = {
 
 }
 const completedRuns = [
-  { name: 'Sunday Craft Fair', date: '15/09/2026', revenue: '฿8,420' },
-  { name: 'Artisan Weekend Pop-up', date: '10/09/2026', revenue: '฿12,350' },
+  { Sale_run_name: 'Sunday Craft Fair', Date_closed: '15/09/2026', Gross_sale: '฿8,420' },
+  { Sale_run_name: 'Artisan Weekend Pop-up', Date_closed: '10/09/2026', Gross_sale: '฿12,350' },
 ];
 
 export default function DashboardPage() {
@@ -387,17 +387,17 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <div className="hidden grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] bg-[#7C5CFF]/5 px-4 py-2.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0F4F] sm:grid sm:px-5">
                   <span> {language === 'EN' ? 'Market event & location' : 'เหตุการณ์และสถานที่'}</span>
                   <span>{language === 'EN' ? 'Date closed' : 'วันที่ปิดรายการ'}</span>
-                  <span>{language === 'EN' ? 'Gross sales' : 'ยอดขายรวม'}</span>
+                  <span>{language === 'EN' ? 'Gross sales': 'ยอดขายรวม'}</span>
                   <span className="text-right ">{language === 'EN' ? 'Settlement summary' : 'สรุปการชำระเงิน'}</span>
                 </div>
-                {completedRuns.map((run) => (
-                  <div key={run.name} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
+                {completedRuns.map((run,index) => (
+                  <div key={index} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <span className="shrink-0 rounded-full bg-[#f1f2f6] px-2 py-1 text-[9px] font-semibold text-[#858ba0]">• Archived</span>
-                      <span className="min-w-0 break-words font-bold">{run.name}</span>
+                      <span className="min-w-0 break-words font-bold">{run.Sale_run_name}</span>
                     </div>
-                    <span className="whitespace-nowrap text-[#858ba0]">{run.date}</span>
-                    <span className="text-sm font-extrabold">{run.revenue}</span>
+                    <span className="whitespace-nowrap text-[#858ba0]">{run.Date_closed}</span>
+                    <span className="text-sm font-extrabold">{run.Gross_sale}</span>
                     <Link href="/sales/completed" className="inline-flex min-h-10 items-center justify-center gap-1.5 justify-self-stretch rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2 text-[11px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:min-h-0 sm:justify-self-end sm:text-[10px]">
                        {language === 'EN' ? 'View Summary' : 'ดูสรุป'} <ChevronRight size={12} />
                     </Link>
