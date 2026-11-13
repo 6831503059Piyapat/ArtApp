@@ -375,13 +375,9 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
       ))}
     </div>
   </div>
-)}
+)}   
 
-
-
-          
-
-          {showCompleted && (
+          {showCompleted && ( 
             <div className="mt-6">
               <div className="mb-1.5 flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
                 <h3 className="text-sm font-bold text-[#7C5CFF]"> {language === 'EN' ? 'Past Completed Runs' : 'รายการขายที่เสร็จสิ้นแล้ว'}</h3>

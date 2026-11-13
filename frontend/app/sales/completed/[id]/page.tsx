@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense , useState} from 'react';
+import React, { Suspense, useState, useSyncExternalStore } from 'react';
 import { 
   FileSpreadsheet, FileText, Share2,
   Wallet, Receipt, DollarSign, Users, List,
@@ -9,31 +9,36 @@ import {
 import Navbar from '@/app/components/navbar';
 import Footer from '@/app/components/footer';
 
+const subscribeToLanguage = () => () => {};
+const getLanguageSnapshot = (): 'EN' | 'TH' =>
+  localStorage.getItem('language') === 'EN' ? 'EN' : 'TH';
+const getServerLanguageSnapshot = (): 'EN' | 'TH' => 'TH';
+
 // ข้อมูลจำลองสำหรับหน้า Sales Log
 const salesData = [
   {
     id: "#88", time: "22:15:30", name: "Turtle food 500g", sku: "SKU-TF-500",
-    supplier: "P' Kaimook", qty: 5, price: 80, total: 400, soldBy: "Ploy W.",
+    supplier: "P' Kaimook", qty: 5, price: 80, total: 400, paymentMethod: "Cash", soldBy: "Ploy W.",
     iconColor: "bg-[#7C5CFF]/10 text-[#7C5CFF]", supColor: "bg-[#7C5CFF]/10 text-[#7C5CFF]", soldColor: "text-[#ED571B]"
   },
   {
     id: "#87", time: "22:04:12", name: "Green Horned Frog", sku: "SKU-GHF-01",
-    supplier: "Host (My Products)", qty: 1, price: 150, total: 150, soldBy: "Alex Chen",
+    supplier: "Host (My Products)", qty: 1, price: 150, total: 150, paymentMethod: "Mobile banking", soldBy: "Alex Chen",
     iconColor: "bg-[#7C5CFF]/10 text-[#7C5CFF]", supColor: "bg-[#7C5CFF]/15 text-[#7C5CFF]", soldColor: "text-[#7C5CFF]"
   },
   {
     id: "#86", time: "21:58:05", name: "Mini Terrarium Starter Glass", sku: "SKU-TER-ST",
-    supplier: "Nong' Japan", qty: 1, price: 190, total: 190, soldBy: "Ploy W.",
+    supplier: "Nong' Japan", qty: 1, price: 190, total: 190, paymentMethod: "Cash", soldBy: "Ploy W.",
     iconColor: "bg-[#FFB24C]/15 text-[#FFB24C]", supColor: "bg-[#FFB24C]/15 text-[#FFB24C]", soldColor: "text-[#ED571B]"
   },
   {
     id: "#85", time: "21:42:19", name: "Japanese turtle (Small)", sku: "SKU-JT-SM",
-    supplier: "P' Kaimook", qty: 2, price: 100, total: 200, soldBy: "Alex Chen",
+    supplier: "P' Kaimook", qty: 2, price: 100, total: 200, paymentMethod: "Mobile banking", soldBy: "Alex Chen",
     iconColor: "bg-[#7C5CFF]/10 text-[#7C5CFF]", supColor: "bg-[#7C5CFF]/10 text-[#7C5CFF]", soldColor: "text-[#7C5CFF]"
   },
   {
     id: "#84", time: "21:30:44", name: "Aquarium Moss Ball (Medium)", sku: "SKU-MB-MED",
-    supplier: "Nong' Japan", qty: 2, price: 60, total: 120, soldBy: "Ploy W.",
+    supplier: "Nong' Japan", qty: 2, price: 60, total: 120, paymentMethod: "Cash", soldBy: "Ploy W.",
     iconColor: "bg-[#FFB24C]/15 text-[#FFB24C]", supColor: "bg-[#FFB24C]/15 text-[#FFB24C]", soldColor: "text-[#ED571B]"
   }
 ];
@@ -94,8 +99,10 @@ const auditData = [
 
 export default function ConsignDeskDashboard() {
   const [activeTab, setActiveTab] = useState('payouts');
-  const [language] = useState<'EN' | 'TH'>(() =>
-    typeof window !== 'undefined' && localStorage.getItem('language') === 'EN' ? 'EN' : 'TH'
+  const language = useSyncExternalStore(
+    subscribeToLanguage,
+    getLanguageSnapshot,
+    getServerLanguageSnapshot
   );
   //const [activeTab, setActiveTab] = useState('sales'); 
   // 1. เพิ่ม State เก็บข้อความที่พิมพ์ค้นหา
@@ -420,7 +427,7 @@ export default function ConsignDeskDashboard() {
 
               {/* Table */}
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] border-collapse text-left">
+                <table className="w-full min-w-[900px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-400 uppercase bg-gray-50/30">
                       <th className="p-4 font-semibold">{language === 'EN' ? '# / TIME SOLD' : '# / เวลาขาย'}</th>
@@ -429,6 +436,7 @@ export default function ConsignDeskDashboard() {
                       <th className="p-4 font-semibold text-center">{language === 'EN' ? 'QTY' : 'จำนวน'}</th>
                       <th className="p-4 font-semibold text-right">{language === 'EN' ? 'UNIT PRICE' : 'ราคาต่อหน่วย'}</th>
                       <th className="p-4 font-semibold text-right">{language === 'EN' ? 'TOTAL (฿)' : 'รวม (฿)'}</th>
+                      <th className="p-4 font-semibold">{language === 'EN' ? 'PAYMENT METHOD' : 'วิธีชำระเงิน'}</th>
                       <th className="p-4 font-semibold text-right">{language === 'EN' ? 'SOLD BY' : 'ผู้ขาย'}</th>
                     </tr>
                   </thead>
@@ -461,6 +469,11 @@ export default function ConsignDeskDashboard() {
                           <td className="p-4 text-center font-medium">{item.qty}</td>
                           <td className="p-4 text-right text-gray-500">฿{item.price.toFixed(2)}</td>
                           <td className="p-4 text-right font-bold text-[#7C5CFF]">฿{item.total.toFixed(2)}</td>
+                          <td className="p-4">
+                            <span className={`inline-flex whitespace-nowrap rounded-md border border-gray-200 bg-gray-50 py-1 text-xs font-medium text-gray-600 ${item.paymentMethod === 'Cash' ? 'px-4' : 'px-2.5'}`}>
+                              {item.paymentMethod}
+                            </span>
+                          </td>
                           <td className="p-4 text-right">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 border border-gray-200 text-gray-600 text-xs font-medium">
                               <User size={12} className={item.soldColor} /> {item.soldBy}
@@ -470,7 +483,7 @@ export default function ConsignDeskDashboard() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="p-10 text-center text-gray-400">
+                        <td colSpan={8} className="p-10 text-center text-gray-400">
                          {language === 'EN' ? `No results found for "${searchQuery}"` : `ไม่พบข้อมูลที่ค้นหา "${searchQuery}"`}
                         </td>
                       </tr>
