@@ -23,17 +23,18 @@ public class OnGoingSaleDTO {
 //     }]
 
     String Sale_run_Id;
+    String code_join;
     String Sale_run_Name;
     Double Gross_sales;
     Long Total_Stock;
     Long Total_Sale;
-
-    public OnGoingSaleDTO(String sale_run_Id, String sale_run_Name, Double gross_sales, Long total_Stock, Long total_Sale) {
+    public OnGoingSaleDTO(String sale_run_Id, String sale_run_Name, Double gross_sales, Long total_Stock, Long total_Sale,String code_join) {
         Sale_run_Id = sale_run_Id;
         Sale_run_Name = sale_run_Name;
         Gross_sales = gross_sales;
         Total_Stock = total_Stock;
         Total_Sale = total_Sale;
+        this.code_join = code_join;
     }
 
     public String getSale_run_Id() {
@@ -68,6 +69,12 @@ public class OnGoingSaleDTO {
         Total_Sale = total_Sale;
     }
 
+    public String getCode_join() {
+        return code_join;
+    }
+    public void setCode_join(String code_join) {
+        this.code_join = code_join;
+    }
 
 
 }

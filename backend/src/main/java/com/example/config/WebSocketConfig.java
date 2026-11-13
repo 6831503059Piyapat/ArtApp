@@ -12,15 +12,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // ให้ Client ที่กดติดตาม (Subscribe) รับข้อมูลผ่าน Path ขึ้นต้นด้วย /topic
-        config.enableSimpleBroker("/topic");
-        
-        
+        // เปิดช่องทางสำหรับส่งข้อมูลออกไปให้ Next.js ที่ Subscribe ไว้
+        config.enableSimpleBroker("/viewLive");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Endpoint สำหรับการเชื่อมต่อ WebSocket ครั้งแรก
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+        // เปิด Endpoint /ws และอนุญาตให้ Next.js (localhost:3000) เชื่อมต่อเข้ามาได้
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("http://localhost:3000", "*")
+                .withSockJS();
     }
 }

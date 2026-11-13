@@ -4,12 +4,14 @@ public class SellItemDTO {
     private String saleRunId;
     private String assistanceName;
     private List<CartDTO> cart;
+    private String paymentMethod;
 
     public SellItemDTO() {}
-    public SellItemDTO(String assistanceName, List<CartDTO> cart, String saleRunId) {
+    public SellItemDTO(String assistanceName, List<CartDTO> cart, String saleRunId, String paymentMethod) {
         this.assistanceName = assistanceName;
         this.cart = cart;
         this.saleRunId = saleRunId;
+        this.paymentMethod = paymentMethod;
     }
     public String getAssistanceName() {
         return assistanceName;
@@ -28,5 +30,8 @@ public class SellItemDTO {
     }
     public void setSaleRunId(String saleRunId) {
         this.saleRunId = saleRunId;
+    }
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 }

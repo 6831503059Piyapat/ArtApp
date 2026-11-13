@@ -8,6 +8,7 @@ import com.example.service.Salerun.SalerunService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import com.example.dto.request.SaleRun.SaleRunEndDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,10 +56,11 @@ salerunService.createSaleRun(saleRunDTO);
         return ResponseEntity.status(201).body("Sale run created successfully");
     }
 
-    @PutMapping("/sale-runs/{id}/end")
-    public ResponseEntity<String> EndSaleRunStatus(@PathVariable("id") String id) throws Exception {
-        // Implement the logic to update the sale run status here
-        salerunService.endSaleRun(id);
+    @PutMapping("/sale-runs/end")
+    public ResponseEntity<String> EndSaleRunStatus(@RequestBody SaleRunEndDTO saleRunEndDTO) throws Exception {
+        String id = saleRunEndDTO.getSaleRunId();
+        String assistantName = saleRunEndDTO.getAssistanceName();
+        salerunService.endSaleRun(id, assistantName);
 
         return ResponseEntity.ok("Sale run status updated successfully");
     }

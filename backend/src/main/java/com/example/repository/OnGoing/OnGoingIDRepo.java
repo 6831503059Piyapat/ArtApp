@@ -47,7 +47,8 @@ SELECT product_id AS Product_Id,product_name AS Product_Name,supplier_id AS Supp
                 JOIN product p ON p.supplier_id = s.supplier_id
                 WHERE s.sales_run_id = sr.sale_run_id
             ), 0) AS SIGNED) AS Total_Stock,
-            CAST(COALESCE(SUM(sl.quantity_sold), 0) AS SIGNED) AS Total_Sale
+            CAST(COALESCE(SUM(sl.quantity_sold), 0) AS SIGNED) AS Total_Sale,
+            sr.code_join
         FROM sale_run sr
         LEFT JOIN sale_logs sl ON sl.sale_run_id = sr.sale_run_id
         WHERE sr.sale_run_id = :sales_id
