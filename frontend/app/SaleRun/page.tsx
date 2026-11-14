@@ -197,8 +197,8 @@ export default function CreateSalesRun() {
     }catch(err){
         console.error(err);
         const message = language === "EN"
-          ? "An error occurred while submitting the form."
-          : "เกิดข้อผิดพลาดระหว่างบันทึกข้อมูล";
+          ? "An error occurred. Please check the limit on the number of stores that can be added and try again."
+          : "เกิดข้อผิดพลาด กรุณาตรวจสอบจำนวนลิมิตของร้านค้าที่สามารถเพิ่มได้และลองอีกครั้ง";
         setError(message);
         setSubmitStatus({ type: "error", message });
     } finally {
@@ -519,7 +519,13 @@ export default function CreateSalesRun() {
               onClick={() => {
                 setSubmitStatus(null);
                 if (submitStatus.type === "success") {
-                  router.replace("/sales/OnGoing");
+                  setSections(initialSections);
+                  setExpenses(initialExpenses);
+                  setRunName("");
+                  setRunDate(getTodayDate());
+                  setRunLocation("");
+                  router.push("/sales/OnGoing");
+
                 }
               }}
               className="mt-4 inline-flex min-h-10 items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-5 py-2 text-sm font-bold text-white hover:bg-[#6642ed]"

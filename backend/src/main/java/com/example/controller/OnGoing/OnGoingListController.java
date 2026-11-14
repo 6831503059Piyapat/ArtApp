@@ -80,6 +80,13 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
         List<ProductAddDTO> add = productRequestSaveDTO.getAdd();
         List<ProductDeleteDTO> delete = productRequestSaveDTO.getDelete();
         onGoingIDService.saveChanges(saleRunId, assistanceName, fixStock, add, delete);
+        LiveStatsDTO payload =  liveStatusService.updateLiveStatus(saleRunId);
+        payload.setLiveID(saleRunId);
+        
+        messagingTemplate.convertAndSend(
+            "/viewLive/" + saleRunId,
+            payload
+        );
         return ResponseEntity.ok("Changes saved successfully");
     }
    @GetMapping("/ongoing/{id}/expenses-list")

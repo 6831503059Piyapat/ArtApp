@@ -36,25 +36,25 @@ public class SaleRunEntity {
     @Column(name = "Host_user_Id", nullable = false, insertable = false, updatable = false)
     private String Host_user_Id;
 
-    @JsonManagedReference
+    @JsonManagedReference("saleRun-saleLogs")
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SaleLogsEntity> saleLogs = new ArrayList<>();
-    @JsonManagedReference
+    @JsonManagedReference("saleRun-expensesLogs")
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ExpenseLogEntity> expensesLogs = new ArrayList<>();
-    @JsonManagedReference
+    @JsonManagedReference("saleRun-Supplier")
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SupplierEntity> Supplier = new ArrayList<>();
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunSupplierPayoutEntity> runSupplierPayouts = new ArrayList<>();
-    @JsonManagedReference
+    @JsonManagedReference("saleRun-changesHistories")
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ChangesHistoryEntity> changesHistories = new ArrayList<>();
     @JsonManagedReference("saleRun-assistance")
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunAssistanceEntity> runAssistants = new ArrayList<>();
-    @JsonBackReference
+    @JsonBackReference("saleRun-user")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)   
     @JoinColumn(name = "Host_user_Id", referencedColumnName = "User_Id")
     private UserEntity user;

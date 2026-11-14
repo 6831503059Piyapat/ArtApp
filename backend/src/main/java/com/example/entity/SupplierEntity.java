@@ -20,12 +20,12 @@ public class SupplierEntity implements Persistable<String> {
 
     @Column(name = "Sales_run_Id", nullable = false, insertable = false, updatable = false)
     private String Sales_run_id;
-    @JsonBackReference
+    @JsonBackReference("saleRun-Supplier")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Sales_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity SaleRun;
 
-    @JsonManagedReference
+    @JsonManagedReference("Supplier-Products")
     @OneToMany(fetch = FetchType.LAZY ,cascade = CascadeType.ALL ,mappedBy = "Supplier")
     private List<ProductEntity> Products = new ArrayList<>();
 
