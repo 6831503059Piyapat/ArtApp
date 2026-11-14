@@ -6,6 +6,25 @@ import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import Link from 'next/link';
 import { BadgeCheck, Banknote, Clock3, ShoppingBag,Sparkles } from 'lucide-react';
 
+
+type RunData = {
+  AVG_Revenue: number;
+  AVG_duration: string;
+  Total_Revenue: number;
+  Total_duration: string;
+  Total_item_sold: number;
+  CompleteList: {
+    length: number;
+  }[];
+  total_run_complete: number;
+};
+
+
+
+
+
+
+
 // Mock Data
 const INITIAL_RUNS = [
   {
@@ -40,9 +59,13 @@ const INITIAL_RUNS = [
   },
 ];
 
+
+
+
 export default function CompletedRunsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); // Default to English
+  const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); 
+  const [dataFetch,setDataFetch] = useState<RunData | null>(null);
   async function fetchListCompleteRun(idToken: string){
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/complete-list',{
       headers: {
@@ -53,7 +76,10 @@ export default function CompletedRunsPage() {
       method: 'GET',
 
     });
-    console.log("Response from backend:", await response.json());
+    const data = await response.json();
+    setDataFetch(data);
+    console.log("Response from backend:", data);
+    setDataFetch(data);
   }
   // Filter Logic
   const filteredRuns = useMemo(() => {
@@ -93,7 +119,7 @@ useEffect(() => {
               <div className="flex flex-col gap-1">
                 <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold tracking-tight leading-7">
                   {language === 'EN' ? 'Completed Sales Runs' : 'การขายที่เสร็จสิ้น'}
-                  <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary">3 {language === 'EN' ? 'Archived' : 'การขาย'}</span>
+                  <span className="rounded-full border border-primary/20 bg-creatory-lavender px-2.5 py-0 text-[9px] font-bold leading-4 text-primary"> {dataFetch?.total_run_complete || 0} {language === 'EN' ? 'Archived' : 'การขาย'}</span>
                 </h1>
               </div>
             </div>
@@ -109,7 +135,7 @@ useEffect(() => {
                 </div>
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
-                    <span className="text-lg font-extrabold leading-5 md:text-xl">3</span>
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">{dataFetch?.total_run_complete || 0}</span>
                     <span className="rounded-full bg-creatory-lavender px-1.5 py-0.5 text-[9px] font-bold text-primary"> {language === 'EN' ? 'Completed' : 'เสร็จสิ้น'}</span>
                   </div>
                   <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]"> {language === 'EN' ? '100% reconciled across all artists' : '100% ตรวจสอบแล้ว across all artists'}</p>
@@ -125,10 +151,14 @@ useEffect(() => {
                 </div>
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
-                    <span className="text-lg font-extrabold leading-5 md:text-xl">6{language === 'EN' ? 'h' : 'ชม'} 10{language === 'EN' ? 'm' : 'นาที'}</span>
+                    {/* <span className="text-lg font-extrabold leading-5 md:text-xl"> 6 {language === 'EN' ? 'h' : 'ชม'} 10{language === 'EN' ? 'm' : 'นาที'} </span> */}
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">{/* ดึงค่าเวลาเฉลี่ยจาก API */} {dataFetch?.AVG_duration || '0h 0m'}</span>
                     <span className="text-[9px] font-semibold text-creatory-gray"> {language === 'EN' ? 'Avg / run' : 'เฉลี่ยต่อการรัน'}</span>
                   </div>
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18{language === 'EN' ? 'h' : 'ชม'} 30{language === 'EN' ? 'm' : 'นาที'} {language === 'EN' ? 'Total duration' : ''} </p>
+                  {/* <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18{language === 'EN' ? 'h' : 'ชม'} 30{language === 'EN' ? 'm' : 'นาที'} {language === 'EN' ? 'Total duration' : ''} </p> */}
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{dataFetch?.Total_duration || '0h 0m'} {language === 'EN' ? 'Total duration' : 'เวลารวม'}</p>
+
+
                 </div>
               </div>
 
@@ -141,7 +171,7 @@ useEffect(() => {
                 </div>
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
-                    <span className="text-lg font-extrabold leading-5 md:text-xl">195</span>
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">{dataFetch?.Total_item_sold || '0'}</span>
                     <span className="text-[9px] font-semibold text-creatory-gray">{language === 'EN' ? 'Items' : 'รายการ'}</span>
                   </div>
                   <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{language === 'EN' ? 'Clearance Rate' : 'อัตราการขาย'}: <strong className="font-semibold text-creatory-navy">85%</strong></p>
@@ -157,9 +187,9 @@ useEffect(() => {
                 </div>
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1.5">
-                    <span className="text-lg font-extrabold leading-5 tracking-tight md:text-xl">฿20,770</span>
+                    <span className="text-lg font-extrabold leading-5 tracking-tight md:text-xl">฿{dataFetch?.Total_Revenue?.toLocaleString() || '0'}</span>
                   </div>
-                  <p className="text-[9px] font-semibold leading-3 text-primary md:text-[10px]"> {language === 'EN' ? 'Avg' : 'เฉลี่ย'} ฿6,923 / {language === 'EN' ? 'run intake' : 'รัน'}</p>
+                  <p className="text-[9px] font-semibold leading-3 text-primary md:text-[10px]"> {language === 'EN' ? 'Avg' : 'เฉลี่ย'} ฿{dataFetch?.AVG_Revenue?.toLocaleString() || '0'} / {language === 'EN' ? 'run intake' : 'รัน'}</p>
                 </div>
               </div>
             </div>
