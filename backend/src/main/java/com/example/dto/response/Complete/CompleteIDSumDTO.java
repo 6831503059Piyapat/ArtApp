@@ -6,6 +6,7 @@ public class CompleteIDSumDTO {
     private String complete_name;
     private LocalDateTime Date_complete;
     private Boolean isActive;
+    
     private String Host_name;
     private Double Gross_sales;
     private Double Expense_total;
