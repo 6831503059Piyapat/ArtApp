@@ -17,6 +17,7 @@ public class ProductDTO {
    private String Product_Id;
    private String Product_Name;
    private String Supplier_Id;
+   private String Supplier_Name;
     private Double Product_Unit_Price;
     private String Image_url;
     private Integer Start_Stock;
@@ -26,6 +27,7 @@ public class ProductDTO {
              String productId,
              String productName,
              String supplierId,
+             String supplierName,
              Double productUnitPrice,
              String imageUrl,
              Integer startStock,
@@ -33,6 +35,7 @@ public class ProductDTO {
          Product_Id = productId;
          Product_Name = productName;
          Supplier_Id = supplierId;
+         Supplier_Name = supplierName;
          Product_Unit_Price = productUnitPrice;
          Image_url = imageUrl;
          Start_Stock = startStock;
@@ -81,6 +84,11 @@ public class ProductDTO {
     public void setCurrent_Stock(Integer current_Stock) {
         Current_Stock = current_Stock;
     }
-
+    public String getSupplier_Name() {
+        return Supplier_Name;
+    }
+    public void setSupplier_Name(String supplier_Name) {
+        Supplier_Name = supplier_Name;
+    }
 
 }

@@ -37,22 +37,22 @@ public class SaleRunEntity {
     private String Host_user_Id;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SaleLogsEntity> saleLogs = new ArrayList<>();
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ExpenseLogEntity> expensesLogs = new ArrayList<>();
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SupplierEntity> Supplier = new ArrayList<>();
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunSupplierPayoutEntity> runSupplierPayouts = new ArrayList<>();
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ChangesHistoryEntity> changesHistories = new ArrayList<>();
     @JsonManagedReference("saleRun-assistance")
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunAssistanceEntity> runAssistants = new ArrayList<>();
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)   

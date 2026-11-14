@@ -16,8 +16,23 @@ import java.util.List;
 public interface OnGoingIDRepo extends JpaRepository<SaleRunEntity, String> {
 
     @Query(value = """
-SELECT product_id AS Product_Id,product_name AS Product_Name,supplier_id AS Supplier_Id,product_unit_price AS Product_Unit_Price,image_url AS Image_url,start_stock AS Start_Stock,current_stock AS Current_Stock FROM `product` WHERE supplier_id = :Supplier_Id
-    """,nativeQuery = true)
+SELECT
+    p.product_id AS Product_Id,
+    p.product_name AS Product_Name,
+    p.supplier_id AS Supplier_Id,
+    s.supplier_name AS Supplier_Name,
+    p.product_unit_price AS Product_Unit_Price,
+    p.image_url AS Image_url,
+    p.start_stock AS Start_Stock,
+    p.current_stock AS Current_Stock
+FROM
+    `product` AS p
+INNER JOIN supplier AS s
+ON
+    p.supplier_id = s.supplier_id
+WHERE
+    p.supplier_id = :Supplier_Id
+     """,nativeQuery = true)
     List<ProductDTO> findProductBySupplierId(@Param("Supplier_Id") String Supplier_Id);
     // String Supplier_Id;
     // String Supplier_Name;
