@@ -39,6 +39,7 @@ public class SaleRunDTO {
 //         runExpenses: expenses
     private String runName;
     private LocalDateTime runDate;
+    private LocalDateTime runEnd;
     private String runOwnerName;
     private String runLocation;
     private String runOwnerId;
@@ -48,9 +49,10 @@ public class SaleRunDTO {
     private List<SaleRunExpenseDTO> expenses;
     
 
-    public SaleRunDTO(String runName, LocalDateTime runDate, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections, String runOwnerName) {
+    public SaleRunDTO(String runName, LocalDateTime runDate, LocalDateTime runEnd, String runLocation, String runOwnerId, List<SaleRunExpenseDTO> expenses, List<SaleRunSupplierDTO> sections, String runOwnerName) {
         this.runName = runName;
         this.runDate = runDate;
+        this.runEnd = runEnd;
         this.runLocation = runLocation;
         this.runOwnerId = runOwnerId;
         this.expenses = expenses;
@@ -99,6 +101,12 @@ public class SaleRunDTO {
     }
     public void setRunOwnerName(String runOwnerName) {
         this.runOwnerName = runOwnerName;
+    }
+    public LocalDateTime getRunEnd() {
+        return runEnd;
+    }
+    public void setRunEnd(LocalDateTime runEnd) {
+        this.runEnd = runEnd;
     }
 
 }

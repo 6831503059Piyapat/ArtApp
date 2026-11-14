@@ -41,6 +41,11 @@ public interface SalerunRepo extends JpaRepository<SaleRunEntity, String> {
     """, nativeQuery = true)
     String existsByCode_JoinId(@Param("code_join") String code_join);
 
+    @Query (value = """
+        SELECT COALESCE(COUNT(sale_run_id),0) AS totalActive FROM sale_run WHERE host_user_id = :host_user_id AND sale_run_status = 1
+        """,nativeQuery = true)
+        Long getTotalActiveSaleRunByHostId(@Param("host_user_id") String host_user_id);
+
 
 
    

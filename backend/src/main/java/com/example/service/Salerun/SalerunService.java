@@ -11,10 +11,8 @@ import com.example.dto.request.SaleRunDTO;
 import com.example.dto.request.SaleRunExpenseDTO;
 
 import com.example.dto.System.SupplierFindDTO;
-import java.time.LocalDate;
 
 import java.util.Random;
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import com.example.entity.SupplierEntity;
@@ -62,10 +60,14 @@ public class SalerunService {
         
         String runName = saleRunDTO.getRunName();
         LocalDateTime runDate = saleRunDTO.getRunDate();
+        LocalDateTime runEnd = saleRunDTO.getRunEnd();
         String runLocation = saleRunDTO.getRunLocation();
         String runOwnerName = saleRunDTO.getRunOwnerName();
         String runOwnerId = saleRunDTO.getRunOwnerId();
         
+        if (salerunRepository.getTotalActiveSaleRunByHostId(runOwnerId) >= 5) {
+            throw new IllegalArgumentException("You have reached the maximum limit of 5 active sale runs.");
+        }
          Random random = new Random();
         StringBuilder sb = new StringBuilder(15);
        
@@ -82,10 +84,9 @@ public class SalerunService {
             sbc.append(CHARACTERS.charAt(randomIndex));
         }
         String code_join = sbc.toString();
-        java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(LocalDateTime.now());
         String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
-        salerunRepository.createSaleRun(sale_run_id,null,runDate,runOwnerId,true,runLocation,code_join,runName  );
+        salerunRepository.createSaleRun(sale_run_id,runEnd,runDate,runOwnerId,true,runLocation,code_join,runName  );
         SaleRunEntity saleRun = entityManager.getReference(SaleRunEntity.class, sale_run_id);
         
         if (saleRunDTO.getSections() != null && !saleRunDTO.getSections().isEmpty()) {

@@ -102,6 +102,10 @@ function getLocalDateTime() {
 
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
+
+function getDateTimeAtStartOfDay(date: string) {
+  return date ? `${date}T00:00:00` : "";
+}
 export default function CreateSalesRun() {
   //token 
   const [token, setToken] = useState<string | null>(null);
@@ -155,6 +159,7 @@ export default function CreateSalesRun() {
       body: JSON.stringify({
         runName: runName,
         runDate: getLocalDateTime(),
+        runEnd: getDateTimeAtStartOfDay(runDate),
         runLocation: runLocation,
         runOwnerId:getAuth().currentUser?.uid,
         runOwnerName:getAuth().currentUser?.displayName,
