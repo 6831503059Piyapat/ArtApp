@@ -92,4 +92,13 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
         """,nativeQuery = true
     )
     void deleteProductById(@Param("id") String id);
+
+    @Modifying 
+    @Transactional 
+    @Query (
+        value = """
+        UPDATE product SET current_stock = current_stock - :quantity WHERE product_id = :id
+        """,nativeQuery = true
+    )
+    void SellProduct(@Param("id") String id, @Param("quantity") Integer quantity);
 }

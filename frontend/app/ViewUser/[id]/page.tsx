@@ -648,7 +648,7 @@ export default function ConsignDesk() {
               <div className="flex items-center justify-between gap-2 border-b border-[#f0eef7] bg-[#f8f6ff] px-3 py-2">
                 <div className="flex items-center gap-1.5 text-[9px] font-bold text-[#7957ff]">
                   <Zap className="h-3 w-3" />
-                  <span>{language === "EN" ? "Latest Checkout (Sale #05)" : "การชำระเงินล่าสุด (รายการขาย #05)"}</span>
+                  <span>{language === "EN" ? `Latest Checkout (Sale #${totalSold})` : `การชำระเงินล่าสุด (รายการขาย #${totalSold})`}</span>
                 </div>
                 <span className="rounded-full border border-[#f0eaff] bg-white px-2 py-0.5 text-[8px] font-medium text-[#7957ff]">
                   {language === "EN" ? "1 min ago" : "1 นาทีที่แล้ว"}
@@ -699,7 +699,7 @@ export default function ConsignDesk() {
             <div className="rounded-2xl border border-[#eeeafd] bg-white px-3.5 py-3 shadow-[0_4px_14px_rgba(93,76,166,0.035)]">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-[9px] font-bold">{language === "EN" ? "Current Split Allocation" : "สัดส่วนการแบ่งเงินปัจจุบัน"}</h3>
-                <span className="text-[8px] text-[#858ba0]">{language === "EN" ? "Calculated at 20:45" : "คำนวณเมื่อ 20:45"}</span>
+                <span className="text-[8px] text-[#858ba0]">{language === "EN" ? `Calculated at ${dataAfterFetch?.timestamp}` : `คำนวณเมื่อ ${dataAfterFetch?.timestamp}`}</span>
               </div>
               <div className="mb-2 flex h-2 w-full overflow-hidden rounded-full bg-[#f0eaff]">
                 {dataAfterFetch?.Supplier?.map((supplier,index)=>(

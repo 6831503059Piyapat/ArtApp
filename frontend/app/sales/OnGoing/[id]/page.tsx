@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore  } from 'react';
 import Link from 'next/link';
 import {getAuth , onAuthStateChanged} from "firebase/auth"; 
 import {Suspense} from 'react';
 import { useParams } from "next/navigation";
+import QRCode from 'qrcode';
 
 import {
   ChevronRight,
@@ -49,6 +50,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
+import { ref, set } from 'firebase/database';
 
 type InventoryProduct = {
   Product_Id?: string;
@@ -129,7 +131,7 @@ type dataFetch ={
     can_sell:boolean;
     can_view_log:boolean;
     display_name:string;
-    run_assistance_id:string;
+    run_assistace_id:string;
   }[];
   Sale_run_Id:string;
   Sale_run_Name:string;
@@ -150,7 +152,7 @@ type dataFetch ={
     }[];
   }[];
   Supplier_Name:string[];
-  Total_Sales:number;
+  Total_Sale:number;
   Total_Stock:number;
 }
 type ExpenseDTO ={
@@ -164,22 +166,34 @@ type ExpenseDTO ={
   new: boolean;
   timestamp: string;
 }
-export default function SalesRunDetail() {
-  return (
-   
-    
-      <SalesRunDetailContent />
-   
-  );
-}
 
-function SalesRunDetailContent() {
+
+export default function SalesRunDetailContent() {
   const { id } = useParams<{ id: string }>();
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [AssistantName, setAsistantName] = useState<string>('');
   const [expenses, setExpenses] = useState<ExpenseDTO[]>([]);
   const [totalProduct, setTotalProduct] = useState<number>(0);
   const [dataFetched, setDataFetched] = useState<dataFetch | null>(null);
   const [products, setProducts] = useState<Supplier[]>([]);
+  const subscribeToOrigin = () => () => undefined;
+const getOrigin = () => window.location.origin;
+const getServerOrigin = () => "";
+
+    const origin = useSyncExternalStore(subscribeToOrigin, getOrigin, getServerOrigin);
+
+  let url = origin
+    ? new URL(`/dashboard/?id${encodeURIComponent(id)}`, origin).toString()
+    : "";
+  function generateQrcodeUrl(){
+    QRCode.toDataURL(url, { width: 256, margin: 1, errorCorrectionLevel: "H" })
+      .then((dataUrl) => {
+        setQrCodeUrl(dataUrl);
+      })
+      .catch((error: unknown) => {
+        console.error("QR code generation failed:", error);
+      });
+  }
   async function fetchSalesRunData(saleRunId: string, idToken: string) {
     // setProducts([]);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
@@ -244,200 +258,7 @@ function SalesRunDetailContent() {
     });
     return () => unsubscribe();
   }, [id]);
-  // const Suppliers: Supplier[] = [
-  //   {
-  //   id: "supplier0-up73mVrzGH6Lfm7-20261113094945",
-  //   name: "My Products",
-  //   role: "Host's inventory",
-  //   accent: "purple",
-  //   category: "host",
-  //   placeholder: "Item Name (e.g. Linen Coaster Set)",
 
-  //   products: [
-  //     {
-  //     id: "product-0-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
-  //     name: 'Green Horned Frog',
-  //     start: 13,
-  //     stock: 3,
-  //     price: 150,
-  //     sold: 10,
-  //     icon: Leaf,
-  //     iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-  //     supplierId: "supplier0-up73mVrzGH6Lfm7-20261113094945",
-  //     supplierName:"My Products"
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Yellow Horned Frog',
-  //     start: 10,
-  //     stock: 1,
-  //     price: 150,
-  //     sold: 9,
-  //     icon: Sun,
-  //     iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-  //     supplierId: "supplier0-qx4hjObfR9rBeyY-20261109115632",
-  //     supplierName:"My Products"
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Brown Horned Frog',
-  //     start: 10,
-  //     stock: 6,
-  //     price: 150,
-  //     sold: 4,
-  //     icon: Mountain,
-  //     iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-  //     supplierId: "supplier0-qx4hjObfR9rBeyY-20261109115632",
-  //     supplierName:"My Products"
-     
-  //   },
-  //   ],
-  // },
-  //  {
-  //   id: "supplier1-up73mVrzGH6Lfm7-20261113094945",
-  //   name: "P Kaimook",
-  //   role: "Host's inventory",
-  //   accent: "purple",
-  //   placeholder: "Item Name (e.g. Linen Coaster Set)",
-  //   category: "supplier",
-  //   products: [
-  //     {
-  //     id: "product-1-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
-  //     name: 'Green Horned Frog',
-  //     start: 13,
-  //     stock: 3,
-  //     price: 150,
-  //     sold: 10,
-  //     icon: Leaf,
-  //     iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-  //     supplierId: "supplier1-up73mVrzGH6Lfm7-20261113094945",
-  //     supplierName:"P Kaimook"
-     
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Yellow Horned Frog',
-  //     start: 10,
-  //     stock: 1,
-  //     price: 150,
-  //     sold: 9,
-  //     icon: Sun,
-  //     iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-  //     supplierId: "kaimook-8466468345",
-  //     supplierName:"P Kaimook"
-     
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Brown Horned Frog',
-  //     start: 10,
-  //     stock: 6,
-  //     price: 150,
-  //     sold: 4,
-  //     icon: Mountain,
-  //     iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-  //     supplierId: "kaimook-8466468345",
-  //     supplierName:"P Kaimook"
-  //   },
-  //   ],
-  // },
-  // {
-  //   id: "supplier2-up73mVrzGH6Lfm7-20261113094945",
-  //   name: "Nong' Japan",
-  //   role: "Supplier inventory",
-  //   accent: "yellow",
-  //   placeholder: "Item Name (e.g. Linen Coaster Set)",
-  //   category: "supplier",
-  //   products: [
-  //     {
-  //       id: "product-2-20261113094945-up73mVrzGH6Lfm7-20261113094945-0",
-  //       name: 'Aquarium Moss Ball (Medium)',
-  //       start: 15,
-  //       stock: 8,
-  //       price: 60,
-  //       sold: 7,
-  //       icon: Package,
-  //       iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-  //       supplierId: "supplier2-up73mVrzGH6Lfm7-20261113094945",
-  //       supplierName:"Nong' Japan"
-  //     },
-  //     {
-  //       id: 'nong-japan-2',
-  //       name: 'Mini Terrarium Starter Glass',
-  //       start: 6,
-  //       stock: 3,
-  //       price: 190,
-  //       sold: 3,
-  //       icon: Droplets,
-  //       iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-  //       supplierId: "nong-japan-8466468345",
-  //       supplierName:"Nong' Japan"
-  //     },
-  //     {
-  //       id: 'nong-japan-3',
-  //       name: 'Terrarium Pebble Pack',
-  //       start: 12,
-  //       stock: 9,
-  //       price: 45,
-  //       sold: 3,
-  //       icon: Grid,
-  //       iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-  //       supplierId: "nong-japan-8466468345",
-  //       supplierName:"Nong' Japan"
-  //     },
-  //   ],
-  // },
-  // ];
-  // const assistants = [
-  //   {
-  //     id:'1',
-  //     name: 'Alex Chen',
-  //     status: true,
-  //     avatar: '/path/to/alex_chen.jpg',
-  //     permission:{
-  //       Sell:true,
-  //       Crud:true,
-  //       Record:true,
-  //       ViewLog:true,
-  //       ManagePermission:true
-  //     }
-  //   },
-  
-  // ];
- 
-  // const expensesList = [
-  //   {
-  //     id: '01',
-  //     timestamp: '14/9/26 12:43:05',
-  //     detail: 'Weekend Market Stall Rent',
-  //     dotColor: 'bg-[#FFB24C]',
-  //     category: 'Booth Fee',
-  //     categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
-  //     loggedBy: 'Alex Chen',
-  //     role: '(Host)',
-  //     amount: '฿700.00'
-  //   },
-  //   {
-  //     id: '02',
-  //     timestamp: '14/9/26 15:10:20',
-  //     detail: 'Ice bucket, string bags & tape',
-  //     dotColor: 'bg-[#7C5CFF]',
-  //     category: 'Stall expense',
-  //     categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
-  //     loggedBy: 'Alex Chen',
-  //     role: '(Host)',
-  //     amount: '฿150.00'
-  //   }
-  // ];
-  // const StockList = [
-  //   {
-  //     id,
-  //     name:"MFU outside night market (MON 14)",
-  //     totalsoldMax:85,
-  //     totalsold:66,
-  //     grossIntake:8490,
-  //   }
-  // ];
   const [ProductsFixStock, setProductsFixStock] = useState<ProductFixStock[]>([]);
   const [ProductsAdd, setProductsAdd] = useState<ProductAdd[]>([]);
   const [ProductsDelete, setProductsDelete] = useState<ProductDelete[]>([]);
@@ -465,7 +286,6 @@ function SalesRunDetailContent() {
   const [isFinalEndRunOpen, setIsFinalEndRunOpen] = useState(false);
   const [isEndRunConfirmed, setIsEndRunConfirmed] = useState(false);
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
-  const joinPin = '88X2-901';
   // Toggle Switches State
   const [activeTab, setActiveTab] = useState<'global' | 'may' | 'tanawat'>('global');
   const [isPermissionEnabled, setIsPermissionEnabled] = useState(false);
@@ -671,8 +491,11 @@ const handleConfirmSale = async () => {
   if (!response.ok) {
     throw new Error(`Sale confirmation failed: ${await response.text()}`);
   }
-  console.log("Confirming sale for items:", await response.text());
-
+  const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
   setProducts((prev) =>
     prev.map((supplier) => {
@@ -742,6 +565,11 @@ async function handleSaveChanges(){
     console.error("Error saving changes");
     return;
   }
+   const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
   console.log(ProductsFixStock, ProductsAdd, ProductsDelete);
   // Clear the arrays after successful save
   setProductsFixStock([]);
@@ -885,7 +713,7 @@ async function endRunSendRequest() {
             <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Gross Intake' : 'รายได้รวม'}</p>
-                <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{dataFetched?.Gross_sales.toLocaleString('en-US') || 0}.00</p>
+                <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{dataFetched?.Gross_sales.toLocaleString('en-US') || 0}</p>
               </div>
               <div className="absolute right-3 top-3 rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
                 <Receipt className="h-4 w-4" />
@@ -897,7 +725,7 @@ async function endRunSendRequest() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                  <span className="text-lg font-extrabold text-[#0B0F4F]">{dataFetched?.Total_Sales || 0}</span>
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">{dataFetched?.Total_Sale || 0}</span>
                   <span className="text-xs font-medium text-slate-400">/ {dataFetched?.Total_Stock || 0} {language === 'EN' ? 'starting' : 'เริ่มต้น'}</span>
                 </div>
               </div>
@@ -994,7 +822,11 @@ async function endRunSendRequest() {
                 </div>
                 <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• {language === 'EN' ? 'Online' : 'ออนไลน์'}</span>
               </div>
-              <button onClick={() => setIsOpen(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
+              <button onClick={() => {
+                setIsOpen(true);
+                generateQrcodeUrl();
+                
+              }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
                 <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
               <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
@@ -1013,7 +845,7 @@ async function endRunSendRequest() {
               </div>
             </div>
 
-            <Link href="/ViewUser/1" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
+            <Link href={`/ViewUser/`+id} target="_blank" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5"> {language === 'EN' ? 'Sales Activity Board' : 'บอร์ดกิจกรรมการขาย'}</span><span className="block text-[9px] leading-3 text-white/80"> {language === 'EN' ? 'Enter live sales feed & telemetry' : 'เข้าสู่กระแสการขายสดและข้อมูล telemetry'}</span></span>
@@ -1648,8 +1480,10 @@ async function endRunSendRequest() {
           onClose={() => setIsOpen(false)}
           copied={copied}
           onCopy={handleCopy}
+          qrCodeUrl={qrCodeUrl}
+          Assistant_Name={dataFetched?.Run_Assistant_Name ?? []}
           inviteUrl={inviteUrl}
-          joinPin={joinPin}
+          joinPin={dataFetched?.Join_code ?? ''}
           onOpenPermissions={() => {
             setIsOpen(false);
             setIsPermissionEnabled(true);
@@ -1735,12 +1569,22 @@ type SupplierInviteModalProps = {
   copied: boolean;
   onCopy: () => void;
   inviteUrl: string;
+  Assistant_Name:{
+    can_manage_permission:boolean;
+    can_manage_stock:boolean;
+    can_record_expenses:boolean;
+    can_sell:boolean;
+    can_view_log:boolean;
+    display_name:string;
+    run_assistace_id:string;
+  }[];
   joinPin: string;
   onOpenPermissions: () => void;
   language: 'EN' | 'TH';
+  qrCodeUrl: string;
 };
 // MODAL COMPONENT: Supplier Invite Modal
-function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
+function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assistant_Name, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
   return (
     <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-3 backdrop-blur-sm transition-all animate-in fade-in duration-200 sm:items-center sm:p-4">
       
@@ -1817,6 +1661,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 {/* Simulated QR Code Graphic */}
                 <div className="w-16 h-16 bg-white relative flex items-center justify-center">
                   <QrCode className="w-full h-full text-[#0B0F4F]" />
+                  <img src={qrCodeUrl} alt="QR Code" className="w-full h-full" />
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
@@ -1829,41 +1674,27 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
           {/* ASSISTANTS JOINED (2) SECTION */}
           <div className="space-y-2.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-               {language === 'EN' ? 'ASSISTANTS JOINED ' : 'ผู้ช่วยที่เข้าร่วม'} (2)
+               {language === 'EN' ? 'ASSISTANTS JOINED ' : 'ผู้ช่วยที่เข้าร่วม'} ({Assistant_Name.length})
             </label>
 
             <div className="space-y-2">
-              {/* Assistant 1: @may_craft (Active) */}
-              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-[#7C5CFF] text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
-                    MC
+              {Assistant_Name.map((assistant,index) => (
+                <div key={index} className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-[#7C5CFF] text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
+                      {assistant.display_name.slice(0, 2)}
+                    </div>
+                    <span className="text-xs font-bold text-slate-800">
+                      @{assistant.display_name}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold text-slate-800">
-                    @may_craft
+                  <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {language === 'EN' ? 'Active' : 'ใช้งาน'}
                   </span>
                 </div>
-                <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  {language === 'EN' ? 'Active' : 'ใช้งาน'}
-                </span>
-              </div>
-
-              {/* Assistant 2: granawan.b (Offline) */}
-              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center uppercase">
-                    TB
-                  </div>
-                  <span className="text-xs font-semibold text-slate-600">
-                    granawan.b
-                  </span>
-                </div>
-                <span className="bg-slate-100 text-slate-500 border border-slate-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  {language === 'EN' ? 'Offline' : 'ออฟไลน์'}
-                </span>
-              </div>
+              ))}
+            
             </div>
           </div>
 
@@ -2006,7 +1837,9 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
                   <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Price' : 'ราคา'}</span>
                   <span className="font-bold text-[#FFB24C]">฿</span>
                   <input
-                    type="text"
+                    type="number"
+                    min="0"
+                    step="any"
                     value={item.price}
                     onChange={(event) => {
                       const nextPrice = Number(event.target.value);
@@ -2126,7 +1959,7 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
             <span>{language === 'EN' ? 'Start' : 'เริ่ม'}: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
             <span className={isOutOfStock ? 'text-[#ED571B] font-semibold' : 'text-[#7C5CFF] font-semibold'}>
-              {isOutOfStock ? (language === 'EN' ? 'Out of stock' : 'หมดสต็อก') : `${item.stock} ${language === 'EN' ? 'in stock' : 'ในสต็อก'}`}
+              {isOutOfStock ? (language === 'EN' ? 'Out of stock' : 'หมดสต็อก') : `${item.Current_Stock ?? 0} ${language === 'EN' ? 'in stock' : 'ในสต็อก'}`}
             </span>
           </div>
         </div>
@@ -2140,7 +1973,7 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
             {item.price}
           </div>
           <p className="mt-1 text-sm font-medium text-slate-400">
-            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.sold}</span>
+            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.Start_Stock ? item.Start_Stock - (item.Current_Stock ?? 0) : 0}</span> 
           </p>
         </div>
 

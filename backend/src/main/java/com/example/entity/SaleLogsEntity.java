@@ -55,12 +55,12 @@ public class SaleLogsEntity implements Persistable<String>{
     @Column(name = "paymentMethod", nullable = false)
     private String paymentMethod;
   
-    @JsonBackReference
+    @JsonBackReference("saleRun-saleLogs")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id" , insertable = false, updatable = false)
     private SaleRunEntity saleRun;
     
-    @JsonBackReference
+    @JsonBackReference("supplier-saleLogs")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", referencedColumnName = "Supplier_Id", nullable = false)
     private SupplierEntity supplier;
