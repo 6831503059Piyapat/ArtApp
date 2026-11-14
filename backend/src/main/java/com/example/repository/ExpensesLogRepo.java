@@ -26,5 +26,10 @@ public interface ExpensesLogRepo extends JpaRepository<ExpenseLogEntity, String>
         """,nativeQuery = true)
     void insertExpenseLog(@Param("expenseId") String expenseId, @Param("saleRunId") String saleRunId, @Param("amount") Double amount, @Param("category") String category, @Param("description") String description, @Param("paidByUserName") String paidByUserName);
 
-   
+   @Query(
+        value = """
+        SELECT SUM(amount) AS total_expenses FROM expense_log WHERE sale_run_id = :saleRunId
+        """, nativeQuery = true
+    )
+    Double findTotalExpensesBySaleRunId(@Param("saleRunId") String saleRunId);
 }

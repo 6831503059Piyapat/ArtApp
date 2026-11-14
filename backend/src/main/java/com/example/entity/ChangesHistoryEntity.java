@@ -34,7 +34,7 @@ public class ChangesHistoryEntity  implements Persistable<String> {
 
    
    
-    @JsonBackReference
+    @JsonBackReference("saleRun-changesHistories")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id", insertable = false, updatable = false)
     private SaleRunEntity SaleRun;

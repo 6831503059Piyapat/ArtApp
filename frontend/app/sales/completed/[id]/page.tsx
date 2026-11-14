@@ -1,5 +1,6 @@
 "use client";
-import React, { Suspense, useState, useSyncExternalStore } from 'react';
+import React, { Suspense, useState, useSyncExternalStore,useEffect } from 'react';
+import {useParams} from 'next/navigation';
 import { 
   FileSpreadsheet, FileText, Share2,
   Wallet, Receipt, DollarSign, Users, List,
@@ -13,6 +14,7 @@ const subscribeToLanguage = () => () => {};
 const getLanguageSnapshot = (): 'EN' | 'TH' =>
   localStorage.getItem('language') === 'EN' ? 'EN' : 'TH';
 const getServerLanguageSnapshot = (): 'EN' | 'TH' => 'TH';
+import {getAuth,onAuthStateChanged} from 'firebase/auth';
 
 // ข้อมูลจำลองสำหรับหน้า Sales Log
 const salesData = [
@@ -98,6 +100,8 @@ const auditData = [
 
 
 export default function ConsignDeskDashboard() {
+    const { id } = useParams<{ id: string }>();
+
   const [activeTab, setActiveTab] = useState('payouts');
   const language = useSyncExternalStore(
     subscribeToLanguage,
@@ -141,7 +145,28 @@ export default function ConsignDeskDashboard() {
     return matchSupplier && matchSearch && matchStaff;
   });
 
- 
+  async function fetchData(idToken:string) {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/backend/complete-list/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}` // ส่ง token ไปด้วย
+      }
+    });
+    const data = await response.json();
+    console.log('Fetched data:', data);
+  }
+ useEffect(() => {
+  const auth = getAuth();
+   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(user){
+    const idToken = await user?.getIdToken();
+    fetchData(idToken);
+    }
+    
+  });
+  return () => unsubscribe(); // Cleanup subscription on unmount
+},[])
 
   return (
     <div className="relative isolate flex min-h-screen flex-col bg-[#f7f8fc] font-sans text-[#0B0F4F]">

@@ -40,30 +40,46 @@ public class SaleLogsEntity implements Persistable<String>{
     private String Run_Assistant_Name;
     @Column(name = "Quantity_sold", nullable = false)
     private Integer Quantity_sold;
+    @Column(name = "Supplier_Id", nullable = false, insertable = false, updatable = false)
+    private String Supplier_Id;
     @Column(name = "Product_Unit_Price", nullable = false)
     private Double Product_Unit_Price;
     @Column(name = "Time_Stamp", nullable = false)
     private LocalDateTime Time_Stamp;
     @Column(name ="Supplier_Name", nullable = false)
     private String Supplier_Name;
+   
     @Column(name = "Total_Price", nullable = false)
     private Double Total_Price;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Payment_Method")
-    private PaymentMethod paymentMethod;
+
+    @Column(name = "paymentMethod", nullable = false)
+    private String paymentMethod;
   
-        @JsonBackReference
+    @JsonBackReference("saleRun-saleLogs")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id" , insertable = false, updatable = false)
     private SaleRunEntity saleRun;
     
+    @JsonBackReference("supplier-saleLogs")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id", referencedColumnName = "Supplier_Id", nullable = false)
+    private SupplierEntity supplier;
 
     public SaleLogsEntity() {
     }   
-    public SaleLogsEntity(String Sale_logs_id, String Sale_run_id, String Product_name) {
+    public SaleLogsEntity(String Sale_logs_id, String Sale_run_id, String Product_name, String Run_Assistant_Name, Integer Quantity_sold, Double Product_Unit_Price, LocalDateTime Time_Stamp, String Supplier_Name, String Supplier_Id, Double Total_Price, String paymentMethod) {
         this.Sale_logs_id = Sale_logs_id;
         this.Sale_run_id = Sale_run_id;
         this.Product_name = Product_name;
+        this.Run_Assistant_Name = Run_Assistant_Name;
+        this.Quantity_sold = Quantity_sold;
+        this.Product_Unit_Price = Product_Unit_Price;
+        this.Time_Stamp = Time_Stamp;
+        this.Supplier_Name = Supplier_Name;
+        this.Supplier_Id = Supplier_Id;
+        this.Total_Price = Total_Price;
+        this.paymentMethod = paymentMethod;
+        
     }
     public String getSale_logs_id() {
         return Sale_logs_id;
@@ -126,12 +142,22 @@ public class SaleLogsEntity implements Persistable<String>{
     public void setTotal_Price(Double Total_Price) {
         this.Total_Price = Total_Price;
     }
-
-    public PaymentMethod getPaymentMethod() {
+    // public String getSupplier_Id() {
+    //     return Supplier_Id;
+    // }
+    // public void setSupplier_Id(String Supplier_Id) {
+    //     this.Supplier_Id = Supplier_Id;
+    // }
+    public SupplierEntity getSupplier() {
+        return supplier;
+    }
+    public void setSupplier(SupplierEntity supplier) {
+        this.supplier = supplier;
+    }
+    public String getPaymentMethod() {
         return paymentMethod;
     }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
+    public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 }

@@ -62,7 +62,9 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/public/**","/backend/users/register-profile").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/live-status/**").permitAll()
+                .requestMatchers("/api/public/**", "/backend/users/register-profile").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

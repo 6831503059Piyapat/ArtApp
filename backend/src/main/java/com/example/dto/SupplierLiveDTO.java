@@ -1,13 +1,13 @@
 package com.example.dto;
-
+import java.math.BigDecimal;
 public class SupplierLiveDTO {
     private String Id_supplier;
     private String Name_supplier;
     private Double gross_sales;
-    private Integer total_stock;
-    private Integer total_sale;
+    private BigDecimal total_stock;
+    private BigDecimal total_sale;
     
-    public SupplierLiveDTO(String Id_supplier, String Name_supplier, Double gross_sales, Integer total_stock, Integer total_sale) {
+    public SupplierLiveDTO(String Id_supplier, String Name_supplier, Double gross_sales, BigDecimal total_stock, BigDecimal total_sale) {
         this.Id_supplier = Id_supplier;
         this.Name_supplier = Name_supplier;
         this.gross_sales = gross_sales;
@@ -35,17 +35,17 @@ public class SupplierLiveDTO {
         this.gross_sales = gross_sales;
     }
 
-    public Integer getTotal_stock() {
+    public BigDecimal getTotal_stock() {
         return total_stock;
     }
-    public void setTotal_stock(Integer total_stock) {
+    public void setTotal_stock(BigDecimal total_stock) {
         this.total_stock = total_stock;
     }
 
-    public Integer getTotal_sale() {
+    public BigDecimal getTotal_sale() {
         return total_sale;
     }
-    public void setTotal_sale(Integer total_sale) {
+    public void setTotal_sale(BigDecimal total_sale) {
         this.total_sale = total_sale;
     }
 

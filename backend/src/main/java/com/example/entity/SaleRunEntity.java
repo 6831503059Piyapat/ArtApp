@@ -27,31 +27,34 @@ public class SaleRunEntity {
     @Column(name = "Date_closed", nullable = true)
     private LocalDateTime Date_closed;
 
+    @Column (name = "code_join", nullable = false)
+    private String code_join;
+
     @Column(name = "SaleRun_Status", nullable = false)
     private boolean Is_Active;
 
     @Column(name = "Host_user_Id", nullable = false, insertable = false, updatable = false)
     private String Host_user_Id;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @JsonManagedReference("saleRun-saleLogs")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SaleLogsEntity> saleLogs = new ArrayList<>();
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @JsonManagedReference("saleRun-expensesLogs")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ExpenseLogEntity> expensesLogs = new ArrayList<>();
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @JsonManagedReference("saleRun-Supplier")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<SupplierEntity> Supplier = new ArrayList<>();
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunSupplierPayoutEntity> runSupplierPayouts = new ArrayList<>();
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY)
+    @JsonManagedReference("saleRun-changesHistories")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "SaleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<ChangesHistoryEntity> changesHistories = new ArrayList<>();
     @JsonManagedReference("saleRun-assistance")
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "saleRun",fetch = FetchType.LAZY ,orphanRemoval = true)
     private List<RunAssistanceEntity> runAssistants = new ArrayList<>();
-    @JsonBackReference
+    @JsonBackReference("saleRun-user")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)   
     @JoinColumn(name = "Host_user_Id", referencedColumnName = "User_Id")
     private UserEntity user;
@@ -80,13 +83,14 @@ public class SaleRunEntity {
     public SaleRunEntity() {
     }
 
-    public SaleRunEntity(String Sale_run_id, String Sale_run_name, LocalDateTime Date_created, LocalDateTime Date_closed, boolean Is_Active, String Host_user_Id) {
+    public SaleRunEntity(String Sale_run_id, String Sale_run_name, LocalDateTime Date_created, LocalDateTime Date_closed, boolean Is_Active, String Host_user_Id, String code_join) {
         this.Sale_run_id = Sale_run_id;
         this.Sale_run_name = Sale_run_name;
         this.Date_created = Date_created;
         this.Date_closed = Date_closed;
         this.Is_Active = Is_Active;
         this.Host_user_Id = Host_user_Id;
+        this.code_join = code_join;
     }
 
 
@@ -141,7 +145,12 @@ public class SaleRunEntity {
         return saleLogs;
     }
 
-   
+   public String getCode_join() {
+        return code_join;
+    }
+    public void setCode_join(String code_join) {
+        this.code_join = code_join;
+    }
 
     public void setSaleLogs(List<SaleLogsEntity> saleLogs) {
         this.saleLogs = saleLogs;

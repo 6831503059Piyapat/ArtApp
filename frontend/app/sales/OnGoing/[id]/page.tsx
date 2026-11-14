@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore  } from 'react';
 import Link from 'next/link';
 import {getAuth , onAuthStateChanged} from "firebase/auth"; 
 import {Suspense} from 'react';
 import { useParams } from "next/navigation";
+import QRCode from 'qrcode';
 
 import {
   ChevronRight,
@@ -49,8 +50,17 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
+import { ref, set } from 'firebase/database';
 
 type InventoryProduct = {
+  Product_Id?: string;
+  Product_Name?: string;
+  Start_Stock?: number;
+  Current_Stock?: number;
+  Product_Unit_Price?: number;
+  Supplier_Id?: string;
+  Image_url?: string;
+  Supplier_Name?: string;
   id: string;
   name: string;
   start: number;
@@ -60,8 +70,8 @@ type InventoryProduct = {
   icon: LucideIcon;
   iconBg: string;
   supplierId: string;
-  imageUrl?: string;
   supplierName: string;
+  imageUrl?: string;
 };
 
 type Supplier = {
@@ -110,19 +120,82 @@ type ProductDelete = {
   supplierName: string;
   AssistantName: string;
 }
-export default function SalesRunDetail() {
-  return (
-   
-    
-      <SalesRunDetailContent />
-   
-  );
+
+type dataFetch ={
+  Gross_sales:number;
+  Join_code:string;
+  Run_Assistant_Name:{
+    can_manage_permission:boolean;
+    can_manage_stock:boolean;
+    can_record_expenses:boolean;
+    can_sell:boolean;
+    can_view_log:boolean;
+    display_name:string;
+    run_assistace_id:string;
+  }[];
+  Sale_run_Id:string;
+  Sale_run_Name:string;
+  Supplier:{
+    Category:string;
+    Host_user_Id:string;
+    Supplier_Id:string;
+    Supplier_Name:string;
+    products:{
+      Current_Stock:number;
+      Image_url?:string;
+      Product_Id:string;
+      Product_Name:string;
+      Product_Unit_Price:number;
+      Start_Stock:number;
+      Supplier_Id:string; 
+      Supplier_Name:string;
+    }[];
+  }[];
+  Supplier_Name:string[];
+  Total_Sale:number;
+  Total_Stock:number;
+}
+type ExpenseDTO ={
+  Amount:number;
+  Category:string;
+  Description:string;
+  Expense_id:string;
+  Paid_by_User_Name:string;
+  Sale_run_id:string;
+  id:string;
+  new: boolean;
+  timestamp: string;
 }
 
-function SalesRunDetailContent() {
+
+export default function SalesRunDetailContent() {
   const { id } = useParams<{ id: string }>();
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [AssistantName, setAsistantName] = useState<string>('');
+  const [expenses, setExpenses] = useState<ExpenseDTO[]>([]);
+  const [totalProduct, setTotalProduct] = useState<number>(0);
+  const [dataFetched, setDataFetched] = useState<dataFetch | null>(null);
+  const [products, setProducts] = useState<Supplier[]>([]);
+  const subscribeToOrigin = () => () => undefined;
+const getOrigin = () => window.location.origin;
+const getServerOrigin = () => "";
+
+    const origin = useSyncExternalStore(subscribeToOrigin, getOrigin, getServerOrigin);
+
+  let url = origin
+    ? new URL(`/dashboard/?id${encodeURIComponent(id)}`, origin).toString()
+    : "";
+  function generateQrcodeUrl(){
+    QRCode.toDataURL(url, { width: 256, margin: 1, errorCorrectionLevel: "H" })
+      .then((dataUrl) => {
+        setQrCodeUrl(dataUrl);
+      })
+      .catch((error: unknown) => {
+        console.error("QR code generation failed:", error);
+      });
+  }
   async function fetchSalesRunData(saleRunId: string, idToken: string) {
+    // setProducts([]);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
       method: 'GET',
       headers: {
@@ -133,7 +206,44 @@ function SalesRunDetailContent() {
 
     }
   );
-   console.log(response.json());
+    if (!response.ok) {
+      throw new Error(`Failed to load sale run: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const normalizedSuppliers: Supplier[] = data.Supplier.map((supplier: dataFetch['Supplier'][number]) => ({
+      id: supplier.Supplier_Id,
+      name: supplier.Supplier_Name,
+      role: supplier.Supplier_Name === 'My Products' ? "Host's inventory" : "Supplier inventory",
+      accent: supplier.Supplier_Name === 'My Products' ? 'purple' : 'pink',
+      category: supplier.Supplier_Name === 'My Products' ? 'host' : 'supplier',
+      placeholder: 'Item Name (e.g. Linen Coaster Set)',
+      products: supplier.products.map((product) => ({
+          ...product,
+          id: product.Product_Id,
+          name: product.Product_Name,
+          start: product.Start_Stock,
+          stock: product.Current_Stock,
+          price: product.Product_Unit_Price,
+          sold: product.Start_Stock - product.Current_Stock,
+          icon: Package,
+          iconBg: supplier.Supplier_Name === 'My Products'
+            ? 'bg-[#7C5CFF]/10 text-[#7C5CFF]'
+            : 'bg-[#F062C0]/10 text-[#F062C0]',
+          supplierId: product.Supplier_Id,
+          supplierName: product.Supplier_Name,
+          imageUrl: product.Image_url,
+        })),
+    }));
+    setDataFetched(data);
+    setProducts(normalizedSuppliers);
+    let totalProduct = 0;
+    for (const supplier of data.Supplier) {
+      totalProduct += supplier.products.length;
+    }
+    setTotalProduct(totalProduct);
+    
+    console.log("Fetched Sales Run Data:", data);
   }
   
   useEffect(() => {
@@ -146,207 +256,12 @@ function SalesRunDetailContent() {
         fetchSalesRunData(id, idToken);
       }
     });
-    console.log("Sales Run ID:", id);
     return () => unsubscribe();
   }, [id]);
-  const Suppliers: Supplier[] = [
-    {
-    id: "host-8466468345",
-    name: "My Products",
-    role: "Host's inventory",
-    accent: "purple",
-    category: "host",
-    placeholder: "Item Name (e.g. Linen Coaster Set)",
 
-    products: [
-      {
-      id: 'product-0-20261109115632-qx4hjObfR9rBeyY-20261109115632-0',
-      name: 'Green Horned Frog',
-      start: 13,
-      stock: 3,
-      price: 150,
-      sold: 10,
-      icon: Leaf,
-      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
-      supplierName:"My Products"
-    },
-    {
-      id: '2',
-      name: 'Yellow Horned Frog',
-      start: 10,
-      stock: 1,
-      price: 150,
-      sold: 9,
-      icon: Sun,
-      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
-      supplierName:"My Products"
-    },
-    {
-      id: '3',
-      name: 'Brown Horned Frog',
-      start: 10,
-      stock: 6,
-      price: 150,
-      sold: 4,
-      icon: Mountain,
-      iconBg: 'bg-[#7C5CFF]/10 text-[#7C5CFF]',
-      supplierId: "host-8466468345",
-      supplierName:"My Products"
-     
-    },
-    ],
-  },
-   {
-    id: "kaimook-8466468345",
-    name: "P Kaimook",
-    role: "Host's inventory",
-    accent: "purple",
-    placeholder: "Item Name (e.g. Linen Coaster Set)",
-    category: "supplier",
-    products: [
-      {
-      id: '1',
-      name: 'Green Horned Frog',
-      start: 13,
-      stock: 3,
-      price: 150,
-      sold: 10,
-      icon: Leaf,
-      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345",
-      supplierName:"P Kaimook"
-     
-    },
-    {
-      id: '2',
-      name: 'Yellow Horned Frog',
-      start: 10,
-      stock: 1,
-      price: 150,
-      sold: 9,
-      icon: Sun,
-      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345",
-      supplierName:"P Kaimook"
-     
-    },
-    {
-      id: '3',
-      name: 'Brown Horned Frog',
-      start: 10,
-      stock: 6,
-      price: 150,
-      sold: 4,
-      icon: Mountain,
-      iconBg: 'bg-[#F062C0]/10 text-[#F062C0]',
-      supplierId: "kaimook-8466468345",
-      supplierName:"P Kaimook"
-    },
-    ],
-  },
-  {
-    id: "nong-japan-8466468345",
-    name: "Nong' Japan",
-    role: "Supplier inventory",
-    accent: "yellow",
-    placeholder: "Item Name (e.g. Linen Coaster Set)",
-    category: "supplier",
-    products: [
-      {
-        id: 'nong-japan-1',
-        name: 'Aquarium Moss Ball (Medium)',
-        start: 15,
-        stock: 8,
-        price: 60,
-        sold: 7,
-        icon: Package,
-        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345",
-        supplierName:"Nong' Japan"
-      },
-      {
-        id: 'nong-japan-2',
-        name: 'Mini Terrarium Starter Glass',
-        start: 6,
-        stock: 3,
-        price: 190,
-        sold: 3,
-        icon: Droplets,
-        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345",
-        supplierName:"Nong' Japan"
-      },
-      {
-        id: 'nong-japan-3',
-        name: 'Terrarium Pebble Pack',
-        start: 12,
-        stock: 9,
-        price: 45,
-        sold: 3,
-        icon: Grid,
-        iconBg: 'bg-[#FFB24C]/15 text-[#FFB24C]',
-        supplierId: "nong-japan-8466468345",
-        supplierName:"Nong' Japan"
-      },
-    ],
-  },
-  ];
-  const assistants = [
-    {
-      id:'1',
-      name: 'Alex Chen',
-      status: true,
-      avatar: '/path/to/alex_chen.jpg',
-      permission:{
-        Sell:true,
-        Crud:true,
-        Record:true,
-        ViewLog:true,
-        ManagePermission:true
-      }
-    },
-  
-  ];
- 
-  const expensesList = [
-    {
-      id: '01',
-      timestamp: '14/9/26 12:43:05',
-      detail: 'Weekend Market Stall Rent',
-      dotColor: 'bg-[#FFB24C]',
-      category: 'Booth Fee',
-      categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
-      loggedBy: 'Alex Chen',
-      role: '(Host)',
-      amount: '฿700.00'
-    },
-    {
-      id: '02',
-      timestamp: '14/9/26 15:10:20',
-      detail: 'Ice bucket, string bags & tape',
-      dotColor: 'bg-[#7C5CFF]',
-      category: 'Stall expense',
-      categoryBg: 'bg-[#FFB24C]/10 text-[#FFB24C] border-[#FFB24C]/20',
-      loggedBy: 'Alex Chen',
-      role: '(Host)',
-      amount: '฿150.00'
-    }
-  ];
-  const StockList = [
-    {
-      id,
-      name:"MFU outside night market (MON 14)",
-      totalsoldMax:85,
-      totalsold:66,
-      grossIntake:8490,
-    }
-  ];
   const [ProductsFixStock, setProductsFixStock] = useState<ProductFixStock[]>([]);
   const [ProductsAdd, setProductsAdd] = useState<ProductAdd[]>([]);
   const [ProductsDelete, setProductsDelete] = useState<ProductDelete[]>([]);
-  const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');
   const [activeCatalog, setActiveCatalog] = useState('all');
   const [language, setLanguage] = useState<'EN' | 'TH'>('TH');
@@ -371,7 +286,6 @@ function SalesRunDetailContent() {
   const [isFinalEndRunOpen, setIsFinalEndRunOpen] = useState(false);
   const [isEndRunConfirmed, setIsEndRunConfirmed] = useState(false);
   const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
-  const joinPin = '88X2-901';
   // Toggle Switches State
   const [activeTab, setActiveTab] = useState<'global' | 'may' | 'tanawat'>('global');
   const [isPermissionEnabled, setIsPermissionEnabled] = useState(false);
@@ -386,12 +300,32 @@ function SalesRunDetailContent() {
 
   //เพิ่ม State สำหรับระบบตะกร้า (Cart)
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [totalExpenses, setTotalExpenses] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'mobileBanking' | 'cash'>('mobileBanking');
   const [showUndoNotification, setShowUndoNotification] = useState(false);
 
 
+async function getExpenses(){
+  setStepMode("expense");
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/${id}/expenses-list`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
 
+  });
+  const data = await response.json();
+  setExpenses(data);
+  let total = 0;
+  for (const expense of data) {
+    expense.Amount = Number(expense.Amount);
+    total += expense.Amount;
+  }
+  setTotalExpenses(total);
+  console.log("Fetched Expenses Data:", data);
+}
   const togglePermission = (key: keyof typeof permissions) => {
     setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -414,6 +348,8 @@ function SalesRunDetailContent() {
     );
     setImageProduct(null);
   };
+  
+ 
   const handleCopy = () => {
     navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
@@ -555,8 +491,11 @@ const handleConfirmSale = async () => {
   if (!response.ok) {
     throw new Error(`Sale confirmation failed: ${await response.text()}`);
   }
-  console.log("Confirming sale for items:", await response.text());
-
+  const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
   setProducts((prev) =>
     prev.map((supplier) => {
@@ -626,14 +565,64 @@ async function handleSaveChanges(){
     console.error("Error saving changes");
     return;
   }
+   const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
   console.log(ProductsFixStock, ProductsAdd, ProductsDelete);
   // Clear the arrays after successful save
   setProductsFixStock([]);
   setProductsAdd([]);
   setProductsDelete([]);
 }
+ async function handleAddExpense() {
+   
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/${id}/add-expense`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+      },
+      body: JSON.stringify({
+        Expense_id: `expense-${Date.now()}`,
+        Sale_run_id: id,
+        Paid_by_User_Name: AssistantName,
+        Time_Stamp: new Date().toISOString(),
+        Description: expenseTitle,
+        Category: category,
+        Amount: parseFloat(amount),
 
+      })
+    });
+    if (!response.ok) {
+      console.error("Error adding expense");
+      return;
+    }
+    setExpenseTitle('');
+    setCategory('Stall Supplies');
+    setAmount('70');
+    console.log("Adding expense:", await response.text());
+  }
+async function endRunSendRequest() {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/sale-runs/end`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body: JSON.stringify({
+      saleRunId: id,
+      assistanceName: AssistantName,
+    }),
+  });
 
+  if (!response.ok) {
+    console.error("Error ending sales run");
+    return;
+  }
+  console.log("Ending sales run:", await response.text());
+}
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9fe] font-sans text-[#0B0F4F]">
       <Suspense fallback="Loading...">
@@ -647,7 +636,7 @@ async function handleSaveChanges(){
             <div className="flex min-w-0 flex-col gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 <h1 className="min-w-0 break-words text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
-                  {StockList[0].name}
+                  {dataFetched?.Sale_run_Name || 'Loading...'}
                 </h1>
                 {stepMode === "edit" ? (
                   <span className="flex items-center gap-1.5 rounded-full border border-[#FDE68A] bg-[#FFFBEB] px-2.5 py-1 text-[10px] font-bold text-[#B45309]">
@@ -668,7 +657,7 @@ async function handleSaveChanges(){
               >
                 
                 <UsersRound className="h-4 w-4 text-[#7C5CFF]" />
-                <span>1 {language === 'EN'?'Assistant':'ผู้ช่วย'}</span>
+                <span>{dataFetched?.Run_Assistant_Name.length} {language === 'EN'?'Assistant':'ผู้ช่วย'}</span>
                 <span className="text-slate-500">•</span>
                 <span className="text-[#7C5CFF]">+ {language === 'EN'?'Invite':'เชิญ'}</span>
               </button>
@@ -724,7 +713,7 @@ async function handleSaveChanges(){
             <div className="relative flex min-h-[76px] min-w-0 items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2.5 shadow-sm">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Gross Intake' : 'รายได้รวม'}</p>
-                <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{StockList[0].grossIntake.toLocaleString('en-US')}.00</p>
+                <p className="mt-0.5 text-lg font-extrabold text-[#0B0F4F]">฿{dataFetched?.Gross_sales.toLocaleString('en-US') || 0}</p>
               </div>
               <div className="absolute right-3 top-3 rounded-md bg-[#7C5CFF]/10 p-2 text-[#7C5CFF]">
                 <Receipt className="h-4 w-4" />
@@ -736,8 +725,8 @@ async function handleSaveChanges(){
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                  <span className="text-lg font-extrabold text-[#0B0F4F]">{StockList[0].totalsold}</span>
-                  <span className="text-xs font-medium text-slate-400">/ {StockList[0].totalsoldMax} {language === 'EN' ? 'starting' : 'เริ่มต้น'}</span>
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">{dataFetched?.Total_Sale || 0}</span>
+                  <span className="text-xs font-medium text-slate-400">/ {dataFetched?.Total_Stock || 0} {language === 'EN' ? 'starting' : 'เริ่มต้น'}</span>
                 </div>
               </div>
               <div className="absolute right-3 top-3 rounded-md bg-[#FFB24C]/15 p-2 text-[#FFB24C]">
@@ -753,10 +742,10 @@ async function handleSaveChanges(){
                 </p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
                   <span className="text-lg font-extrabold text-[#0B0F4F]">
-                    {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.stock, 0), 0)}
+                    {dataFetched?.Supplier.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.Current_Stock, 0), 0)}
                   </span>
                   <span className="text-xs font-medium text-slate-400">
-                    / {products.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.start, 0), 0)} {language === 'EN' ? 'starting' : 'เริ่มต้น'}
+                    / {dataFetched?.Supplier.reduce((total, supplier) => total + supplier.products.reduce((supplierTotal, product) => supplierTotal + product.Start_Stock, 0), 0)} {language === 'EN' ? 'starting' : 'เริ่มต้น'}
                   </span>
                 </div>
               </div>
@@ -783,33 +772,32 @@ async function handleSaveChanges(){
                     <LayoutGrid className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
                     <span>{language === 'EN' ? 'All Products' : 'ผลิตภัณฑ์ทั้งหมด'}</span>
                   </div>
-                  <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">9</span>
+                  <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#7C5CFF]">{totalProduct}</span>
                 </button>
+                {dataFetched?.Supplier && dataFetched.Supplier.map((supplier, index) => (
+                  <button key={index} className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
+                    <div className="flex items-center gap-1.5">
+                      
+                      {supplier.Supplier_Name === "My Products" ? (
+                        <>
+                        <User className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
+                          <span>{supplier.Supplier_Name} ({language === 'EN' ? 'Host' : 'เจ้าของ'})</span>
+                        </>
+                      ) : (
+                        <>
+                        <Store className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
+                        <span>{supplier.Supplier_Name}</span>
+                        </>
 
-                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <User className="h-2.5 w-2.5 shrink-0 text-[#7C5CFF]" />
-                    <span>My Products ({language === 'EN' ? 'Host' : 'เจ้าของ'})</span>
-                  </div>
-                </button>
-
-                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <Store className="h-2.5 w-2.5 shrink-0 text-[#F062C0]" />
-                    <span>P Kaimook</span>
-                  </div>
-                </button>
-
-                <button className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2 text-left text-xs text-[#4c526a] transition-colors hover:bg-[#f7f5ff] sm:min-h-0 sm:px-1.5 sm:py-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <Store className="h-2.5 w-2.5 shrink-0 text-[#FFB24C]" />
-                    <span>Nong&apos; Japan</span>
-                  </div>
-                </button>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              
               </nav>
 
               <div className="mt-1.5 border-t border-[#eff0f5] pt-1.5">
-                <button onClick={()=>setStepMode("expense")} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-2 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20 sm:min-h-0 sm:px-1.5 sm:py-1.5">
+                <button onClick={()=>getExpenses()} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-[#FFB24C]/10 px-2 text-xs font-semibold text-[#0B0F4F] transition-colors hover:bg-[#FFB24C]/20 sm:min-h-0 sm:px-1.5 sm:py-1.5">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="h-2.5 w-2.5 text-[#FFB24C]" />
                     <span>{language === 'EN' ? 'Booth Expenses' : 'ค่าใช้จ่ายของบูธ'}</span>
@@ -822,19 +810,23 @@ async function handleSaveChanges(){
             <div className="mx-auto w-[92%] rounded-xl border border-slate-100 bg-white p-2 shadow-sm sm:mx-0 sm:w-auto">
               <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-bold text-[#0B0F4F]">
                 <span className="flex items-center gap-1.5"><UsersRound className="h-3.5 w-3.5 text-[#7C5CFF]" />  {language === 'EN' ? 'Assistants' : 'ผู้ช่วย'}</span>
-                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• 1 {language === 'EN' ? 'Active' : 'ใช้งาน'}</span>
+                <span className="rounded-full border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] text-emerald-600">• {dataFetched?.Run_Assistant_Name.length} {language === 'EN' ? 'Active' : 'ใช้งาน'}</span>
               </div>
               <div className="mt-2 flex items-center justify-between gap-1.5 rounded-lg bg-slate-50 px-1.5 py-1.5">
                 <div className="flex min-w-0 items-center gap-1.5">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#7C5CFF] text-xs font-bold text-white">P</span>
                   <div>
-                    <p className="text-xs font-bold leading-4 text-slate-700">Ploy W.</p>
-                    <p className="text-[10px] leading-3.5 text-slate-400">Cashier Mode</p>
+                    <p className="text-xs font-bold leading-4 text-slate-700">{dataFetched?.Run_Assistant_Name.at(0)?.display_name}</p>
+                    {/* <p className="text-[10px] leading-3.5 text-slate-400">{dataFetched?.Run_Assistant_Name.at(0)?.}</p> */}
                   </div>
                 </div>
                 <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• {language === 'EN' ? 'Online' : 'ออนไลน์'}</span>
               </div>
-              <button onClick={() => setIsOpen(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
+              <button onClick={() => {
+                setIsOpen(true);
+                generateQrcodeUrl();
+                
+              }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
                 <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
               <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
@@ -853,7 +845,7 @@ async function handleSaveChanges(){
               </div>
             </div>
 
-            <Link href="/ViewUser/1" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
+            <Link href={`/ViewUser/`+id} target="_blank" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5"> {language === 'EN' ? 'Sales Activity Board' : 'บอร์ดกิจกรรมการขาย'}</span><span className="block text-[9px] leading-3 text-white/80"> {language === 'EN' ? 'Enter live sales feed & telemetry' : 'เข้าสู่กระแสการขายสดและข้อมูล telemetry'}</span></span>
@@ -1032,7 +1024,7 @@ async function handleSaveChanges(){
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.category} id={supplier.id} language={language} />
+   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.name === "My Products"? "host" : "Supplier"} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -1137,7 +1129,7 @@ async function handleSaveChanges(){
 
           {/* Record Button */}
           <div className="md:col-span-2">
-            <button className="min-h-11 w-full rounded-xl bg-[#FFB24C] py-2.5 text-xs font-bold text-[#0B0F4F] shadow-xs transition-colors hover:bg-[#f5a733] active:bg-[#e99a2e] flex items-center justify-center gap-1">
+            <button onClick={()=>handleAddExpense()} className="min-h-11 w-full rounded-xl bg-[#FFB24C] py-2.5 text-xs font-bold text-[#0B0F4F] shadow-xs transition-colors hover:bg-[#f5a733] active:bg-[#e99a2e] flex items-center justify-center gap-1">
               <Plus className="w-4 h-4 stroke-[3]" />{language === 'EN' ? 'Record' : 'บันทึก'}
             </button>
           </div>
@@ -1172,27 +1164,27 @@ async function handleSaveChanges(){
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {expensesList.map((item) => (
+              {expenses.map((item,index) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 px-5 font-bold text-[#0B0F4F]">{item.id}</td>
+                  <td className="py-4 px-5 font-bold text-[#0B0F4F]">{index + 1}</td>
                   <td className="py-4 px-4 text-slate-400 text-[11px]">{item.timestamp}</td>
                   <td className="py-4 px-4">
                     <div className="flex items-center space-x-2">
-                      <span className={`w-2 h-2 rounded-full ${item.dotColor}`}></span>
-                      <span className="font-bold text-slate-800">{item.detail}</span>
+                      <span className={`w-2 h-2 rounded-full bg-yellow-500`}></span>
+                      <span className="font-bold text-slate-800">{item.Description}</span>
                     </div>
                   </td>
                   <td className="py-4 px-4 text-center">
-                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border ${item.categoryBg}`}>
-                      {item.category}
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border bg-yellow-500`}>
+                      {item.Category}
                     </span>
                   </td>
                   <td className="py-4 px-4 text-center">
-                    <span className="font-semibold text-slate-700">{item.loggedBy} </span>
-                    <span className="text-[#FFB24C] font-bold text-[11px]">{item.role}</span>
+                    <span className="font-semibold text-slate-700">{item.Paid_by_User_Name} </span>
+                    <span className="text-[#FFB24C] font-bold text-[11px]">{item.new}</span>
                   </td>
                   <td className="py-4 px-5 text-right font-black text-[#0B0F4F] text-sm">
-                    {item.amount}
+                    {item.Amount}
                   </td>
                 </tr>
               ))}
@@ -1203,11 +1195,11 @@ async function handleSaveChanges(){
         {/* Table Footer / Summary */}
         <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50/50 p-4 text-xs sm:flex-row sm:items-center sm:justify-between">
           <span className="text-slate-400 font-medium">
-            {language === 'EN' ? 'Showing' : 'แสดง'} 2  {language === 'EN' ? 'settled market expenses' : 'ค่าใช้จ่ายตลาด'}
+            {language === 'EN' ? 'Showing' : 'แสดง'} {expenses.length}  {language === 'EN' ? 'settled market expenses' : 'ค่าใช้จ่ายตลาด'}
           </span>
           <div className="flex items-center space-x-1.5">
             <span className="text-slate-400 font-medium"> {language === 'EN' ? 'Subtotal Logged' : 'รวม'}:</span>
-            <span className="font-black text-[#FFB24C] text-sm">฿850.00</span>
+            <span className="font-black text-[#FFB24C] text-sm">฿{totalExpenses}</span>
           </div>
         </div>
       </div>
@@ -1488,8 +1480,10 @@ async function handleSaveChanges(){
           onClose={() => setIsOpen(false)}
           copied={copied}
           onCopy={handleCopy}
+          qrCodeUrl={qrCodeUrl}
+          Assistant_Name={dataFetched?.Run_Assistant_Name ?? []}
           inviteUrl={inviteUrl}
-          joinPin={joinPin}
+          joinPin={dataFetched?.Join_code ?? ''}
           onOpenPermissions={() => {
             setIsOpen(false);
             setIsPermissionEnabled(true);
@@ -1513,6 +1507,7 @@ async function handleSaveChanges(){
           onRequestConfirmation={() => setIsFinalEndRunOpen(true)}
           onUnconfirm={() => setIsEndRunConfirmed(false)}
           onConfirmEndRun={() => {
+            endRunSendRequest();
             setIsEndRunOpen(false);
             setIsEndRunConfirmed(false);
           }}
@@ -1574,12 +1569,22 @@ type SupplierInviteModalProps = {
   copied: boolean;
   onCopy: () => void;
   inviteUrl: string;
+  Assistant_Name:{
+    can_manage_permission:boolean;
+    can_manage_stock:boolean;
+    can_record_expenses:boolean;
+    can_sell:boolean;
+    can_view_log:boolean;
+    display_name:string;
+    run_assistace_id:string;
+  }[];
   joinPin: string;
   onOpenPermissions: () => void;
   language: 'EN' | 'TH';
+  qrCodeUrl: string;
 };
 // MODAL COMPONENT: Supplier Invite Modal
-function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
+function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assistant_Name, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
   return (
     <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-3 backdrop-blur-sm transition-all animate-in fade-in duration-200 sm:items-center sm:p-4">
       
@@ -1656,6 +1661,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
                 {/* Simulated QR Code Graphic */}
                 <div className="w-16 h-16 bg-white relative flex items-center justify-center">
                   <QrCode className="w-full h-full text-[#0B0F4F]" />
+                  <img src={qrCodeUrl} alt="QR Code" className="w-full h-full" />
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
@@ -1668,41 +1674,27 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
           {/* ASSISTANTS JOINED (2) SECTION */}
           <div className="space-y-2.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-               {language === 'EN' ? 'ASSISTANTS JOINED ' : 'ผู้ช่วยที่เข้าร่วม'} (2)
+               {language === 'EN' ? 'ASSISTANTS JOINED ' : 'ผู้ช่วยที่เข้าร่วม'} ({Assistant_Name.length})
             </label>
 
             <div className="space-y-2">
-              {/* Assistant 1: @may_craft (Active) */}
-              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-[#7C5CFF] text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
-                    MC
+              {Assistant_Name.map((assistant,index) => (
+                <div key={index} className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-[#7C5CFF] text-white font-bold text-xs flex items-center justify-center uppercase shadow-2xs">
+                      {assistant.display_name.slice(0, 2)}
+                    </div>
+                    <span className="text-xs font-bold text-slate-800">
+                      @{assistant.display_name}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold text-slate-800">
-                    @may_craft
+                  <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {language === 'EN' ? 'Active' : 'ใช้งาน'}
                   </span>
                 </div>
-                <span className="bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  {language === 'EN' ? 'Active' : 'ใช้งาน'}
-                </span>
-              </div>
-
-              {/* Assistant 2: granawan.b (Offline) */}
-              <div className="bg-[#7C5CFF]/5 border border-[#7C5CFF]/15 rounded-2xl p-3 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center uppercase">
-                    TB
-                  </div>
-                  <span className="text-xs font-semibold text-slate-600">
-                    granawan.b
-                  </span>
-                </div>
-                <span className="bg-slate-100 text-slate-500 border border-slate-200/60 px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  {language === 'EN' ? 'Offline' : 'ออฟไลน์'}
-                </span>
-              </div>
+              ))}
+            
             </div>
           </div>
 
@@ -1731,20 +1723,7 @@ function SupplierInviteModal({ onClose, copied, onCopy, inviteUrl, joinPin, onOp
 
 // COMPONENT: Product Group Section (ใช้สร้างตารางสินค้าแต่ละ Supplier)
 function getSupplierAccent(id: string) {
-  if (id.toLowerCase().includes("kaimook")) {
-    return {
-      dot: "bg-[#F062C0]",
-      badge: "text-[#6366F1]",
-      count: "border-[#F062C0]/20 bg-[#F062C0]/10 text-[#F062C0]",
-    };
-  }
-  if (id.toLowerCase().includes("nong")) {
-    return {
-      dot: "bg-[#FFB24C]",
-      badge: "text-[#6366F1]",
-      count: "border-[#FFB24C]/30 bg-[#FFB24C]/10 text-[#B7791F]",
-    };
-  }
+  
   return {
     dot: "bg-[#7C5CFF]",
     badge: "text-[#6366F1]",
@@ -1858,7 +1837,9 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
                   <span className="text-[10px] font-semibold text-slate-500 sm:hidden">{language === 'EN' ? 'Price' : 'ราคา'}</span>
                   <span className="font-bold text-[#FFB24C]">฿</span>
                   <input
-                    type="text"
+                    type="number"
+                    min="0"
+                    step="any"
                     value={item.price}
                     onChange={(event) => {
                       const nextPrice = Number(event.target.value);
@@ -1978,7 +1959,7 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
             <span>{language === 'EN' ? 'Start' : 'เริ่ม'}: <strong className="text-slate-700">{item.start}</strong></span>
             <span>•</span>
             <span className={isOutOfStock ? 'text-[#ED571B] font-semibold' : 'text-[#7C5CFF] font-semibold'}>
-              {isOutOfStock ? (language === 'EN' ? 'Out of stock' : 'หมดสต็อก') : `${item.stock} ${language === 'EN' ? 'in stock' : 'ในสต็อก'}`}
+              {isOutOfStock ? (language === 'EN' ? 'Out of stock' : 'หมดสต็อก') : `${item.Current_Stock ?? 0} ${language === 'EN' ? 'in stock' : 'ในสต็อก'}`}
             </span>
           </div>
         </div>
@@ -1992,7 +1973,7 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
             {item.price}
           </div>
           <p className="mt-1 text-sm font-medium text-slate-400">
-            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.sold}</span>
+            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.Start_Stock ? item.Start_Stock - (item.Current_Stock ?? 0) : 0}</span> 
           </p>
         </div>
 
@@ -2009,8 +1990,6 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
         </button>
       </div> */}
       <button
-    // เปลี่ยนจาก onSell(item.id) เป็นฟังก์ชันเพิ่มลงตะกร้า 
-    // แนะนำให้ส่งไปทั้ง item เพื่อให้ตะกร้ารู้ชื่อและราคา
     onClick={() => onSell(item.id)}
   disabled={isOutOfStock}
   className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
@@ -2516,10 +2495,6 @@ function SaleSection({
   id: string;
   language: 'EN' | 'TH';
 }) {
-  // กรองสินค้าของ Supplier ที่ตรงกับ ID
-  const filteredProducts = products.filter(
-    (item) => item && item.supplierId === id
-  );
   const accent = getSupplierAccent(id);
 
 
@@ -2540,12 +2515,12 @@ function SaleSection({
         </div>
 
         <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${accent.count}`}>
-          {filteredProducts.length} {language === 'EN' ? 'items' : ' รายการ'}
+          {products.length} {language === 'EN' ? 'items' : ' รายการ'}
         </span>
       </div>
 
       {/* Product Cards */}
-      {filteredProducts.map((cardItem) => (
+      {products.map((cardItem) => (
         <ProductCard
           key={cardItem.id}
           item={cardItem}

@@ -10,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
+
 import java.io.IOException;
 import java.util.List;
 
@@ -22,7 +24,11 @@ public class FirebaseFilter extends OncePerRequestFilter {
                 String path = request.getServletPath();
 
         // 1. กำหนด Path ของ WebSocket ที่ต้องการยกเว้น
-        if (path.startsWith("/ws-public")) {
+        if (path.startsWith("/ws")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (path.startsWith("/live-status")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -34,10 +34,11 @@ import com.example.repository.SupplierRepo;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.HttpStatus;
-import com.example.repository.ExpenseRepo;
+import com.example.dto.response.Assistant.AssistantDTO;
 import com.example.repository.ExpensesLogRepo;
 import com.example.repository.ChangeHistoryRepo;
 import org.springframework.web.server.ResponseStatusException;
+import com.example.dto.request.OnGoing.OngoingID.Supplier.AddSupplierDTO;
 
 @Service
 public class OnGoingIDService {
@@ -77,7 +78,7 @@ public class OnGoingIDService {
             onGoingIDProductDTO.add(new OnGoingIDProductDTO(Supplier_id, supplier.getSupplier_Name(), null, null, products));
 
         }
-        List<String> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
+        List<AssistantDTO> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
  
         OnGoingSaleDTO onGoingSaleDTO = onGoingIDRepository.findOnGoingIDListBySalesId(Sale_run_Id);
         if (onGoingSaleDTO == null) {
@@ -92,6 +93,7 @@ public class OnGoingIDService {
         onGoingIDDTO.setGross_sales(onGoingSaleDTO.getGross_sales());
         onGoingIDDTO.setTotal_Stock(onGoingSaleDTO.getTotal_Stock());
         onGoingIDDTO.setTotal_Sale(onGoingSaleDTO.getTotal_Sale());
+        onGoingIDDTO.setJoin_code(onGoingSaleDTO.getCode_join());
         List<String> supplierNames = new ArrayList<>();
         for (SupplierOnGoingDTO supplier : supplierDTO) {
             supplierNames.add(supplier.getSupplier_Name());
@@ -123,16 +125,27 @@ public class OnGoingIDService {
             saleLog.setRun_Assistant_Name(sellItemDTO.getAssistanceName());
             saleLog.setSale_run_id(sale_run_Id);
             saleLog.setSupplier_Name(item.getSupplierName());
+            
+            saleLog.setSupplier(
+                    supplierRepository.findById(item.getSupplierId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Supplier not found with ID: " + item.getSupplierId()
+                            ))
+            );
             saleLog.setTime_sold(LocalDateTime.parse(DateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             saleLog.setTotal_Price(item.getPrice() * item.getQuantity());
             saleLog.setPaymentMethod(sellItemDTO.getPaymentMethod());
             saleLogs.add(saleLog);
+
             saleLog.setSaleRun(
             saleRunRepository.getReferenceById(sale_run_Id)
 );
+            saleLog.setSupplier(
+            supplierRepository.getReferenceById(item.getSupplierId())
+            );
             ///
             //Update Product Stock
-            productRepository.updateProductCurrentStock(item.getProductId(),item.getQuantity());
+            productRepository.SellProduct(item.getProductId(),item.getQuantity());
 
         }
         saleLogRepository.saveAllAndFlush(saleLogs);
@@ -243,6 +256,21 @@ public class OnGoingIDService {
         expenseLogRepository.save(expenseLog);
         changesHistoryRepository.save(new ChangesHistoryEntity("CHL-EXPENSE" + generatedId + "-" + sale_run_id, sale_run_id, expenseLog.getPaid_by_User_Name(),expenseLog.getPaid_by_User_Name(),LocalDateTime.now(),"Expense Add", "ADD Expense: " + expenseLog.getDescription()));
 
+    }
+    @Transactional 
+    public void addSupplier(AddSupplierDTO supplier, String sale_run_id) {
+        
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(1);
+       
+        for (int i = 0; i < 1; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(randomIndex));
+        }
+        
+        String generatedId = "supplier" + sb.toString() + "-" +sale_run_id+ "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        supplierRepository.addSupplier(generatedId, sale_run_id, supplier.getName());
+        
     }
 }
 

@@ -21,7 +21,7 @@ public class UserEntity {
     private String displayName;
 
 
-    @JsonManagedReference
+    @JsonManagedReference("saleRun-user")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SaleRunEntity> saleRun = new ArrayList<>();
 
