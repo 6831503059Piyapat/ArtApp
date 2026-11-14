@@ -34,7 +34,7 @@ public class ProductEntity implements Persistable<String> {
 
     @Column(name = "Current_Stock", nullable = false)
     private int Current_Stock;
-    @JsonBackReference
+    @JsonBackReference("Supplier-Products")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Supplier_Id", referencedColumnName = "Supplier_Id")
     private SupplierEntity Supplier;

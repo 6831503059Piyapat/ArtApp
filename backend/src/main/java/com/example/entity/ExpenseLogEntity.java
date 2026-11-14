@@ -32,7 +32,7 @@ public class ExpenseLogEntity implements Persistable<String> {
 
     @Column(name = "Amount", nullable = false)
     private Double Amount;
-    @JsonBackReference
+    @JsonBackReference("saleRun-expensesLogs")
     @ManyToOne(fetch = FetchType.LAZY ,cascade = CascadeType.ALL)
     @JoinColumn(name = "Sale_run_Id", referencedColumnName = "Sale_run_Id")
     private SaleRunEntity SaleRun;

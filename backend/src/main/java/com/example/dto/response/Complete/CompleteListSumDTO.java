@@ -5,12 +5,12 @@ import java.math.BigDecimal;
 public class CompleteListSumDTO {
     private Long total_run_complete;
     private BigDecimal Total_duration;
-    private Double AVG_duration;
-    private Double Total_item_sold;
-    private BigDecimal Total_Revenue;
-    private BigDecimal AVG_Revenue;
-
-    public CompleteListSumDTO(Long total_run_complete, BigDecimal total_duration, Double AVG_duration, Double total_item_sold, BigDecimal total_Revenue, BigDecimal AVG_Revenue) {
+    private BigDecimal AVG_duration;
+    private BigDecimal Total_item_sold;
+    private Double Total_Revenue;
+    private Double AVG_Revenue;
+    
+    public CompleteListSumDTO(Long total_run_complete, BigDecimal total_item_sold, Double total_Revenue, Double AVG_Revenue, BigDecimal total_duration, BigDecimal AVG_duration) {
         this.total_run_complete = total_run_complete;
         Total_duration = total_duration;
         this.AVG_duration = AVG_duration;
@@ -30,28 +30,28 @@ public class CompleteListSumDTO {
     public void setTotal_duration(BigDecimal total_duration) {
         Total_duration = total_duration;
     }
-    public Double getAVG_duration() {
+    public BigDecimal getAVG_duration() {
         return AVG_duration;
     }
-    public void setAVG_duration(Double AVG_duration) {
+    public void setAVG_duration(BigDecimal AVG_duration) {
         this.AVG_duration = AVG_duration;
     }
-    public Double getTotal_item_sold() {
+    public BigDecimal getTotal_item_sold() {
         return Total_item_sold;
     }
-    public void setTotal_item_sold(Double total_item_sold) {
+    public void setTotal_item_sold(BigDecimal total_item_sold) {
         Total_item_sold = total_item_sold;
     }
-    public BigDecimal getTotal_Revenue() {
+    public Double getTotal_Revenue() {
         return Total_Revenue;
     }
-    public void setTotal_Revenue(BigDecimal total_Revenue) {
+    public void setTotal_Revenue(Double total_Revenue) {
         Total_Revenue = total_Revenue;
     }
-    public BigDecimal getAVG_Revenue() {
+    public Double getAVG_Revenue() {
         return AVG_Revenue;
     }
-    public void setAVG_Revenue(BigDecimal AVG_Revenue) {
+    public void setAVG_Revenue(Double AVG_Revenue) {
         this.AVG_Revenue = AVG_Revenue;
     }
     public CompleteListSumDTO() {
