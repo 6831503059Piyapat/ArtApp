@@ -404,7 +404,8 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
             <div className="mt-6">
               <div className="mb-1.5 flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
                 <h3 className="text-sm font-bold text-[#7C5CFF]"> {language === 'EN' ? 'Past Completed Runs' : 'รายการขายที่เสร็จสิ้นแล้ว'}</h3>
-                <span className="text-[10px] text-[#858ba0]">2 {language === 'EN' ? 'settled markets archived' : 'รายการขายที่เสร็จสิ้นแล้ว'}</span>
+                <span className="text-[10px] text-[#858ba0]"> {dataFetch?.Total_completed || 0} {language === 'EN' ? 'settled markets archived' : 'รายการขายที่เสร็จสิ้นแล้ว'}</span>
+                {/* เปลี่ยนจากเลขคงที่เป็นจำนวนรายการที่เสร็จสิ้นแล้วจาก API */}
               </div>
               <div className="overflow-hidden rounded-2xl border border-[#eceef5] bg-white shadow-[0_5px_22px_rgba(17,23,71,0.04)]">
                 <div className="hidden grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] bg-[#7C5CFF]/5 px-4 py-2.5 text-[9px] font-bold uppercase tracking-wide text-[#0B0F4F] sm:grid sm:px-5">
@@ -413,7 +414,42 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                   <span>{language === 'EN' ? 'Gross sales': 'ยอดขายรวม'}</span>
                   <span className="text-right ">{language === 'EN' ? 'Settlement summary' : 'สรุปการชำระเงิน'}</span>
                 </div>
-                {completedRuns.map((run,index) => (
+                {/* 
+                  1. ตรวจสอบว่ามี dataFetch และ List_Run หรือไม่
+                  2. กรองเฉพาะ isActive === false 
+                  3. นำข้อมูลที่ผ่านการกรองมา map เพื่อแสดงผล
+                */}
+
+                {dataFetch?.List_Run?.filter(run => !run.isActive).map((run,index) => (
+                  <div key={run.Id || index} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="shrink-0 rounded-full bg-[#f1f2f6] px-2 py-1 text-[9px] font-semibold text-[#858ba0]">• Archived</span>
+                      <span className="min-w-0 break-words font-bold">{run.Sale_run_name}</span>
+                    </div>
+
+                    {/* เปลี่ยนจากการดึง Date_closed เป็นของ run จาก API */}
+                    <span className="whitespace-nowrap text-[#858ba0]">{run.Date_closed || '-'}</span>
+                    {/* เปลี่ยนจากการดึง Gross_sale เป็นของ run จาก API และเพิ่มสัญลักษณ์เงิน */}
+                    <span className="text-sm font-extrabold">฿{run.Gross_sale.toLocaleString() || 0}</span>
+                    {/* สามารถแก้ Link ไปยังหน้าที่ต้องการได้ เช่น /sales/completed/[Id] */}
+                    <Link href={`/sales/completed/${run.Id}`} className="inline-flex min-h-10 items-center justify-center gap-1.5 justify-self-stretch rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-3 py-2 text-[11px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:min-h-0 sm:justify-self-end sm:text-[10px]">
+                       {language === 'EN' ? 'View Summary' : 'ดูสรุป'} <ChevronRight size={12} />
+                    </Link>
+                  </div>
+                ))}
+
+                {/* ข้อความแจ้งเตือนกรณีไม่มีข้อมูล */}
+                {dataFetch?.List_Run?.filter(run => !run.isActive).length === 0 && (
+                  <div className="p-4 text-center text-xs text-[#858ba0]">
+                     {language === 'EN' ? 'No completed runs found.' : 'ไม่พบรายการที่เสร็จสิ้น'}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+
+                {/* {completedRuns.map((run,index) => (
                   <div key={index} className="grid min-w-0 gap-2 border-t border-[#f0f1f6] px-3 py-3 text-xs sm:grid-cols-[minmax(220px,1.5fr)_1fr_1fr_130px] sm:items-center sm:px-5 sm:py-2.5">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <span className="shrink-0 rounded-full bg-[#f1f2f6] px-2 py-1 text-[9px] font-semibold text-[#858ba0]">• Archived</span>
@@ -428,7 +464,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </section>
       </main>
 {isJoinModalOpen && (
