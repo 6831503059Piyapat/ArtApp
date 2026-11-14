@@ -110,6 +110,40 @@ type ProductDelete = {
   supplierName: string;
   AssistantName: string;
 }
+
+type dataFetch ={
+  Gross_sales:number;
+  Join_code:string;
+  Run_Assistant_Name:{
+    can_manage_permission:boolean;
+    can_manage_stock:boolean;
+    can_record_expenses:boolean;
+    can_sell:boolean;
+    can_view_log:boolean;
+    display_name:string;
+    run_assistance_id:string;
+  }[];
+  Sale_run_Id:string;
+  Supplier:{
+    Category:string;
+    Host_user_Id:string;
+    Supplier_Id:string;
+    Supplier_Name:string;
+    products:{
+      Current_Stock:number;
+      Image_url?:string;
+      Product_Id:string;
+      Product_Name:string;
+      Product_Unit_Price:number;
+      Start_Stock:number;
+      Supplier_Id:string; 
+    }[];
+  }[];
+  Supplier_Name:string[];
+  Total_Sales:number;
+  Total_Stock:number;
+}
+
 export default function SalesRunDetail() {
   return (
    
@@ -374,6 +408,7 @@ function SalesRunDetailContent() {
   ];
   const [ProductsFixStock, setProductsFixStock] = useState<ProductFixStock[]>([]);
   const [ProductsAdd, setProductsAdd] = useState<ProductAdd[]>([]);
+  const [dataFetched, setDataFetched] = useState(false);
   const [ProductsDelete, setProductsDelete] = useState<ProductDelete[]>([]);
   const [products, setProducts] = useState(Suppliers);
   const [activeNav, setActiveNav] = useState('Ongoing');

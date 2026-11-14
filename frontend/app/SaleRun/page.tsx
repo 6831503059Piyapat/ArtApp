@@ -1,12 +1,14 @@
 "use client";
 import Navbar from '@/app/components/navbar';
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Footer from "@/app/components/footer";
 import { useState, type FormEvent,useEffect } from "react";
 import {
   CalendarDays,
   Check,
+  CircleAlert,
   ChevronRight,
   FileDown,
   Lightbulb,
@@ -18,6 +20,7 @@ import {
   Trash2,
   UserRound,
   UsersRound,
+  X,
 } from "lucide-react";  
 
 type Product = {
@@ -43,6 +46,11 @@ type Expense = {
   category: string;
   amount: number;
 };
+
+type SubmitStatus = {
+  type: "success" | "error";
+  message: string;
+} | null;
 
 const initialSections: SupplierSection[] = [
   {
@@ -122,11 +130,12 @@ export default function CreateSalesRun() {
   //State for manage blank and error form
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [runNameError, setRunNameError] = useState<boolean>(false);
   const [runDateError, setRunDateError] = useState<boolean>(false);
   const [runLocationError, setRunLocationError] = useState<boolean>(false);
-
+  const router = useRouter();
   //
   const [newSupplierName, setNewSupplierName] = useState("");
   const [supplierFormOpen, setSupplierFormOpen] = useState(false);
@@ -139,7 +148,10 @@ export default function CreateSalesRun() {
 
   //Not real Function for send to backend, just for test
   async function hamdleSubmit(){
-   
+    setSubmitStatus(null);
+    setError("");
+    setSuccess("");
+
     if(!runName ){
       if(!runName) setRunNameError(true);
       if (runName) setRunNameError(false);
@@ -147,10 +159,14 @@ export default function CreateSalesRun() {
       // if (runDate) setRunDateError(false);
       // if(!runLocation) setRunLocationError(true);
       // if (runLocation) setRunLocationError(false);
-      setError("Please fill in all required fields");
+      const message = language === "EN" ? "Please fill in all required fields" : "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน";
+      setError(message);
+      setSubmitStatus({ type: "error", message });
       return;
     }
-     const Response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/backend/sale-runs/create",{
+    setLoading(true);
+    try{
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/backend/sale-runs/create",{
       method: "POST",
       headers: {"Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -167,7 +183,28 @@ export default function CreateSalesRun() {
         runExpenses: expenses
       })
     })
-    console.log(Response.text());
+
+      if (!response.ok) {
+        throw new Error(`Failed to create sales run: ${response.status}`);
+      }
+
+      setSuccess(language === "EN" ? "Sales run created successfully." : "สร้างรายการขายสำเร็จแล้ว");
+      setSubmitStatus({
+        type: "success",
+        message: language === "EN" ? "Sales run created successfully." : "สร้างรายการขายสำเร็จแล้ว",
+      });
+      setLaunched(true);
+    }catch(err){
+        console.error(err);
+        const message = language === "EN"
+          ? "An error occurred while submitting the form."
+          : "เกิดข้อผิดพลาดระหว่างบันทึกข้อมูล";
+        setError(message);
+        setSubmitStatus({ type: "error", message });
+    } finally {
+      setLoading(false);
+    }
+     
     // const saleList = 
     // [{
     //   accent: "purple",
@@ -194,7 +231,6 @@ export default function CreateSalesRun() {
     setRunNameError(false);
     setRunDateError(false);
     setRunLocationError(false);
-    setLaunched(true);
     //Data to send to API backend
     //Setions is the data supplier and Owner Products for send to backend 
     console.log(sections);
@@ -452,14 +488,49 @@ export default function CreateSalesRun() {
           </div>
           <div className="flex shrink-0 gap-2">
             <button type="button" className="min-h-11 flex-1 rounded-lg border border-[#ffd5d5] bg-[#fff5f5] px-3 py-1.5 text-xs font-semibold text-[#e34d55] touch-manipulation hover:bg-[#ffebeb] sm:min-h-0 sm:flex-none sm:text-[10px]">{language === 'EN' ? 'Cancel' : 'ยกเลิก'}</button>
-            <button type="button" onClick={() => hamdleSubmit()} className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm touch-manipulation hover:brightness-105 sm:min-h-0 sm:flex-none">
-              <Rocket className="h-2.5 w-2.5" /> {launched ? language === 'EN' ? 'Launched' : 'เริ่มต้นแล้ว' : language === 'EN' ? 'Launch Run' : 'เริ่มต้นการขาย'}
+            <button type="button" disabled={loading} onClick={() => hamdleSubmit()} className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-[#ffb84d] to-[#ff9c22] px-3 py-2 text-xs font-bold text-[#111747] shadow-sm touch-manipulation hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-0 sm:flex-none">
+              <Rocket className="h-2.5 w-2.5" /> {loading ? language === 'EN' ? 'Saving...' : 'กำลังบันทึก...' : launched ? language === 'EN' ? 'Launched' : 'เริ่มต้นแล้ว' : language === 'EN' ? 'Launch Run' : 'เริ่มต้นการขาย'}
             </button>
           </div>
         </div>
       </div>
 
-      
+      {submitStatus && (
+        <div className="fixed inset-0 z-50 flex animate-[fade-in_180ms_ease-out] items-center justify-center bg-[#111747]/35 px-4" role="presentation">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="submit-status-title"
+            className="w-full max-w-sm animate-[pop-in_220ms_cubic-bezier(0.16,1,0.3,1)] rounded-2xl bg-white p-5 text-center shadow-[0_20px_60px_rgba(17,23,71,0.2)]"
+          >
+            <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${
+              submitStatus.type === "success" ? "bg-[#e8f8f0] text-[#159a68]" : "bg-[#fff0f0] text-[#e34d55]"
+            }`}>
+              {submitStatus.type === "success" ? <Check className="h-6 w-6" /> : <CircleAlert className="h-6 w-6" />}
+            </div>
+            <h2 id="submit-status-title" className="mt-3 text-base font-extrabold text-[#111747]">
+              {submitStatus.type === "success"
+                ? language === "EN" ? "Success" : "สำเร็จ"
+                : language === "EN" ? "Something went wrong" : "ไม่สำเร็จ"}
+            </h2>
+            <p className="mt-1 text-sm text-[#858ba0]">{submitStatus.message}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSubmitStatus(null);
+                if (submitStatus.type === "success") {
+                  router.replace("/sales/OnGoing");
+                }
+              }}
+              className="mt-4 inline-flex min-h-10 items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-5 py-2 text-sm font-bold text-white hover:bg-[#6642ed]"
+            >
+              <X className="h-3.5 w-3.5" />
+              {language === "EN" ? "Close" : "ปิด"}
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

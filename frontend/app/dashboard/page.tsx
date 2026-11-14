@@ -386,7 +386,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               <Wallet size={13} /> Resume Selling
             </Link>
             <div className="grid grid-cols-2 gap-2">
-              <Link href="/sales/OnGoing" className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:h-7 sm:text-[9px]">
+              <Link href={`/sales/OnGoing/` + run.Id} className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 text-[10px] font-extrabold text-[#7C5CFF] transition hover:bg-[#7C5CFF]/10 sm:h-7 sm:text-[9px]">
                 <ListFilter size={12} /> Edit Run
               </Link>
               <Link href={`/ViewUser/` + run.Id} className="inline-flex h-9 items-center justify-center gap-1 rounded-xl border border-pink-100 bg-pink-50 text-[10px] font-extrabold text-pink-500 transition hover:bg-pink-100 sm:h-7 sm:text-[9px]">
