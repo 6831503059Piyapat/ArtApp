@@ -26,6 +26,7 @@ public class CompleteDTO {
     private BigDecimal AVG_duration;
     private BigDecimal Total_item_sold;
     private Double Total_Revenue;
+    private BigDecimal clearance_rate;
     private Double AVG_Revenue;
     private List<CompleteListDTO> List_Complete;
 
@@ -72,6 +73,12 @@ public class CompleteDTO {
     }
     public List<CompleteListDTO> getCompleteList() {
         return List_Complete;
+    }
+    public BigDecimal getClearance_rate() {
+        return clearance_rate;
+    }
+    public void setClearance_rate(BigDecimal clearance_rate) {
+        this.clearance_rate = clearance_rate;
     }
 
 }

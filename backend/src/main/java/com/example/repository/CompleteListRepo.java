@@ -30,15 +30,22 @@ public interface CompleteListRepo extends JpaRepository<SaleRunEntity, String> {
 //     Integer Total_sold,
 //     Double Gross,
 //     Double Net_intake
+// (Total_item sold / totalstock ) * 100
 // ต้องเช็คว่า status = false ด้วย เพราะว่า complete list คือ list ที่ปิดแล้วเท่านั้น
     @Query(value = """
  
+
 SELECT
     COUNT(sr.sale_run_id) AS total_run_complete,
 
     COALESCE(SUM(sl.total_item_sold), 0) AS Total_item_sold,
 
     COALESCE(SUM(sl.total_revenue), 0) AS Total_Revenue,
+
+    COALESCE(
+        SUM(sl.total_item_sold) / NULLIF(SUM(pd.total_start_stock), 0) * 100,
+        0
+    ) AS clearance_rate,
 
     COALESCE(
         SUM(sl.total_revenue) / NULLIF(COUNT(sr.sale_run_id), 0),
@@ -78,10 +85,19 @@ LEFT JOIN (
     GROUP BY sale_run_id
 ) sl ON sr.sale_run_id = sl.sale_run_id
 
+LEFT JOIN (
+    SELECT
+        sp.sales_run_id,
+        SUM(COALESCE(p.start_stock, 0)) AS total_start_stock
+    FROM supplier sp
+    LEFT JOIN product p
+        ON p.supplier_id = sp.supplier_id
+    GROUP BY sp.sales_run_id
+) pd ON sr.sale_run_id = pd.sales_run_id
+
 WHERE
     sr.host_user_id = :uid
-    AND sr.sale_run_status = FALSE
-
+    AND sr.sale_run_status = FALSE;
 
     """,nativeQuery = true)
      CompleteListSumDTO findCompleteListTotalSumByUserId(@Param("uid") String uid);

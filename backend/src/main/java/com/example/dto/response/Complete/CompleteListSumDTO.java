@@ -7,16 +7,18 @@ public class CompleteListSumDTO {
     private BigDecimal Total_duration;
     private BigDecimal AVG_duration;
     private BigDecimal Total_item_sold;
+    private BigDecimal clearance_rate;
     private Double Total_Revenue;
     private Double AVG_Revenue;
     
-    public CompleteListSumDTO(Long total_run_complete, BigDecimal total_item_sold, Double total_Revenue, Double AVG_Revenue, BigDecimal total_duration, BigDecimal AVG_duration) {
+    public CompleteListSumDTO(Long total_run_complete, BigDecimal total_item_sold, Double total_Revenue,BigDecimal clearance_rate, Double AVG_Revenue, BigDecimal total_duration, BigDecimal AVG_duration) {
         this.total_run_complete = total_run_complete;
         Total_duration = total_duration;
         this.AVG_duration = AVG_duration;
         this.Total_item_sold = total_item_sold;
         Total_Revenue = total_Revenue;
         this.AVG_Revenue = AVG_Revenue;
+        this.clearance_rate = clearance_rate;
     }
     public Long getTotal_run_complete() {
         return total_run_complete;
@@ -57,4 +59,10 @@ public class CompleteListSumDTO {
     public CompleteListSumDTO() {
     }
     
+    public BigDecimal getClearance_rate() {
+        return clearance_rate;
+    }
+    public void setClearance_rate(BigDecimal clearance_rate) {
+        this.clearance_rate = clearance_rate;
+    }
 }

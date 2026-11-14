@@ -28,7 +28,8 @@ public class CompleteListService {
         completeTotalAndList.setTotal_duration(completeListSum.getTotal_duration());
         completeTotalAndList.setTotal_item_sold(completeListSum.getTotal_item_sold());
         completeTotalAndList.setTotal_run_complete(completeListSum.getTotal_run_complete());
-        
+        completeTotalAndList.setClearance_rate(completeListSum.getClearance_rate());
+
         completeTotalAndList.setCompleteList(completeList);
         return completeTotalAndList;
     }
