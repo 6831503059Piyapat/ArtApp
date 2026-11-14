@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState, useSyncExternalStore  } from 'react';
+import {useRouter} from 'next/navigation';
 import Link from 'next/link';
 import {getAuth , onAuthStateChanged} from "firebase/auth"; 
 import {Suspense} from 'react';
@@ -167,15 +168,30 @@ type ExpenseDTO ={
   timestamp: string;
 }
 
+type AssistantPermissionValue = {
+  can_manage_permission: boolean;
+  can_manage_stock: boolean;
+  can_record_expenses: boolean;
+  can_sell: boolean;
+  can_view_log: boolean;
+  run_assistace_id: string;
+};
+
+type AssistantPermissionAssistant = AssistantPermissionValue & {
+  display_name: string;
+};
+
 
 export default function SalesRunDetailContent() {
   const { id } = useParams<{ id: string }>();
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [AssistantName, setAsistantName] = useState<string>('');
   const [expenses, setExpenses] = useState<ExpenseDTO[]>([]);
   const [totalProduct, setTotalProduct] = useState<number>(0);
   const [dataFetched, setDataFetched] = useState<dataFetch | null>(null);
   const [products, setProducts] = useState<Supplier[]>([]);
+  const [isAddSupplierOpen, setIsAddSupplierOpen] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState("");
   const subscribeToOrigin = () => () => undefined;
 const getOrigin = () => window.location.origin;
 const getServerOrigin = () => "";
@@ -285,7 +301,12 @@ const getServerOrigin = () => "";
   const [isEndRunOpen, setIsEndRunOpen] = useState(false);
   const [isFinalEndRunOpen, setIsFinalEndRunOpen] = useState(false);
   const [isEndRunConfirmed, setIsEndRunConfirmed] = useState(false);
-  const inviteUrl = 'https://consigndesk.app/join/MFU-M...';
+  let inviteUrl = origin
+    ? new URL(`/Invite?token=${encodeURIComponent(dataFetched?.Join_code || '')}`, origin).toString()
+    : "";
+
+
+
   // Toggle Switches State
   const [activeTab, setActiveTab] = useState<'global' | 'may' | 'tanawat'>('global');
   const [isPermissionEnabled, setIsPermissionEnabled] = useState(false);
@@ -305,7 +326,37 @@ const getServerOrigin = () => "";
   const [paymentMethod, setPaymentMethod] = useState<'mobileBanking' | 'cash'>('mobileBanking');
   const [showUndoNotification, setShowUndoNotification] = useState(false);
 
+async function sendReqaddSupplier(){
+  try{
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/backend/ongoing/${id}/add-supplier`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+    },
+    body:JSON.stringify({
+      name: newSupplierName,
+    })
+  })
 
+  if(!response.ok){
+    console.error("Error adding supplier");
+    throw new Error(`Error adding supplier: ${response.statusText}`);
+  }
+  const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id,refreshedToken);
+  setIsAddSupplierOpen(false);
+  setNewSupplierName("");
+  
+  }catch(err){
+    console.error('Error adding supplier:', err);
+  }
+  
+
+}
 async function getExpenses(){
   setStepMode("expense");
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing/${id}/expenses-list`, {
@@ -822,14 +873,22 @@ async function endRunSendRequest() {
                 </div>
                 <span className="shrink-0 text-[10px] font-semibold text-emerald-600">• {language === 'EN' ? 'Online' : 'ออนไลน์'}</span>
               </div>
-              <button onClick={() => {
+              <button onClick={ async() => {
                 setIsOpen(true);
                 generateQrcodeUrl();
-                
+                const refreshedToken = await getAuth().currentUser?.getIdToken()||'';
+                if (!refreshedToken) return;
+                fetchSalesRunData(id, refreshedToken);
               }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
                 <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
-              <button onClick={() => setIsPermissionEnabled(true)} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
+              <button onClick={async () => {
+                setIsPermissionEnabled(true);
+                const refreshedToken = await getAuth().currentUser?.getIdToken();
+                if (!refreshedToken) return;
+                fetchSalesRunData(id, refreshedToken);
+
+              }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />{language === 'EN' ? 'Manage Permissions' : 'จัดการสิทธิ์'}
               </button>
             </div>
@@ -1215,9 +1274,38 @@ async function endRunSendRequest() {
                 </div>
                 <span className="font-bold text-slate-800 text-sm">{language === 'EN' ? 'Add New Supplier' : 'เพิ่มซัพพลายเออร์ใหม่'}</span>
               </div>
-              <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]">
-                <Plus className="w-4 h-4" /> {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
-              </button>
+              {isAddSupplierOpen ? (
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[280px]">
+                  <label htmlFor="new-supplier-name" className="text-xs font-semibold text-slate-600">
+                    {language === 'EN' ? 'Supplier name' : 'ชื่อซัพพลายเออร์'}
+                  </label>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      id="new-supplier-name"
+                      type="text"
+                      value={newSupplierName}
+                      onChange={(event) => setNewSupplierName(event.target.value)}
+                      placeholder={language === 'EN' ? 'Enter supplier name' : 'กรอกชื่อซัพพลายเออร์'}
+                      className="min-h-11 min-w-0 flex-1 rounded-xl border border-[#D8D4F5] bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/15"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => sendReqaddSupplier()}
+                      className="flex min-h-11 items-center justify-center rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]"
+                    >
+                      {language === 'EN' ? 'Confirm' : 'ยืนยัน'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAddSupplierOpen(true)}
+                  className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#6366F1] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5558E8]"
+                >
+                  <Plus className="w-4 h-4" /> {language === 'EN' ? 'Add Supplier' : 'เพิ่มซัพพลายเออร์'}
+                </button>
+              )}
             </div>
             )}
           </div>
@@ -1488,6 +1576,12 @@ async function endRunSendRequest() {
             setIsOpen(false);
             setIsPermissionEnabled(true);
           }}
+          onRefresh={async () => {
+            const refreshedToken = await getAuth().currentUser?.getIdToken();
+            if (refreshedToken) {
+              await fetchSalesRunData(id, refreshedToken);
+            }
+          }}
           language={language}
         />
       )}
@@ -1495,6 +1589,13 @@ async function endRunSendRequest() {
        < AssistantPermissionsModal
        onClose={() => setIsPermissionEnabled(false)}
        language={language}
+       Assistant_Name={dataFetched?.Run_Assistant_Name ?? []}
+       onRefresh={async () => {
+         const refreshedToken = await getAuth().currentUser?.getIdToken();
+         if (refreshedToken) {
+           await fetchSalesRunData(id, refreshedToken);
+         }
+       }}
        />
       )}
       {isEndRunOpen && (
@@ -1580,11 +1681,12 @@ type SupplierInviteModalProps = {
   }[];
   joinPin: string;
   onOpenPermissions: () => void;
+  onRefresh: () => Promise<void>;
   language: 'EN' | 'TH';
-  qrCodeUrl: string;
+  qrCodeUrl: string | null;
 };
 // MODAL COMPONENT: Supplier Invite Modal
-function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assistant_Name, joinPin, onOpenPermissions,language }: SupplierInviteModalProps) {
+function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assistant_Name, joinPin, onOpenPermissions, onRefresh, language }: SupplierInviteModalProps) {
   return (
     <div onClick={() => onClose()} className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-3 backdrop-blur-sm transition-all animate-in fade-in duration-200 sm:items-center sm:p-4">
       
@@ -1661,7 +1763,7 @@ function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assi
                 {/* Simulated QR Code Graphic */}
                 <div className="w-16 h-16 bg-white relative flex items-center justify-center">
                   <QrCode className="w-full h-full text-[#0B0F4F]" />
-                  <img src={qrCodeUrl} alt="QR Code" className="w-full h-full" />
+                  <img src={qrCodeUrl ?? undefined} alt="QR Code" className="w-full h-full" />
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
@@ -1702,7 +1804,11 @@ function SupplierInviteModal({ onClose, copied, onCopy,qrCodeUrl, inviteUrl,Assi
 
         {/* 3. MODAL FOOTER */}
         <div className="flex flex-col-reverse items-stretch justify-end gap-2.5 border-t border-slate-100 bg-slate-50/50 p-4 sm:flex-row sm:items-center sm:space-x-2.5">
-          <button onClick={onOpenPermissions} className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#6366F1]/20 bg-white px-4 py-2 text-xs font-bold text-[#6366F1] shadow-2xs transition-colors hover:bg-slate-50">
+          <button onClick={async ()=>{
+          onOpenPermissions();
+              await onRefresh();
+          }
+          } className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#6366F1]/20 bg-white px-4 py-2 text-xs font-bold text-[#6366F1] shadow-2xs transition-colors hover:bg-slate-50">
             <Shield className="w-3.5 h-3.5 text-[#6366F1]" />
             <span>{language === 'EN' ? 'Assistant Permissions' : 'สิทธิ์ของผู้ช่วย'}</span>
           </button>
@@ -2006,39 +2112,113 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
 }
 type AssistantPermissionsModalProps = {
   isOpen?: boolean;
+  Assistant_Name: AssistantPermissionAssistant[];
   onClose?: () => void;
-  onSave?: (permissions: Record<string, boolean>) => void;
+  onSave?: (permissions: AssistantPermissionValue) => void;
+  onRefresh?: () => void | Promise<void>;
   language?: 'EN' | 'TH';
 };
 function AssistantPermissionsModal({
   isOpen = true,
   onClose = () => {},
   onSave = () => {},
-  language
+  onRefresh,
+  language,
+  Assistant_Name
 }: AssistantPermissionsModalProps) {
-  // State สำหรับเก็บสถานะสวิตช์ทั้ง 5 รายการ (ค่าเริ่มต้นปิดทั้งหมด 0/5 ตามรูป)
-  const [permissions, setPermissions] = useState({
-    sellProducts: false,
-    editProducts: false,
-    recordExpenses: false,
-    viewSalesLog: false,
-    managePermissions: false
+  const [permissions, setPermissions] = useState<AssistantPermissionValue>({
+    can_sell: false,
+    can_manage_stock: false,
+    can_record_expenses: false,
+    can_view_log: false,
+    can_manage_permission: false,
+    run_assistace_id: ''
   });
-
+  const router = useRouter();
   // State สำหรับ Dropdown เลือก Assistant
-  const [selectedAssistant, setSelectedAssistant] = useState('@ploy_w');
+  const [selectedAssistant, setSelectedAssistant] = useState('');
+  const [isAssistantDropdownOpen, setIsAssistantDropdownOpen] = useState(false);
 
-  // ฟังก์ชันสลับการเปิด/ปิดสวิตช์ Toggle
+  useEffect(() => {
+    if (Assistant_Name.length === 0) {
+      setSelectedAssistant('');
+      return;
+    }
+
+    setSelectedAssistant((current) =>
+      Assistant_Name.some((assistant) => assistant.run_assistace_id === current)
+        ? current
+        : Assistant_Name[0].run_assistace_id
+    );
+  }, [Assistant_Name]);
+
+  const selectedAssistantData = Assistant_Name.find(
+    (assistant) => assistant.run_assistace_id === selectedAssistant
+  );
+
+  useEffect(() => {
+    if (!selectedAssistantData) {
+      setPermissions({
+        can_manage_permission: false,
+        can_manage_stock: false,
+        can_record_expenses: false,
+        can_sell: false,
+        can_view_log: false,
+        run_assistace_id: ''
+      });
+      return;
+    }
+
+    setPermissions({
+      can_manage_permission: selectedAssistantData.can_manage_permission,
+      can_manage_stock: selectedAssistantData.can_manage_stock,
+      can_record_expenses: selectedAssistantData.can_record_expenses,
+      can_sell: selectedAssistantData.can_sell,
+      can_view_log: selectedAssistantData.can_view_log,
+      run_assistace_id: selectedAssistantData.run_assistace_id
+    });
+  }, [selectedAssistantData]);
+
   const togglePermission = (key: keyof typeof permissions) => {
+    if (key === 'run_assistace_id') return;
+
     setPermissions((prev) => ({
       ...prev,
       [key]: !prev[key]
     }));
   };
 
-  // คำนวณจำนวนรายการที่เปิดใช้งาน
-  const enabledCount = Object.values(permissions).filter(Boolean).length;
+  const enabledCount = [
+    permissions.can_manage_permission,
+    permissions.can_manage_stock,
+    permissions.can_record_expenses,
+    permissions.can_sell,
+    permissions.can_view_log
+  ].filter(Boolean).length;
 
+  const handleSavePermissions = async (_value: AssistantPermissionValue) => {
+    
+    const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/backend/ongoing/update-assistant-permission`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${refreshedToken}`
+      },
+      body: JSON.stringify(_value)
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update assistant permissions");
+    }
+    await onRefresh?.();
+    onClose();
+    
+  };
+  
   // ถ้าสั่งปิด Modal ให้คืนค่า null ไม่แสดงผล
   if (!isOpen) return null;
 
@@ -2081,19 +2261,28 @@ function AssistantPermissionsModal({
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
               {language === 'EN' ? <span>SELECT ASSISTANT</span> : <span>เลือกผู้ช่วย</span>}
-              <span className="text-slate-400 font-semibold lowercase">3 joined {language === 'EN' ? 'joined' : 'เข้าร่วม'}</span>
+              <span className="text-slate-400 font-semibold lowercase">{Assistant_Name.length} joined {language === 'EN' ? 'joined' : 'เข้าร่วม'}</span>
             </div>
 
-            {/* Custom Dropdown Box */}
-            <div className="bg-[#6366F1]/5 border border-[#6366F1]/20 rounded-2xl p-2.5 flex items-center justify-between cursor-pointer hover:bg-[#6366F1]/10 transition-colors">
+            {/* Assistant Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                aria-expanded={isAssistantDropdownOpen}
+                aria-haspopup="listbox"
+                onClick={() => setIsAssistantDropdownOpen((open) => !open)}
+                disabled={Assistant_Name.length === 0}
+                className="relative flex w-full items-center gap-3 rounded-2xl border border-[#6366F1]/20 bg-[#6366F1]/5 p-2.5 text-left transition-colors hover:bg-[#6366F1]/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-full bg-[#6366F1] text-white font-bold text-sm flex items-center justify-center uppercase shadow-xs">
-                  P
+                  {(selectedAssistantData?.display_name || '?').charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center space-x-1.5">
                     <span className="font-bold text-[#0B0F4F] text-sm">
-                      {selectedAssistant}
+                      {selectedAssistantData?.display_name ||
+                        (language === 'EN' ? 'No assistant available' : 'ไม่มีผู้ช่วย')}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1 text-xs font-semibold">
@@ -2108,7 +2297,42 @@ function AssistantPermissionsModal({
                 </div>
               </div>
 
-              <ChevronDown className="w-5 h-5 text-slate-400" />
+                <ChevronDown className={`ml-auto h-5 w-5 shrink-0 text-slate-400 transition-transform ${isAssistantDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isAssistantDropdownOpen && Assistant_Name.length > 0 && (
+                <div
+                  role="listbox"
+                  aria-label={language === 'EN' ? 'Select assistant' : 'เลือกผู้ช่วย'}
+                  className="absolute left-0 right-0 top-full z-10 mt-2 max-h-52 overflow-y-auto rounded-2xl border border-[#D8D4F5] bg-white p-1.5 shadow-lg"
+                >
+                  {Assistant_Name.map((assistant) => (
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={assistant.run_assistace_id === selectedAssistant}
+                      key={assistant.run_assistace_id}
+                      onClick={() => {
+                        setSelectedAssistant(assistant.run_assistace_id);
+                        setIsAssistantDropdownOpen(false);
+                      }}
+                      className={`flex min-h-11 w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                        assistant.run_assistace_id === selectedAssistant
+                          ? 'bg-[#6366F1]/10 text-[#4F46E5]'
+                          : 'text-[#0B0F4F] hover:bg-[#F5F3FF]'
+                      }`}
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-xs font-bold uppercase text-white">
+                        {assistant.display_name.charAt(0)}
+                      </span>
+                      <span className="truncate">{assistant.display_name}</span>
+                      {assistant.run_assistace_id === selectedAssistant && (
+                        <Check className="ml-auto h-4 w-4 shrink-0 text-[#6366F1]" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -2128,48 +2352,48 @@ function AssistantPermissionsModal({
               
               {/* Item 1: Sell Products / Cashier Mode */}
               <PermissionToggleRow
-                icon={<Calculator className={`w-5 h-5 ${permissions.sellProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
+                icon={<Calculator className={`w-5 h-5 ${permissions.can_sell ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title={language === 'EN' ? 'Sell Products / Cashier Mode' : 'ขายสินค้า / โหมดแคชเชียร์'}
                 description={language === 'EN' ? 'Sell products and register sales transactions in Sales Mode' : 'ขายสินค้าและบันทึกการทำธุรกรรมการขายในโหมดการขาย'}
-                enabled={permissions.sellProducts}
-                onToggle={() => togglePermission('sellProducts')}
+                enabled={permissions.can_sell}
+                onToggle={() => togglePermission('can_sell')}
               />
 
               {/* Item 2: Add / Edit / Delete Products */}
               <PermissionToggleRow
-                icon={<Edit3 className={`w-5 h-5 ${permissions.editProducts ? "text-emerald-600" : "text-[#6366F1]"}`} />}
+                icon={<Edit3 className={`w-5 h-5 ${permissions.can_manage_stock ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title={language === 'EN' ? 'Add / Edit / Delete Products' : 'เพิ่ม / แก้ไข / ลบสินค้า'}
                 description={language === 'EN' ? 'Manage catalog items, quantities, and pricing' : 'จัดการรายการสินค้า, ปริมาณ, และราคา'}
-                enabled={permissions.editProducts}
-                onToggle={() => togglePermission('editProducts')}
+                enabled={permissions.can_manage_stock}
+                onToggle={() => togglePermission('can_manage_stock')}
               />
 
               {/* Item 3: Record Booth Expenses */}
               <PermissionToggleRow
-                icon={<Receipt className={`w-5 h-5 ${permissions.recordExpenses ? "text-emerald-600" : "text-[#6366F1]"}`} />}
+                icon={<Receipt className={`w-5 h-5 ${permissions.can_record_expenses ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title={language === 'EN' ? 'Record Booth Expenses' : 'บันทึกค่าใช้จ่ายของบูธ'}
                 description={language === 'EN' ? 'Record booth expenses and operational costs' : 'บันทึกค่าใช้จ่ายของบูธและค่าใช้จ่ายในการดำเนินงาน'}
-                enabled={permissions.recordExpenses}
-                onToggle={() => togglePermission('recordExpenses')}
+                enabled={permissions.can_record_expenses}
+                onToggle={() => togglePermission('can_record_expenses')}
               />
 
               {/* Item 4: View Sales Log & Gross Stats */}
               <PermissionToggleRow
-                icon={<History className={`w-5 h-5 ${permissions.viewSalesLog ? "text-emerald-600" : "text-[#6366F1]"}`} />}
+                icon={<History className={`w-5 h-5 ${permissions.can_view_log ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title={language === 'EN' ? 'View Sales Log & Gross Stats' : 'ดูบันทึกการขายและสถิติทั้งหมด'}
                 description={language === 'EN' ? 'Access transaction history, undo sales, and total stats' : 'เข้าถึงประวัติการทำธุรกรรม, ยกเลิกการขาย, และสถิติทั้งหมด'}
-                enabled={permissions.viewSalesLog}
-                onToggle={() => togglePermission('viewSalesLog')}
+                enabled={permissions.can_view_log}
+                onToggle={() => togglePermission('can_view_log')}
               />
 
               {/* Item 5: Manage & Grant Permissions */}
               <PermissionToggleRow
-                icon={<Shield className={`w-5 h-5 ${permissions.managePermissions ? "text-emerald-600" : "text-[#6366F1]"}`} />}
+                icon={<Shield className={`w-5 h-5 ${permissions.can_manage_permission ? "text-emerald-600" : "text-[#6366F1]"}`} />}
                 title={language === 'EN' ? 'Manage & Grant Permissions' : 'จัดการและให้สิทธิ์'}
                 badgeText="RESTRICTED"
                 description={language === 'EN' ? 'Assign roles and grant assistant permissions' : 'กำหนดบทบาทและให้สิทธิ์แก่ผู้ช่วย'}
-                enabled={permissions.managePermissions}
-                onToggle={() => togglePermission('managePermissions')}
+                enabled={permissions.can_manage_permission}
+                onToggle={() => togglePermission('can_manage_permission')}
               />
 
             </div>
@@ -2187,7 +2411,10 @@ function AssistantPermissionsModal({
           </button>
           
           <button
-            onClick={() => onSave(permissions)}
+            onClick={() => {
+              handleSavePermissions(permissions);
+              onSave(permissions);
+            }}
             className="w-full sm:w-auto px-5 py-2.5 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
