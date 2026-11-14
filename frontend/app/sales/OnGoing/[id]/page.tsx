@@ -49,6 +49,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
+import { ref, set } from 'firebase/database';
 
 type InventoryProduct = {
   Product_Id?: string;
@@ -150,7 +151,7 @@ type dataFetch ={
     }[];
   }[];
   Supplier_Name:string[];
-  Total_Sales:number;
+  Total_Sale:number;
   Total_Stock:number;
 }
 type ExpenseDTO ={
@@ -671,8 +672,11 @@ const handleConfirmSale = async () => {
   if (!response.ok) {
     throw new Error(`Sale confirmation failed: ${await response.text()}`);
   }
-  console.log("Confirming sale for items:", await response.text());
-
+  const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
 // 1. หักสต็อกและเพิ่มยอดขายสำหรับสินค้าทุกตัวในตะกร้า
   setProducts((prev) =>
     prev.map((supplier) => {
@@ -742,6 +746,11 @@ async function handleSaveChanges(){
     console.error("Error saving changes");
     return;
   }
+   const refreshedToken = await getAuth().currentUser?.getIdToken();
+  if (!refreshedToken) {
+    throw new Error("Unable to refresh sales run data: user is not authenticated");
+  }
+  await fetchSalesRunData(id, refreshedToken);
   console.log(ProductsFixStock, ProductsAdd, ProductsDelete);
   // Clear the arrays after successful save
   setProductsFixStock([]);
@@ -897,7 +906,7 @@ async function endRunSendRequest() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400"> {language === 'EN' ? 'Total Sold Units' : 'หน่วยที่ขายได้ทั้งหมด'}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                  <span className="text-lg font-extrabold text-[#0B0F4F]">{dataFetched?.Total_Sales || 0}</span>
+                  <span className="text-lg font-extrabold text-[#0B0F4F]">{dataFetched?.Total_Sale || 0}</span>
                   <span className="text-xs font-medium text-slate-400">/ {dataFetched?.Total_Stock || 0} {language === 'EN' ? 'starting' : 'เริ่มต้น'}</span>
                 </div>
               </div>
@@ -1013,7 +1022,7 @@ async function endRunSendRequest() {
               </div>
             </div>
 
-            <Link href="/ViewUser/1" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
+            <Link href={`/ViewUser/`+id} target="_blank" className="mx-auto flex min-h-11 w-[92%] items-center justify-between gap-1 rounded-lg bg-gradient-to-r from-[#7C5CFF] to-[#F062C0] px-2 py-1.5 text-white shadow-sm sm:mx-0 sm:min-h-0 sm:w-auto sm:px-1.5">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="shrink-0 rounded bg-white/20 p-1"><History className="h-3 w-3" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold leading-3.5"> {language === 'EN' ? 'Sales Activity Board' : 'บอร์ดกิจกรรมการขาย'}</span><span className="block text-[9px] leading-3 text-white/80"> {language === 'EN' ? 'Enter live sales feed & telemetry' : 'เข้าสู่กระแสการขายสดและข้อมูล telemetry'}</span></span>
@@ -2140,7 +2149,7 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
             {item.price}
           </div>
           <p className="mt-1 text-sm font-medium text-slate-400">
-            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.sold}</span>
+            {language === 'EN' ? 'Sold' : 'ขายแล้ว'}: <span className="font-bold text-slate-700">{item.Start_Stock ? item.Start_Stock - (item.Current_Stock ?? 0) : 0}</span> 
           </p>
         </div>
 
