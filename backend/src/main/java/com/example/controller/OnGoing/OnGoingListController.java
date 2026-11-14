@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.example.dto.LiveStatsDTO;
 import com.example.service.LiveStatusService;
+import com.example.dto.request.OnGoing.OngoingID.Supplier.AddSupplierDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 import java.util.Map;
 // import java.util.Map;
@@ -101,5 +102,10 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
         onGoingIDService.addExpenseLog(expenseLog,sale_run_id);
         return ResponseEntity.ok("Expense added successfully");
     }
-    
+    @PostMapping ("/ongoing/{id}/add-supplier")
+    public ResponseEntity<String> addSupplier(@PathVariable("id") String sale_run_id, @RequestBody  AddSupplierDTO supplier) {
+        // Implement the logic to add a new supplier here
+        // onGoingIDService.addSupplier(supplier, sale_run_id);
+        return ResponseEntity.ok("Supplier added successfully");
+    }
 }

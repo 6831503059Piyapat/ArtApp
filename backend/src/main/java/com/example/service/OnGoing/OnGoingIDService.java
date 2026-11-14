@@ -35,10 +35,10 @@ import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.http.HttpStatus;
 import com.example.dto.response.Assistant.AssistantDTO;
-import com.example.repository.ExpenseRepo;
 import com.example.repository.ExpensesLogRepo;
 import com.example.repository.ChangeHistoryRepo;
 import org.springframework.web.server.ResponseStatusException;
+import com.example.dto.request.OnGoing.OngoingID.Supplier.AddSupplierDTO;
 
 @Service
 public class OnGoingIDService {
@@ -253,6 +253,21 @@ public class OnGoingIDService {
         expenseLogRepository.save(expenseLog);
         changesHistoryRepository.save(new ChangesHistoryEntity("CHL-EXPENSE" + generatedId + "-" + sale_run_id, sale_run_id, expenseLog.getPaid_by_User_Name(),expenseLog.getPaid_by_User_Name(),LocalDateTime.now(),"Expense Add", "ADD Expense: " + expenseLog.getDescription()));
 
+    }
+    @Transactional 
+    public void addSupplier(AddSupplierDTO supplier, String sale_run_id) {
+        
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(1);
+       
+        for (int i = 0; i < 1; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(randomIndex));
+        }
+        
+        String generatedId = "supplier" + sb.toString() + "-" +sale_run_id+ "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        supplierRepository.addSupplier(generatedId, sale_run_id, supplier.getName());
+        
     }
 }
 

@@ -1,11 +1,15 @@
 package com.example.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.dto.System.SupplierFindDTO;
 import com.example.entity.SupplierEntity;
+
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 @Repository
 public interface SupplierRepo extends JpaRepository<SupplierEntity, String> {
@@ -22,4 +26,12 @@ public interface SupplierRepo extends JpaRepository<SupplierEntity, String> {
         WHERE supplier_id = :Supplier_Id
     """, nativeQuery = true)
     SupplierFindDTO findBySaleRunIdAndProductName(@Param("Supplier_Id") String Sale_run_Id);
+
+    @Modifying 
+    @Transactional 
+    @Query (value = """
+        INSERT INTO supplier (supplier_id, supplier_name, sales_run_id)
+        VALUES (:Supplier_Id, :Supplier_Name, :Sales_run_Id)
+    """, nativeQuery = true)
+    void addSupplier(@Param("Supplier_Id") String Supplier_Id, @Param("Sales_run_Id") String Sales_run_Id, @Param("Supplier_Name") String Supplier_Name);
 }
