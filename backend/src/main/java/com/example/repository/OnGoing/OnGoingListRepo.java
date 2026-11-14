@@ -56,7 +56,7 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT 
         sp.sales_run_id,
-        SUM(GREATEST(COALESCE(p.start_stock, 0) - COALESCE(p.current_stock, 0), 0)) AS itemCleared,
+        COALESCE(SUM(p.start_stock), 0) - COALESCE(SUM(p.current_stock), 0) AS itemCleared,
         SUM(COALESCE(p.start_stock, 0)) AS itemClearedMax,
         CASE 
             WHEN SUM(COALESCE(p.start_stock, 0)) > 0 

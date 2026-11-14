@@ -166,7 +166,12 @@ public class SalerunService {
             int randomIndex = random.nextInt(CHARACTERS.length());
             sb.append(CHARACTERS.charAt(randomIndex));
         }
+
         Double totalExpenses = expensesRepository.findTotalExpensesBySaleRunId(saleId);
+        if (totalExpenses == null) {
+            totalExpenses = 0.0;
+        }
+
         SaleRunEntity saleRun = salerunRepository.findById(saleId)
                 .orElseThrow(() -> new EntityNotFoundException("Sale run not found with ID: " + saleId));
 
