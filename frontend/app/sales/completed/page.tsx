@@ -9,20 +9,21 @@ import { BadgeCheck, Banknote, Clock3, ShoppingBag,Sparkles } from 'lucide-react
 
 type RunData = {
   AVG_Revenue: number;
-  AVG_duration: string;
+  AVG_duration: number;
   Total_Revenue: number;
-  Total_duration: string;
+  Total_duration: number;
   Total_item_sold: number;
-  CompleteList: {
-    length: number;
+  completeList: {
+    Date_complete: string;
+    Gross: number;
+    Host_id:string;
+    Id_sales: string;
+    Name_complete:string;
+    Net_intake: number;
+    Total_sold:number; 
   }[];
   total_run_complete: number;
 };
-
-
-
-
-
 
 
 // Mock Data
@@ -81,6 +82,21 @@ export default function CompletedRunsPage() {
     console.log("Response from backend:", data);
     setDataFetch(data);
   }
+
+  const formatDuration = (minutes: number | undefined, lang:string) => {
+  if (!minutes) return '0h 0m';
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  
+  const unitH = lang === 'EN' ? 'h' : 'ชม';
+  const unitM = lang === 'EN' ? 'm' : 'นาที';
+
+  if (h === 0) return `${m}${unitM}`;
+  return `${h}${unitH} ${m}${unitM}`;
+};
+
+ 
+
   // Filter Logic
   const filteredRuns = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -152,11 +168,11 @@ useEffect(() => {
                 <div>
                   <div className="-translate-y-1 flex items-baseline gap-1">
                     {/* <span className="text-lg font-extrabold leading-5 md:text-xl"> 6 {language === 'EN' ? 'h' : 'ชม'} 10{language === 'EN' ? 'm' : 'นาที'} </span> */}
-                    <span className="text-lg font-extrabold leading-5 md:text-xl">{/* ดึงค่าเวลาเฉลี่ยจาก API */} {dataFetch?.AVG_duration || '0h 0m'}</span>
+                    <span className="text-lg font-extrabold leading-5 md:text-xl">{/* ดึงค่าเวลาเฉลี่ยจาก API */}{formatDuration(dataFetch?.AVG_duration, language)}</span>
                     <span className="text-[9px] font-semibold text-creatory-gray"> {language === 'EN' ? 'Avg / run' : 'เฉลี่ยต่อการรัน'}</span>
                   </div>
                   {/* <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">18{language === 'EN' ? 'h' : 'ชม'} 30{language === 'EN' ? 'm' : 'นาที'} {language === 'EN' ? 'Total duration' : ''} </p> */}
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{dataFetch?.Total_duration || '0h 0m'} {language === 'EN' ? 'Total duration' : 'เวลารวม'}</p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{formatDuration(dataFetch?.Total_duration, language)}{' '} {language === 'EN' ? 'Total duration' : 'เวลารวม'}</p>
 
 
                 </div>
