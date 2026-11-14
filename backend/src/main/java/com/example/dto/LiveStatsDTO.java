@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import com.example.dto.response.SaleLogs.SaleLogsDTO;
 public class LiveStatsDTO {
     private String LiveID;
+    private String saleRunName;
+    private LocalDateTime dateCreated;
     private List<SaleLogsDTO> saleLogs;
     private List<SupplierLiveDTO> Supplier;
     private String timestamp;
@@ -39,5 +41,17 @@ public class LiveStatsDTO {
     }
     public void setLiveID(String liveID){
         this.LiveID = liveID;
+    }
+    public String getSaleRunName() {
+        return saleRunName;
+    }
+    public void setSaleRunName(String saleRunName) {
+        this.saleRunName = saleRunName;
+    }
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

@@ -84,6 +84,28 @@ const accentStyles = {
 const inputClass ="min-h-11 min-w-0 rounded-lg border bg-white px-2.5 py-2 text-sm text-[#111747] outline-none transition placeholder:text-[#8b90a2] sm:min-h-0";
 const inputClass2 = 'border-[#e7e9f1] focus:border-[#a28aff] focus:ring-2 focus:ring-[#7957ff]/10';
 
+function getTodayDate() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getLocalDateTime() {
+    const date = new Date();
+
+    const pad = (num: number) => String(num).padStart(2, "0");
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function getDateTimeAtStartOfDay(date: string) {
+  return date ? `${date}T00:00:00` : "";
+}
 export default function CreateSalesRun() {
   //token 
   const [token, setToken] = useState<string | null>(null);
@@ -94,7 +116,7 @@ export default function CreateSalesRun() {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   // State for run name and Form for send to backend
   const [runName, setRunName] = useState<string>("");
-  const [runDate, setRunDate] = useState<string>("");
+  const [runDate, setRunDate] = useState<string>(getTodayDate()); // Default to today's date
   const [runLocation, setRunLocation] = useState<string>("");
   const [ownerProducts, setOwnerProducts] = useState<Product[]>();
   //State for manage blank and error form
@@ -136,7 +158,8 @@ export default function CreateSalesRun() {
       },
       body: JSON.stringify({
         runName: runName,
-        runDate: runDate,
+        runDate: getLocalDateTime(),
+        runEnd: getDateTimeAtStartOfDay(runDate),
         runLocation: runLocation,
         runOwnerId:getAuth().currentUser?.uid,
         runOwnerName:getAuth().currentUser?.displayName,
@@ -216,8 +239,7 @@ export default function CreateSalesRun() {
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
 
   useEffect(() => {
-
-
+    console.log(getLocalDateTime());
     const auth = getAuth();
   setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -324,7 +346,7 @@ export default function CreateSalesRun() {
                       {language === 'EN' ? 'Run Date' : 'วันที่รายการ'} / {language === 'EN' ? 'Period' : 'ระยะเวลา'}
                       <span className="relative mt-1 block">
                         <CalendarDays className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runDateError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
-                        <input type="date" onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} ${runDateError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
+                        <input type="date" value={runDate} onChange={(e)=>setRunDate(e.target.value)} className={`${inputClass} ${runDateError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                     <label className="block text-xs font-bold">

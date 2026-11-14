@@ -19,24 +19,25 @@ import {getAuth,onAuthStateChanged} from "firebase/auth";
 import { getRunTiming } from '../../features/OnGoing/utils/time';
 
 type SalesRun = {
-  id: number;
+  id: string;
   isOwner: boolean;
   title: string;
   status: boolean;
-  boothtimecreate: string;
+  booth_time_create: string;
   boothtimeEnd: string;
   grossSales: number;
   netSales: number;
   itemsCleared: number;
-  itemsCleardMax: number;
+  itemsClearedMax: number;
   soldPercentage: number;
   boothStaffMax: number;
-  boothStaffList: string[];
+  boothStaffList: number;
 };
 
 export default function ConsignDeskDashboard() {
   const [filter, setFilter] = useState('All Ongoing');
   const [searchQuery, setSearchQuery] = useState('');
+  const [salesRunsFetch, setSalesRunsFetch] = useState<SalesRun[]>([]);
   const [now, setNow] = useState<number | null>(null);
   const [language, setLanguage] = useState<'EN' | 'TH'>('EN'); 
   async function fetchOngoingList(token: string) {
@@ -52,6 +53,7 @@ export default function ConsignDeskDashboard() {
     }
     const data = await response.json();
     console.log("Ongoing Sales Runs:", data);
+    setSalesRunsFetch(data);
   }
   useEffect(() => {
     const auth = getAuth();
@@ -75,72 +77,8 @@ export default function ConsignDeskDashboard() {
   }, []);
 
 
-  // ข้อมูลจำลองของการขาย (Sales Runs Data)
-  const salesRuns: SalesRun[] = [
-    {
-      id: 1,
-      isOwner: true,
-      title: 'งานที่จัดขึ้นที่เชียงใหม่',
-      status: false,
-      boothtimecreate: '2026-10-24T04:00:00Z',
-      boothtimeEnd: '2026-10-31T04:00:00Z',
-      grossSales: 8490.00,
-      netSales: 8420.00,
-      itemsCleared: 66,
-      itemsCleardMax: 103,
-      soldPercentage: 64,
-      boothStaffMax: 6,
-      boothStaffList: ['@may_craft', '@...'],
-    },
-    {
-      id: 2,
-      isOwner: true,
-      title: 'Nimman Artisan Weekend Pop-up',
-      status: true,
-      boothtimecreate: '2026-10-20T10:00:00Z',
-      boothtimeEnd: '2026-10-27T10:00:00Z',
-      grossSales: 4350.00,
-      netSales: 4190.00,
-      itemsCleared: 38,
-      itemsCleardMax: 70  ,
-      soldPercentage: 54,
-      boothStaffMax: 6,
-      boothStaffList: ['@ploy_w'],
-    },
-     {
-      id: 3,
-      isOwner: true,
-      title: 'Chiang Mai Craft Fair (One Nimman)',
-      status: false,
-      boothtimecreate: '2026-10-25T03:00:00Z',
-      boothtimeEnd: '2026-11-01T03:00:00Z',
-      grossSales: 2080.00,
-      netSales: 2010.00,
-      itemsCleared: 14,
-      itemsCleardMax: 45,
-      soldPercentage: 31,
-      boothStaffMax: 6,
-      boothStaffList: ['@art_kajoifaoiwfhiahfo'],
-    },
-    {
-      id: 4,
-      isOwner: false,
-      title: 'Chiang Mai Craft Fair (One Nimman)',
-      status: true,
-      boothtimecreate: '2026-10-25T03:00:00Z',
-      boothtimeEnd: '2026-11-01T03:00:00Z',
-      grossSales: 2080.00,
-      netSales: 2010.00,
-      itemsCleared: 14,
-      itemsCleardMax: 45,
-      soldPercentage: 31,
-      boothStaffMax: 6,
-      boothStaffList: ['@art_k',"daw",'@art_k',"daw",'@art_k',"daw"],
-    },
-    
-    
-  ];
-  const filteredSalesRuns = salesRuns.filter((run) => matchesSalesRun(run, searchQuery, filter));
+  
+  const filteredSalesRuns = salesRunsFetch.filter((run) => matchesSalesRun(run, searchQuery, filter));
   
   return (
     <div className="min-h-screen bg-[#f7f8fc] text-[#1c1d36] font-sans antialiased selection:bg-purple-100 selection:text-purple-700 ">
@@ -160,15 +98,15 @@ export default function ConsignDeskDashboard() {
           <div className="flex items-center gap-2 text-xs font-semibold">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#efebff] text-[#6c5ce7] border border-[#e1d9ff]">
               <span className="w-2 h-2 rounded-full bg-[#6c5ce7]"></span>
-               {language === 'EN' ? 'Active Runs' : 'รายการที่กำลังดำเนินอยู่'} {salesRuns.length} / 5 {language === 'EN' ? 'Max Capacity' : 'ความจุสูงสุด'}
+               {language === 'EN' ? 'Active Runs' : 'รายการที่กำลังดำเนินอยู่'} {salesRunsFetch?.length || 0} / 5 {language === 'EN' ? 'Max Capacity' : 'ความจุสูงสุด'}
             </span>
-            {salesRuns.length < 5 && (
+            {salesRunsFetch?.length < 5 && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e8f8f0] text-[#10b981] border border-[#d1f4e0]">
                 <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
-                {5 - salesRuns.length}  {language === 'EN' ? 'Slots Available' : 'ช่องที่สามารถใช้ได้'}
+                {5 - salesRunsFetch?.length}  {language === 'EN' ? 'Slots Available' : 'ช่องที่สามารถใช้ได้'}
               </span>
             )}
-            {salesRuns.length >= 5 && (
+            {salesRunsFetch?.length >= 5 && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-200/50 text-red-500 border border-red-300/50">
                 <span className="w-2 h-2 rounded-full bg-red-500"></span>
                  {language === 'EN' ? 'No more slots available' : 'ไม่มีช่องว่างเหลืออยู่'}
@@ -194,13 +132,13 @@ export default function ConsignDeskDashboard() {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               autoComplete="off"
-              placeholder={language === 'EN' ? 'Search by name, location, or assistant...' : 'ค้นหาตามชื่อ, สถานที่, หรือผู้ช่วย...'}
+              placeholder={language === 'EN' ? 'Search by name or location...' : 'ค้นหาตามชื่อหรือสถานที่...'}
               className="w-full bg-[#f6f7fb] text-xs font-medium text-slate-700 pl-10 pr-4 py-2.5 rounded-xl border border-transparent focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all placeholder:text-slate-500"
             />
             <datalist id="sales-run-options">
-              {salesRuns.map((run) => (
+              {salesRunsFetch.map((run) => (
                 <option key={run.id} value={run.title}>
-                  {run.boothStaffList.join(', ')}
+                  {run.id}
                 </option>
               ))}
             </datalist>
@@ -246,9 +184,9 @@ export default function ConsignDeskDashboard() {
           )}
           {filteredSalesRuns.map((run) => {
             const timing = getRunTiming(
-              run.boothtimecreate,
+              run.booth_time_create,
               run.boothtimeEnd,
-              now ?? Date.parse(run.boothtimecreate),
+              now ?? Date.parse(run.booth_time_create),
             );
 
             return <div
@@ -312,7 +250,7 @@ export default function ConsignDeskDashboard() {
                       {language === 'EN' ? 'Items Cleared' : 'สินค้าที่ขายแล้ว'}
                     </p>
                     <p className="text-sm font-extrabold text-[#11122a] leading-snug">
-                      {run.itemsCleared} / {run.itemsCleardMax}
+                      {run.itemsCleared} / {run.itemsClearedMax}
                     </p>
                     <p className="text-[10px] font-semibold text-[#10b981]">
                       {run.soldPercentage} % {language === 'EN' ? 'sold out' : 'ขายหมดแล้ว'}
@@ -327,12 +265,12 @@ export default function ConsignDeskDashboard() {
                       {language === 'EN' ? 'Booth Staff' : 'ผู้ช่วยขาย'}
                     </p>
                     <p className="text-sm font-extrabold text-[#11122a] leading-snug">
-                      {run.boothStaffList.length} / {run.boothStaffMax}
+                      {run.boothStaffList} / {run.boothStaffMax}
                     </p>
                     <p className="text-[10px] font-medium text-slate-400">
                       
-                      {run.boothStaffList.length < run.boothStaffMax
-                        ? language === 'EN' ? `Available Slots: ${run.boothStaffMax - run.boothStaffList.length}` : `ช่องว่างที่เหลือ: ${run.boothStaffMax - run.boothStaffList.length}`
+                      {run.boothStaffList < run.boothStaffMax
+                        ? language === 'EN' ? `Available Slots: ${run.boothStaffMax - run.boothStaffList}` : `ช่องว่างที่เหลือ: ${run.boothStaffMax - run.boothStaffList}`
                         : 'No Available Slots'}
 
                     </p>
@@ -357,7 +295,7 @@ export default function ConsignDeskDashboard() {
         </div>
 
         {/* 3. Bottom Dashed Card (Available Run Slots) */}
-        {salesRuns.length < 5 && (
+        {salesRunsFetch?.length < 5 && (
         <div className="border-2 border-dashed border-[#d8d0ff] bg-[#f9f8ff]/60 rounded-3xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           
           <div className="flex items-center gap-4">
@@ -370,10 +308,10 @@ export default function ConsignDeskDashboard() {
             
               <div>
               <h3 className="text-sm font-bold text-[#1a1836]">
-               {5- salesRuns.length}  {language === 'EN' ? 'Left Available Run Slots' : 'ช่องว่างที่เหลือ'}
+               {5- salesRunsFetch?.length}  {language === 'EN' ? 'Left Available Run Slots' : 'ช่องว่างที่เหลือ'}
               </h3>
               <p className="text-xs font-medium text-slate-500 mt-0.5">
-                 {language === 'EN' ? 'You can launch up to' : 'คุณสามารถเริ่มต้นได้อีก'} {5 - salesRuns.length} {language === 'EN' ? 'Once you reach the limit, you will need to wait for a run to complete before starting a new one.' : 'เมื่อคุณถึงขีดจำกัดแล้ว คุณจะต้องรอให้กิจกรรมหนึ่งเสร็จสิ้นก่อนจึงจะเริ่มต้นใหม่ได้'}
+                 {language === 'EN' ? 'You can launch up to' : 'คุณสามารถเริ่มต้นได้อีก'} {5 - salesRunsFetch?.length} {language === 'EN' ? 'Once you reach the limit, you will need to wait for a run to complete before starting a new one.' : 'เมื่อคุณถึงขีดจำกัดแล้ว คุณจะต้องรอให้กิจกรรมหนึ่งเสร็จสิ้นก่อนจึงจะเริ่มต้นใหม่ได้'}
               </p>
             </div>
             
@@ -391,7 +329,10 @@ export default function ConsignDeskDashboard() {
       </main>
 
       {/* Footer */}
+      <div className="mt-75">
         <Footer/>
+      </div>
+        
 
     </div>
   );
