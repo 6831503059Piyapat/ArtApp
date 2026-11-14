@@ -1,5 +1,7 @@
 package com.example.dto.response.SaleLogs;
 
+import com.example.entity.PaymentMethod;
+
 public record SaleLogsDTO(
     String Sale_logs_Id,
     String Product_name,
@@ -7,7 +9,8 @@ public record SaleLogsDTO(
     String Sale_run_id,
     Double Price,
     Double Quantity,
-    String Time_Stamp
+    String Time_Stamp,
+    PaymentMethod paymentMethod
 ) {
     
 }

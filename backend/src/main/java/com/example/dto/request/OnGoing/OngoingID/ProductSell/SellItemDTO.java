@@ -1,8 +1,10 @@
 package com.example.dto.request.OnGoing.OngoingID.ProductSell;
 import java.util.List;
+import com.example.entity.PaymentMethod;
 public class SellItemDTO {
     private String saleRunId;
     private String assistanceName;
+    private PaymentMethod paymentMethod;
     private List<CartDTO> cart;
 
     public SellItemDTO() {}
@@ -28,5 +30,11 @@ public class SellItemDTO {
     }
     public void setSaleRunId(String saleRunId) {
         this.saleRunId = saleRunId;
+    }
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

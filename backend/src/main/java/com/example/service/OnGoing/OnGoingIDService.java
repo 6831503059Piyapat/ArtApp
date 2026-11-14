@@ -105,6 +105,9 @@ public class OnGoingIDService {
 
     @Transactional 
     public void confirmSale(SellItemDTO sellItemDTO){
+        if (sellItemDTO.getPaymentMethod() == null) {
+            throw new IllegalArgumentException("A valid payment method is required");
+        }
         String timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String DateTimeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String sale_run_Id = sellItemDTO.getSaleRunId();
@@ -122,6 +125,7 @@ public class OnGoingIDService {
             saleLog.setSupplier_Name(item.getSupplierName());
             saleLog.setTime_sold(LocalDateTime.parse(DateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             saleLog.setTotal_Price(item.getPrice() * item.getQuantity());
+            saleLog.setPaymentMethod(sellItemDTO.getPaymentMethod());
             saleLogs.add(saleLog);
             saleLog.setSaleRun(
             saleRunRepository.getReferenceById(sale_run_Id)

@@ -48,6 +48,9 @@ public class SaleLogsEntity implements Persistable<String>{
     private String Supplier_Name;
     @Column(name = "Total_Price", nullable = false)
     private Double Total_Price;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Payment_Method")
+    private PaymentMethod paymentMethod;
   
         @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -122,5 +125,13 @@ public class SaleLogsEntity implements Persistable<String>{
     }
     public void setTotal_Price(Double Total_Price) {
         this.Total_Price = Total_Price;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
