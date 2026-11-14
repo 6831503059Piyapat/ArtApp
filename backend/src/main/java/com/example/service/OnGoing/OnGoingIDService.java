@@ -142,7 +142,7 @@ public class OnGoingIDService {
             );
             ///
             //Update Product Stock
-            productRepository.updateProductCurrentStock(item.getProductId(),item.getQuantity());
+            productRepository.SellProduct(item.getProductId(),item.getQuantity());
 
         }
         saleLogRepository.saveAllAndFlush(saleLogs);
