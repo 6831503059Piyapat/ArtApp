@@ -179,6 +179,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
           </section>
 
           <section className="mx-auto mb-8 grid w-full gap-3 sm:mb-12 sm:w-[96%] sm:grid-cols-2">
+            {dataFetch?.List_Run && dataFetch.List_Run.length > 0 ? (
           <article className="relative isolate flex h-full flex-col justify-between overflow-hidden rounded-xl border border-[#eceef5] bg-white/90 px-3 py-4 shadow-[0_5px_22px_rgba(17,23,71,0.04)] md:px-4 md:py-5">
             <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 z-0 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(124,92,255,0.2)_0%,rgba(124,92,255,0.08)_45%,transparent_72%)] blur-2xl" />
             <div className="relative z-10">
@@ -189,7 +190,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 </span>
               </div>
               <h2 className="text-lg font-bold tracking-tight sm:text-2xl">
-                {dataFetch?.List_Run.at(0)?.Sale_run_name || 'MFU Outside Night Market'} <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                {dataFetch?.List_Run.at(0)?.Sale_run_name } <span className="text-sm font-medium text-[#858ba0]"></span>
               </h2>
               
             </div>
@@ -218,7 +219,28 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 <Wallet size={13} />  {language === 'EN' ? 'Run Selling' : 'ดำเนินการขายต่อ'}
               </Link>
             </div>
-          </article>
+          </article>) : ( <article className="relative flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-[#c9cbd5] bg-[#f8f9fc] p-6 text-center shadow-none md:p-8">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#7C5CFF]/10 text-[#7C5CFF]">
+        <Plus size={24} />
+      </div>
+      <h2 className="text-base font-bold text-[#0B0F4F] sm:text-lg">
+        {language === 'EN' ? 'No Active Runs' : 'ยังไม่มีรายการขายที่กำลังดำเนินการ'}
+      </h2>
+      <p className="mt-1 text-xs text-[#858ba0] sm:text-sm">
+        {language === 'EN' ? 'Start your first market run to track sales and inventory.' : 'เริ่มต้นสร้างรายการขายแรกของคุณเพื่อติดตามยอดขายและสต๊อกสินค้า'}
+      </p>
+      <Link
+        href="/SaleRun"
+        className="mt-4 inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#ffb84d] px-4 text-xs font-extrabold text-[#0B0F4F] transition hover:bg-[#ffad32]"
+      >
+        <Plus size={14} />
+        {language === 'EN' ? 'Create New Run' : 'สร้างการขายใหม่'}
+      </Link>
+    </article>
+
+  )}
+
+            
 
           <article className="flex h-full flex-col gap-2 rounded-xl border border-[#eceef5] bg-white/90 px-3 py-4 shadow-[0_5px_22px_rgba(17,23,71,0.04)] md:px-4 md:py-5">
             <div className="mb-2 flex items-center gap-2">
