@@ -51,4 +51,17 @@ public interface AssistantRepo extends JpaRepository<RunAssistanceEntity, String
                             @Param ("can_record_expenses") Boolean can_record_expenses,
                             @Param ("can_sell") Boolean can_sell,
                             @Param ("can_view_log") Boolean can_view_log);
+   @Query(
+        value= """
+        SELECT EXISTS(SELECT 1 FROM run_assistance WHERE user_id = :user_id AND sales_run_id = :sale_run_id) AS is_exist
+        """, nativeQuery = true)
+    Long checkAssistant(@Param("user_id") String user_id, @Param("sale_run_id") String sale_run_id);
+
+    @Query (value = """
+        SELECT sale_run_id FROM sale_run WHERE code_join = :code_join AND sale_run_status = 1
+           """,nativeQuery = true)
+    String findSaleRunIdByCodeJoin(@Param("code_join") String code_join);
+
+
 }
+

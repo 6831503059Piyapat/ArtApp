@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.example.dto.LiveStatsDTO;
 import com.example.service.LiveStatusService;
+import com.example.service.Assistant.AssistantService;
+import com.example.dto.request.OnGoing.OngoingID.Permission.AssistantDTO;
 import com.example.dto.request.OnGoing.OngoingID.Supplier.AddSupplierDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 import java.util.Map;
@@ -35,13 +37,15 @@ public class OnGoingListController {
     private final OnGoingIDService onGoingIDService;
     private final LiveStatusService liveStatusService;
         private final SimpMessagingTemplate messagingTemplate;
+    private final AssistantService assistantService;
 
 
-    public OnGoingListController(OnGoingListService onGoingListService, OnGoingIDService onGoingIDService, SimpMessagingTemplate messagingTemplate, LiveStatusService liveStatusService) {
+    public OnGoingListController(OnGoingListService onGoingListService, OnGoingIDService onGoingIDService, SimpMessagingTemplate messagingTemplate, LiveStatusService liveStatusService, AssistantService assistantService) {
         this.onGoingListService = onGoingListService;
         this.onGoingIDService = onGoingIDService;
         this.liveStatusService = liveStatusService;
         this.messagingTemplate = messagingTemplate;
+        this.assistantService = assistantService;
     }
 @GetMapping("/ongoing-list")
 public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentication) {
@@ -104,8 +108,19 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
     }
     @PostMapping ("/ongoing/{id}/add-supplier")
     public ResponseEntity<String> addSupplier(@PathVariable("id") String sale_run_id, @RequestBody  AddSupplierDTO supplier) {
-        // Implement the logic to add a new supplier here
-        // onGoingIDService.addSupplier(supplier, sale_run_id);
+        onGoingIDService.addSupplier(supplier, sale_run_id);
+        LiveStatsDTO payload =  liveStatusService.updateLiveStatus(sale_run_id);
+        payload.setLiveID(sale_run_id);
+        
+        messagingTemplate.convertAndSend(
+            "/viewLive/" + sale_run_id,
+            payload
+        );
         return ResponseEntity.ok("Supplier added successfully");
+    }
+    @PutMapping ("/ongoing/update-assistant-permission")
+    public ResponseEntity<String> updatePermission( @RequestBody AssistantDTO assistant) {
+      assistantService.setPermissionAssistantBy_Id(assistant);
+        return ResponseEntity.ok("Assistant permission updated successfully");
     }
 }
