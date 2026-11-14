@@ -190,7 +190,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
                 </span>
               </div>
               <h2 className="text-lg font-bold tracking-tight sm:text-2xl">
-                {dataFetch?.List_Run.at(0)?.Sale_run_name } <span className="text-sm font-medium text-[#858ba0]">(Mon 14)</span>
+                {dataFetch?.List_Run.at(0)?.Sale_run_name } <span className="text-sm font-medium text-[#858ba0]"></span>
               </h2>
               
             </div>

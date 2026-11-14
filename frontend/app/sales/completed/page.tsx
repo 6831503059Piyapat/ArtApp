@@ -13,6 +13,7 @@ type RunData = {
   Total_Revenue: number;
   Total_duration: number;
   Total_item_sold: number;
+  clearance_rate: number;
   completeList: {
     Date_complete: string;
     Gross: number;
@@ -190,7 +191,7 @@ useEffect(() => {
                     <span className="text-lg font-extrabold leading-5 md:text-xl">{dataFetch?.Total_item_sold || '0'}</span>
                     <span className="text-[9px] font-semibold text-creatory-gray">{language === 'EN' ? 'Items' : 'รายการ'}</span>
                   </div>
-                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{language === 'EN' ? 'Clearance Rate' : 'อัตราการขาย'}: <strong className="font-semibold text-creatory-navy">85%</strong></p>
+                  <p className="text-[9px] leading-3 text-creatory-gray md:text-[10px]">{language === 'EN' ? 'Clearance Rate' : 'อัตราการขาย'}: <strong className="font-semibold text-creatory-navy">{dataFetch?.clearance_rate || '0'}%</strong></p>
                 </div>
               </div>
 
@@ -241,7 +242,7 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Cards Container */}
+            {/* Cards Container
             <div className="mt-[2px] flex flex-col gap-[10px]">
               {filteredRuns.length > 0 ? (
                 filteredRuns.map((run) => (
@@ -280,7 +281,59 @@ useEffect(() => {
                     </div>
                     </div>
                   </div>
-                ))
+                )) */}
+
+                {/* Cards Container */}
+<div className="mt-[2px] flex flex-col gap-[10px]">
+  {/* เช็คว่ามีข้อมูลใน completeList หรือไม่ */}
+  {dataFetch?.completeList && dataFetch.completeList.length > 0 ? (
+    // เปลี่ยนจาก filteredRuns.map เป็น dataFetch.completeList.map
+    dataFetch.completeList.map((run, index) => (
+      // ใช้ Id_sales เป็น key (หรือใช้ index ถ้าระบบไม่ได้ให้ Id_sales แบบ unique มา)
+      <div key={run.Id_sales || index} className="min-w-0 rounded-[14px] border border-creatory-border bg-white px-3 py-3 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_rgba(124,92,255,0.06)] sm:px-4">
+        <div className="flex min-w-0 flex-col gap-3 px-2 py-1 sm:px-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 md:flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary/20 bg-creatory-lavender px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                <span className="w-1 h-1 rounded-full bg-primary"></span>
+                {language === 'EN' ? 'Settled & Closed' : 'ปิดแล้ว'}
+              </span>
+            </div>
+            {/* เปลี่ยน property title เป็น Name_complete */}
+            <h2 className="mt-0.5 break-words text-sm font-bold leading-5 tracking-tight sm:text-base">
+              {run.Name_complete}
+            </h2>
+            {/* เปลี่ยน property date เป็น Date_complete */}
+            <p className="text-[10px] text-creatory-gray">{run.Date_complete}</p>
+          </div>
+          
+          <div className="flex min-w-0 flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:self-center md:ml-auto">
+            <div className="grid w-full grid-cols-3 gap-2 md:w-auto md:flex md:items-center md:gap-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray"> {language === 'EN' ? 'Total Sold' : 'ขายรวม'}</span>
+                {/* เปลี่ยน property sold เป็น Total_sold */}
+                <span className="text-xs font-bold">{run.Total_sold} {language === 'EN' ? 'items' : 'ชิ้น'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-creatory-gray"> {language === 'EN' ? 'Gross' : 'รวม'}</span>
+                {/* เปลี่ยน property gross เป็น Gross และอาจต้องใส่เครื่องหมายบาทเพิ่มถ้าไม่มีมาให้ */}
+                <span className="text-xs font-bold">฿{run.Gross?.toLocaleString()}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary"> {language === 'EN' ? 'Net Intake' : 'รายได้สุทธิ'}</span>
+                {/* เปลี่ยน property net เป็น Net_intake */}
+                <span className="text-xs font-extrabold text-primary">฿{run.Net_intake?.toLocaleString()}</span>
+              </div>
+            </div>
+            {/* เปลี่ยนการอ้างอิง id ใน Link ให้เป็น Id_sales */}
+            <Link href={`/sales/completed/${run.Id_sales}`} className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-primary to-[#6842FF] px-3 py-2 text-center text-xs font-bold text-white transition-all shadow-sm shadow-primary/30 hover:from-[#6A47F2] hover:to-[#5730EA] md:min-h-0 md:w-auto md:whitespace-nowrap md:px-[10px] md:py-1.5 md:text-[10px]">
+              <span> {language === 'EN' ? 'View Run Breakdown' : 'รายละเอียดการขาย'}</span>
+              <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    ))
               ) : (
                 /* Empty State */
                 <div className="flex p-10 rounded-2xl bg-white border border-creatory-border text-center flex-col items-center justify-center gap-4">
