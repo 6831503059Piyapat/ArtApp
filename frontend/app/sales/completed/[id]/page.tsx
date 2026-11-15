@@ -10,6 +10,74 @@ import {
 import Navbar from '@/app/components/navbar';
 import Footer from '@/app/components/footer';
 
+type RunData = {
+  Date_complete: string;
+  Expense_total: number;
+  Gross_sales: number;
+  Host_name: string;
+  Id_complete: string;
+
+  List_Assistants: {
+    length: number;
+  }[];
+
+  List_Change_Made: {
+    Change_made_by_name: string;
+    Change_made_id: string;
+    Details: string;
+    Sale_run_id: string;
+    Time_stamp: string;
+    actionType: string;
+    run_assistant_name: string;
+
+  }[];
+
+  List_Expense_Logs: {
+    Amount: number;
+    Categpory: string;
+    Description: string;
+    Expense_id: string;
+    Paid_by_User: string;
+    Sale_run_id: string;
+    Time_stamp: string;
+
+}[];
+
+List_Sale_Logs: {
+  Assistant_name: string;
+  Price: number;
+  Product_name: string;
+  Quantity: number;
+  Sale_logs_Id: string;
+  Sale_run_id: string;
+  Supplier_name: string;
+  Time_stamp: string;
+  Unit_price: number;
+
+}[];
+
+List_supplier:{
+  Id_supplier: string;
+  Name_supplier: string;
+  gross_sales: number;
+  is_settled: boolean;
+  net_payout: number;
+  share_expense: number;
+
+}[];
+
+Net_total: number;
+Total_deduction: number;
+Total_item_Expense: number;
+Total_items: number;
+Total_sold: number;
+complete_name: string;
+isActive: boolean;
+
+}
+
+
+
 const subscribeToLanguage = () => () => {};
 const getLanguageSnapshot = (): 'EN' | 'TH' =>
   localStorage.getItem('language') === 'EN' ? 'EN' : 'TH';
@@ -44,6 +112,8 @@ const salesData = [
     iconColor: "bg-[#FFB24C]/15 text-[#FFB24C]", supColor: "bg-[#FFB24C]/15 text-[#FFB24C]", soldColor: "text-[#ED571B]"
   }
 ];
+
+const barColors = ['#7C5CFF', '#F062C0', '#FFB24C', '#3B82F6', '#10B981', '#F43F5E'];
 
 // ข้อมูลจำลองสำหรับหน้า Expenses Log
 const expensesData = [
@@ -118,6 +188,14 @@ export default function ConsignDeskDashboard() {
   // 1. เพิ่ม State สำหรับ Dropdown Staff
   const [selectedStaff, setSelectedStaff] = useState('All Staff');
   const [isStaffDropdownOpen, setIsStaffDropdownOpen] = useState(false);
+  const [dataFetch,setDataFetch] = useState<RunData | null>(null);
+  {/* คำนวณเปอร์เซ็นต์ (ใส่ไว้ก่อนถึง return ใน Component ของคุณ) */}
+const netTotal = dataFetch?.Net_total ?? 0;
+const grossSales = dataFetch?.Gross_sales ?? 0;
+const percentage = grossSales > 0 
+  ? ((netTotal / grossSales) * 100).toFixed(2) 
+  : "0.00";
+  const totalPayout = dataFetch?.List_supplier?.reduce((sum, supplier) => sum + (supplier.net_payout || 0), 0) || 0;
 
 
   // 2. ฟังก์ชันกรองข้อมูล: ถ้าคำที่ค้นหาตรงกับชื่อสินค้า, คนขาย, หรือซัพพลายเออร์ ให้แสดงผล
@@ -154,7 +232,11 @@ export default function ConsignDeskDashboard() {
       }
     });
     const data = await response.json();
+    setDataFetch(data);
     console.log('Fetched data:', data);
+    setDataFetch(data);
+
+
   }
  useEffect(() => {
   const auth = getAuth();
@@ -190,7 +272,7 @@ export default function ConsignDeskDashboard() {
           <div className="relative flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-start min-[900px]:justify-between">
             <div className="min-w-0">
               <h1 className="mb-2 flex min-w-0 flex-wrap items-center gap-2 break-words text-xl font-bold tracking-tight text-[#0B0F4F] md:gap-3 md:text-2xl">
-                MFU Outside Night Market (Mon 14)
+                {/* MFU Outside Night Market (Mon 14) */} {dataFetch?.complete_name || 'No complete run right now'}
               </h1>
               <span className="inline-flex items-center gap-1 rounded-md bg-[#7C5CFF]/10 px-2 py-1 text-[10px] font-semibold text-[#7C5CFF]">
                 <Lock size={11} aria-hidden="true" />
@@ -199,15 +281,17 @@ export default function ConsignDeskDashboard() {
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-[#ED571B]" aria-hidden="true" />
-                  {language === 'EN' ? 'Closed on 14/09/2026 at 22:30' : 'ปิดการขายเมื่อ 14/09/2026 เวลา 22:30'}
+                  {language === 'EN' ? `Closed on ${dataFetch?.Date_complete}` : `ปิดการขายเมื่อ ${dataFetch?.Date_complete}`}
                 </span>
                 <span className="flex items-center gap-1">
                   <User size={13} className="text-[#7C5CFF]" aria-hidden="true" />
-                  {language === 'EN' ? 'Host:' : 'เจ้าของร้าน:'} <strong className="text-[#0B0F4F]">Alex Chen</strong>
+                  {language === 'EN' ? 'Host:' : 'เจ้าของร้าน:'} <strong className="text-[#0B0F4F]">{dataFetch?.Host_name}</strong>
                 </span>
                 <span className="flex items-center gap-1">
                   <Users size={13} className="text-[#7C5CFF]" aria-hidden="true" />
-                  {language === 'EN' ? 'Assistant:' : 'ผู้ช่วย:'} <strong className="text-[#0B0F4F]">Ploy W.</strong>
+                  {language === 'EN' ? 'Assistant:' : 'ผู้ช่วย:'} <strong className="text-[#0B0F4F]">{(dataFetch?.List_Assistants?.length ?? 0) > 0 
+  ? dataFetch?.List_Assistants?.map((a: any) => a.name).join(', ') 
+  : 'No assistants assigned'}</strong>
                 </span>
               </div>
             </div>
@@ -233,7 +317,7 @@ export default function ConsignDeskDashboard() {
               <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Gross Sales' : 'ยอดขายรวม'}</span>
               <div className="bg-[#7C5CFF]/10 p-1.5 rounded-md"><Wallet size={16} className="text-[#7C5CFF]" /></div>
             </div>
-            <div className="text-2xl font-bold text-[#7C5CFF] mb-3">฿8,490.00</div>
+            <div className="text-2xl font-bold text-[#7C5CFF] mb-3">฿ {dataFetch?.Gross_sales?.toLocaleString()}</div>
             <div className="mb-1 flex flex-wrap justify-between gap-x-2 gap-y-1 text-xs text-gray-500">
               <span className="min-w-0 break-words">{language === 'EN' ? 'Units: 88 sold / 96 initial' : 'จำนวน: ขายแล้ว 88 / เริ่มต้น 96'}</span>
               <span className="font-medium text-[#7C5CFF]">{language === 'EN' ? '91.6% sellout' : 'ขายได้ 91.6%'}</span>
@@ -249,7 +333,7 @@ export default function ConsignDeskDashboard() {
               <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Total Deductions' : 'ยอดหักรวม'}</span>
               <div className="bg-[#FEF0EA] p-1.5 rounded-md"><Receipt size={16} className="text-[#ED571B]" /></div>
             </div>
-            <div className="text-2xl font-bold text-[#ED571B] mb-3">฿70.00</div>
+            <div className="text-2xl font-bold text-[#ED571B] mb-3">฿{dataFetch?.Total_deduction?.toLocaleString()}</div>
             <div className="mb-1 flex flex-wrap justify-between gap-x-2 gap-y-1 text-xs text-gray-500">
               <span className="min-w-0 break-words">{language === 'EN' ? '1 Stall Expense logged' : 'บันทึกค่าใช้จ่ายร้านค้า 1 รายการ'}</span>
               <span className="font-medium text-[#ED571B]">{language === 'EN' ? 'Booth Rent' : 'ค่าเช่าบูธ'}</span>
@@ -265,27 +349,32 @@ export default function ConsignDeskDashboard() {
               <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Net Total' : 'ยอดสุทธิ'}</span>
               <div className="bg-[#ECFDF5] p-1.5 rounded-md"><DollarSign size={16} className="text-[#059669]" /></div>
             </div>
-            <div className="text-2xl font-bold text-[#0B0F4F] mb-3">฿8,420.00</div>
+
+            <div className="text-2xl font-bold text-[#0B0F4F] mb-3">฿{netTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             <div className="flex justify-end text-xs text-[#059669] font-medium mb-1">
-              {language === 'EN' ? '99.18% gained from gross sales' : 'คิดเป็น 99.18% จากยอดขายรวม'}
+              {language === 'EN' 
+      ? `${percentage}% gained from gross sales` 
+      : `คิดเป็น ${percentage}% จากยอดขายรวม`}
             </div>
             <div className="mt-auto w-full bg-gray-100 rounded-full h-1.5">
               <div className="bg-[#059669] h-1.5 rounded-full" style={{ width: '99.18%' }}></div>
             </div>
           </div>
-
+          
           {/* Card 4 */}
-          <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
+          {/* {/* <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-bold text-gray-400 uppercase">{language === 'EN' ? 'Suppliers Payout' : 'ยอดจ่ายซัพพลายเออร์'}</span>
               <div className="flex items-center text-xs text-[#7C5CFF] font-medium bg-[#7C5CFF]/10 px-2 py-0.5 rounded-full">
                 <CheckCircle2 size={12} className="mr-1" /> {language === 'EN' ? 'Ready' : 'พร้อมจ่าย'}
               </div>
             </div>
+
             <div className="mt-2 h-[56px] overflow-y-auto text-xs">
               <div className="min-h-full flex flex-col justify-center space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Alex Chen (Host)</span>
+                {/* เช็คว่ามีข้อมูลซัพพลายเออร์หรือไม่ ถ้ามีให้วนลูป map */}
+                {/* <div className="flex justify-between">
+                  <span className="text-gray-500">{dataFetch?.Host_name || 'No host assigned'}</span>
                   <span className="font-semibold text-[#0B0F4F]">฿4,546.66</span>
                 </div>
                 <div className="flex justify-between">
@@ -304,7 +393,111 @@ export default function ConsignDeskDashboard() {
               <div className="bg-[#FFB24C]" style={{ width: '17%' }}></div>
             </div>
           </div>
-        </div>
+        </div> */}  
+{/* </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
+  <div className="flex justify-between items-center mb-2">
+    <span className="text-xs font-bold text-gray-400 uppercase">
+      {language === 'EN' ? 'Suppliers Payout' : 'ยอดจ่ายซัพพลายเออร์'}
+    </span>
+    <div className="flex items-center text-xs text-[#7C5CFF] font-medium bg-[#7C5CFF]/10 px-2 py-0.5 rounded-full">
+      <CheckCircle2 size={12} className="mr-1" /> {language === 'EN' ? 'Ready' : 'พร้อมจ่าย'}
+    </div>
+  </div>
+  
+  <div className="mt-2 h-[56px] overflow-y-auto text-xs">
+    <div className="min-h-full flex flex-col justify-center space-y-1">
+      {/* เช็คว่ามีข้อมูลซัพพลายเออร์หรือไม่ ถ้ามีให้วนลูป map */}
+      {/* {(dataFetch?.List_supplier?.length ?? 0) > 0 ? (
+        dataFetch?.List_supplier.map((supplier, index) => (
+          <div className="flex justify-between" key={supplier.Id_supplier || index}>
+            <span className="text-gray-500">{supplier.Name_supplier}</span>
+            <span className="font-semibold text-[#0B0F4F]">
+              ฿{(supplier.net_payout || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+        ))
+      ) : (
+        <div className="text-gray-400 text-center">No suppliers</div>
+      )}
+    </div>
+  </div> */}
+  
+  {/* แถบสีแสดงสัดส่วนยอดจ่าย */}
+  {/* <div className="mt-auto w-full flex h-1.5 rounded-full overflow-hidden">
+    {dataFetch?.List_supplier?.map((supplier, index) => {
+      const payout = supplier.net_payout || 0;
+      // คำนวณเปอร์เซ็นต์ความกว้างของแต่ละคน
+      const percent = totalPayout > 0 ? (payout / totalPayout) * 100 : 0;
+      
+      // ถ้ายอดเป็น 0 ไม่ต้องแสดงแถบสีของคนนั้น
+      if (percent === 0) return null;
+
+      return (
+        <div 
+          key={`bar-${supplier.Id_supplier || index}`}
+          style={{ 
+            width: `${percent}%`, 
+            backgroundColor: barColors[index % barColors.length] 
+          }}
+        ></div>
+      );
+    })}
+  </div>
+</div> */} 
+
+{/* Card 4 (ตอนนี้เข้ามาอยู่ใน Grid เดียวกันแล้ว) */}
+  <div className="flex min-w-0 flex-col rounded-xl border border-[#E9EBF3] bg-white p-3 shadow-sm">
+    <div className="flex justify-between items-center mb-2">
+      <span className="text-xs font-bold text-gray-400 uppercase">
+        {language === 'EN' ? 'Suppliers Payout' : 'ยอดจ่ายซัพพลายเออร์'}
+      </span>
+      <div className="flex items-center text-xs text-[#7C5CFF] font-medium bg-[#7C5CFF]/10 px-2 py-0.5 rounded-full">
+        <CheckCircle2 size={12} className="mr-1" /> {language === 'EN' ? 'Ready' : 'พร้อมจ่าย'}
+      </div>
+    </div>
+    
+    <div className="mt-2 h-[56px] overflow-y-auto text-xs">
+      <div className="min-h-full flex flex-col justify-center space-y-1">
+        {/* เช็คว่ามีข้อมูลซัพพลายเออร์หรือไม่ ถ้ามีให้วนลูป map */}
+        {(dataFetch?.List_supplier?.length ?? 0) > 0 ? (
+          dataFetch?.List_supplier.map((supplier, index) => (
+            <div className="flex justify-between" key={supplier.Id_supplier || index}>
+              <span className="text-gray-500">{supplier.Name_supplier}</span>
+              <span className="font-semibold text-[#0B0F4F]">
+                ฿{(supplier.net_payout || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className="text-gray-400 text-center">No suppliers</div>
+        )}
+      </div>
+    </div>
+    
+    {/* แถบสีแสดงสัดส่วนยอดจ่าย */}
+    <div className="mt-auto w-full flex h-1.5 rounded-full overflow-hidden">
+      {dataFetch?.List_supplier?.map((supplier, index) => {
+        const payout = supplier.net_payout || 0;
+        const percent = totalPayout > 0 ? (payout / totalPayout) * 100 : 0;
+        
+        if (percent === 0) return null;
+
+        return (
+          <div 
+            key={`bar-${supplier.Id_supplier || index}`}
+            style={{ 
+              width: `${percent}%`, 
+              backgroundColor: barColors[index % barColors.length] 
+            }}
+          ></div>
+        );
+      })}
+    </div>
+  </div>
+
+</div> 
+{/* ปิด Stats 4 Columns ตรงนี้ */}
 
         {/* Tabs */}
         <div className="mb-6 flex w-full flex-nowrap items-center gap-1 overflow-x-auto border-b border-gray-200 px-1 sm:px-2">
@@ -314,7 +507,7 @@ export default function ConsignDeskDashboard() {
             }`}
           >
             <List size={16} /> {language === 'EN' ? 'Sales Log' : 'รายการขาย'}
-            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">88</span>
+            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_Sale_Logs?.length ?? 0}</span>
           </button>
           
           <button onClick={() => setActiveTab('expenses')}
@@ -323,7 +516,7 @@ export default function ConsignDeskDashboard() {
             }`}
           >
             <Receipt size={16} className={activeTab === 'expenses' ? '' : 'text-[#ED571B]'} /> {language === 'EN' ? 'Expenses Log' : 'รายการค่าใช้จ่าย'}
-            <span className="bg-[#FEF0EA] text-[#ED571B] text-xs px-1.5 py-0.5 rounded-md">1</span>
+            <span className="bg-[#FEF0EA] text-[#ED571B] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_Expense_Logs?.length ?? 0}</span>
           </button>
 
           <button onClick={() => setActiveTab('changes')}
@@ -332,7 +525,7 @@ export default function ConsignDeskDashboard() {
             }`}
           >
             <History size={16} className="text-[#F062C0]" /> {language === 'EN' ? 'Changes Made' : 'รายการเปลี่ยนแปลง'}
-            <span className={`${activeTab === 'changes' ? 'bg-[#F062C0]/15 text-[#F062C0]' : 'bg-[#F062C0]/10 text-[#F062C0]'} text-xs px-1.5 py-0.5 rounded-md`}>4</span>
+            <span className={`${activeTab === 'changes' ? 'bg-[#F062C0]/15 text-[#F062C0]' : 'bg-[#F062C0]/10 text-[#F062C0]'} text-xs px-1.5 py-0.5 rounded-md`}>{dataFetch?.List_Change_Made?.length ?? 0}</span>
           </button>
 
           <button onClick={() => setActiveTab('payouts')}
@@ -341,7 +534,7 @@ export default function ConsignDeskDashboard() {
             }`}
           >
             <Users size={16} /> {language === 'EN' ? 'Payout Summaries' : 'สรุปการจ่ายเงิน'}
-            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">3</span>
+            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_supplier?.length ?? 0}</span>
           </button>
         </div>
 
@@ -386,6 +579,8 @@ export default function ConsignDeskDashboard() {
                           >
                             {language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด'}
                           </button>
+                          {/* วนลูปสร้างปุ่มตามรายชื่อ Supplier ที่ได้จาก API */}
+                          
                           <button 
                             onClick={() => { setSelectedSupplier('Host (Alex Chen)'); setIsSupplierDropdownOpen(false); }}
                             className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
