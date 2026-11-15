@@ -35,3 +35,4 @@ public interface SupplierRepo extends JpaRepository<SupplierEntity, String> {
     """, nativeQuery = true)
     void addSupplier(@Param("Supplier_Id") String Supplier_Id, @Param("Sales_run_Id") String Sales_run_Id, @Param("Supplier_Name") String Supplier_Name);
 }
+// (generatedId, sale_run_id, supplier.getName());
