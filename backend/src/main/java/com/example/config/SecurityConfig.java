@@ -3,15 +3,19 @@ package com.example.config;
 
 import java.util.List;
 
+import jakarta.servlet.DispatcherType;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,27 +27,31 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        String allowedOrigin = System.getenv("HEADER_ORIGIN_ALLOWED");
+        String allowedOrigin =
+                System.getenv("HEADER_ORIGIN_ALLOWED");
 
         if (allowedOrigin == null || allowedOrigin.isBlank()) {
             throw new IllegalStateException(
-                "Missing environment variable: HEADER_ORIGIN_ALLOWED"
+                    "Missing environment variable: HEADER_ORIGIN_ALLOWED"
             );
         }
 
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(allowedOrigin));
+
         config.setAllowedMethods(
-            List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         );
+
         config.setAllowedHeaders(
-            List.of("Authorization", "Content-Type")
+                List.of("Authorization", "Content-Type")
         );
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+                new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", config);
 
@@ -52,35 +60,57 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http
+    ) throws Exception {
 
         http
             .cors(Customizer.withDefaults())
+
             .csrf(csrf -> csrf.disable())
+
             .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+                    session.sessionCreationPolicy(
+                            SessionCreationPolicy.STATELESS
+                    )
             )
+
             .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    // Preflight requests
+                    .requestMatchers(
+                            HttpMethod.OPTIONS,
+                            "/**"
+                    ).permitAll()
 
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/live-status/**").permitAll()
+                    // WebSocket handshake
+                    .requestMatchers(
+                            "/ws",
+                            "/ws/**"
+                    ).permitAll()
 
-                .requestMatchers("/api/public/**").permitAll()
+                    // Public live status
+                    .requestMatchers(
+                            "/live-status",
+                            "/live-status/**"
+                    ).permitAll()
 
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/backend/users/register-profile"
-                ).permitAll()
+                    // Public API
+                    .requestMatchers(
+                            "/api/public/**"
+                    ).permitAll()
 
-                .anyRequest().authenticated()
+                    // Error dispatch
+                    .dispatcherTypeMatchers(
+                            DispatcherType.ERROR
+                    ).permitAll()
+
+                    // Everything else requires authentication
+                    .anyRequest().authenticated()
             )
+
             .addFilterBefore(
-                new FirebaseFilter(),
-                UsernamePasswordAuthenticationFilter.class
+                    new FirebaseFilter(),
+                    UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();

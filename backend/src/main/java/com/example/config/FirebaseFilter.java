@@ -3,6 +3,7 @@ package com.example.config;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,9 +24,10 @@ public class FirebaseFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         return "OPTIONS".equalsIgnoreCase(request.getMethod())
-                || path.startsWith("/ws")
-                || path.startsWith("/live-status")
-                || path.equals("/backend/users/register-profile")
+                || path.equals("/ws")
+                || path.startsWith("/ws/")
+                || path.equals("/live-status")
+                || path.startsWith("/live-status/")
                 || path.startsWith("/api/public/");
     }
 
@@ -37,51 +39,60 @@ public class FirebaseFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
-// 
-System.out.println("===== FirebaseFilter =====");
-System.out.println("Authorization exists: " + (header != null));
 
-// 
+        // ตรวจสอบว่ามี Bearer Token หรือไม่
         if (header == null || !header.startsWith("Bearer ")) {
-            response.sendError(401, "Missing Bearer token");
+            response.sendError(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Missing or invalid Authorization header"
+            );
             return;
         }
 
+        String token = header.substring(7);
+
+        FirebaseToken decodedToken;
+
+        // ขั้นที่ 1: ตรวจสอบ Firebase Token เท่านั้น
         try {
-            String token = header.substring(7);
-            
-            FirebaseToken decodedToken =
+
+            decodedToken =
                     FirebaseAuth.getInstance().verifyIdToken(token);
-
-// 
-            System.out.println("Firebase Token Verified");
-System.out.println("UID: " + decodedToken.getUid());
-// 
-
-            String uid = decodedToken.getUid();
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            uid,
-                            null,
-                            List.of(() -> "ROLE_USER")
-                    );
-
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
-                    // 
-System.out.println("Passing request to next filter");
-// 
-            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
 
-            System.err.println("Firebase verification failed: "
-                    + e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(
+                    "Firebase token verification failed: "
+                    + e.getClass().getSimpleName()
+            );
 
             SecurityContextHolder.clearContext();
 
-            response.sendError(401, "Invalid Firebase token");
+            response.sendError(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid Firebase token"
+            );
+
+            return;
         }
+
+        // ขั้นที่ 2: ดึง UID จาก Token
+        String uid = decodedToken.getUid();
+
+        // ขั้นที่ 3: สร้าง Authentication
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        uid,
+                        null,
+                        List.of(() -> "ROLE_USER")
+                );
+
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
+
+        // ขั้นที่ 4: ส่ง Request ไปยัง Controller
+        // อยู่นอก try-catch ของ Firebase เพื่อไม่ให้
+        // Exception จาก Controller กลายเป็น Firebase 401
+        filterChain.doFilter(request, response);
     }
 }
