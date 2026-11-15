@@ -60,32 +60,7 @@ export default function ProfilePage() {
    
   }
 
-  async function saveDisplayName() {
-    const user = auth.currentUser;
-    const displayName = stallAlias.trim();
-
-    if (!user || !displayName) {
-      throw new Error('Display name is required');
-    }
-
-    const token = await user.getIdToken();
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/users/display-name', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ uid: user.uid, displayName }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update display name: ${response.status}`);
-    }
-
-    await updateProfile(user, { displayName });
-    setStallAlias(displayName);
-    setUsername(displayName);
-  }
+ 
 
   function handleLanguageChange(lang: 'EN' | 'TH') {
     localStorage.setItem('language', lang);
@@ -102,7 +77,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      await saveDisplayName();
+      await handleChange();
       setToastMessage(language === 'EN' ? 'Changes saved successfully!' : 'บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!');
       setIsInfoToast(false);
     } catch (error) {
@@ -154,10 +129,10 @@ export default function ProfilePage() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const idToken = await user.getIdToken();
-        const backendDisplayName = await fetchUserDisplayName(user.uid, idToken);
+        const backendDisplayName = await user?.displayName
         const displayName = backendDisplayName || user.displayName || user.email?.split('@')[0] || '';
         setUsername(displayName);
-        setStallAlias(displayName);
+        setStallAlias(await fetchUserDisplayName(user.uid,idToken) || displayName);
         setEmail(user.email || '');
         setProfileImage(user.photoURL || null);
       }
