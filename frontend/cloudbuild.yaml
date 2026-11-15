@@ -1,6 +1,5 @@
 options:
   logging: CLOUD_LOGGING_ONLY
-
 steps:
   # 1. Build Frontend Docker Image
   - name: 'gcr.io/cloud-builders/docker'
