@@ -36,6 +36,7 @@ const LoginWithGoogle = async () => {
     console.log('Google Login Success:', result.user.uid);
     console.log('Email:', result.user.email);
     console.log('Display Name:', result.user.displayName);
+    console.log('Access Token:', await result.user.getIdToken());
 
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/users/register-profile',{
       method: 'POST',
@@ -51,6 +52,9 @@ const LoginWithGoogle = async () => {
     })
 console.log('Backend response status:', response.status);
 console.log('Backend response body:', await response.text());
+if(response.ok){
+  router.replace('/dashboard');
+}
   } catch (error) {
     console.error('Google Login Error:', error);
     setFormMessage(
