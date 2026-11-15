@@ -1,6 +1,7 @@
 package com.example.dto.response.OnGoingID;
 import java.util.List;
 import com.example.dto.response.Assistant.AssistantDTO;
+import com.example.dto.response.Assistant.AssistantPermissionCheckDTO;
 public class OnGoingIDDTO {
 
 //  {
@@ -31,6 +32,7 @@ public class OnGoingIDDTO {
     List<AssistantDTO> Run_Assistant_Name;
     Long Total_Stock;
     Long Total_Sale;
+    AssistantPermissionCheckDTO Permission;
     List<String> Supplier_Name;
     List<OnGoingIDProductDTO> Supplier;
 
@@ -88,6 +90,11 @@ public class OnGoingIDDTO {
     public void setJoin_code(String join_code) {
         Join_code = join_code;
     }
-
+    public AssistantPermissionCheckDTO getPermission() {
+        return Permission;
+    }
+    public void setPermission(AssistantPermissionCheckDTO permission) {
+        Permission = permission;
+    }
 
 }

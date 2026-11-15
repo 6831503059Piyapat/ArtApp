@@ -125,6 +125,13 @@ type ProductDelete = {
 type dataFetch ={
   Gross_sales:number;
   Join_code:string;
+  Permission:{
+    can_manage_permission:boolean;
+    can_manage_stock:boolean;
+    can_record_expenses:boolean;
+    can_sell:boolean;
+    can_view_log:boolean;
+  };
   Run_Assistant_Name:{
     can_manage_permission:boolean;
     can_manage_stock:boolean;
@@ -227,6 +234,19 @@ const getServerOrigin = () => "";
     }
 
     const data = await response.json();
+    if(data.Permission.can_sell === false && data.Permission.can_manage_stock === false){
+      setStepMode("sales");
+    }
+    if(data.Permission.can_sell === false && data.Permission.can_manage_stock === true){
+      setStepMode("edit");
+    }
+    if(data.Permission.can_sell === true && data.Permission.can_manage_stock === false){
+      setStepMode("sales");
+    }
+    if(data.Permission.can_sell === true && data.Permission.can_manage_stock === true){
+      setStepMode("sales");
+    }
+  
     const normalizedSuppliers: Supplier[] = data.Supplier.map((supplier: dataFetch['Supplier'][number]) => ({
       id: supplier.Supplier_Id,
       name: supplier.Supplier_Name,
@@ -369,6 +389,7 @@ async function getExpenses(){
   });
   const data = await response.json();
   setExpenses(data);
+  
   let total = 0;
   for (const expense of data) {
     expense.Amount = Number(expense.Amount);
@@ -685,7 +706,7 @@ async function endRunSendRequest() {
         <div className="min-w-0 space-y-3 rounded-2xl border border-[#7C5CFF]/15 bg-white px-3 py-3 shadow-sm sm:px-5 sm:py-4">
           <div className="flex flex-col gap-3 min-[600px]:flex-row min-[600px]:items-center min-[600px]:justify-between">
             <div className="flex min-w-0 flex-col gap-2">
-              <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
+              <div className={`flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5 ${dataFetched?.Permission.can_manage_permission === false ? 'mb-10' : ''}`}>
                 <h1 className="min-w-0 break-words text-2xl font-extrabold leading-tight tracking-tight text-[#0B0F4F] sm:text-3xl">
                   {dataFetched?.Sale_run_Name || 'Loading...'}
                 </h1>
@@ -704,6 +725,7 @@ async function endRunSendRequest() {
               <button
                 type="button"
                 onClick={() => setIsOpen(true)}
+                hidden={dataFetched?.Permission.can_manage_permission === false}
                 className="flex min-h-11 w-fit max-w-full items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-[#EEE9FF] px-3 py-1 text-xs font-bold text-[#0B0F4F] shadow-sm transition-colors hover:bg-[#E8E1FF] sm:min-h-0"
               >
                 
@@ -724,10 +746,11 @@ async function endRunSendRequest() {
                   type="button"
                   onClick={() => setStepMode("sales")}
                   aria-pressed={stepMode === "sales"}
-                  className={`flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
+                  disabled={dataFetched?.Permission.can_sell === false}
+                  className={`${dataFetched?.Permission.can_sell === false?'cursor-not-allowed bg-gray-400':'hover:text-slate-800'} flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
                     stepMode === "sales"
                       ? "bg-[#7C5CFF] text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-800"
+                      : "text-slate-500 bg-slate-100"
                   }`}
                 >
                   <ShoppingBag className="h-3.5 w-3.5" /> {language === 'EN' ? 'Sales Mode' : 'โหมดขาย'}
@@ -736,10 +759,12 @@ async function endRunSendRequest() {
                   type="button"
                   onClick={() => setStepMode("edit")}
                   aria-pressed={stepMode === "edit"}
-                  className={`flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
+
+                  disabled={dataFetched?.Permission.can_manage_stock === false}
+                  className={`${dataFetched?.Permission.can_manage_stock === false?'cursor-not-allowed':'hover:text-slate-800'} flex min-h-10 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors min-[600px]:min-h-0 min-[600px]:flex-none min-[600px]:gap-1.5 min-[600px]:px-2.5 ${
                     stepMode === "edit"
                       ? "bg-[#FFB24C] text-[#0B0F4F] shadow-sm"
-                      : "text-slate-500 hover:text-slate-800"
+                      : "text-slate-500 "
                   }`}
                 >
                   <Receipt className="h-3.5 w-3.5" />  {language === 'EN' ? 'Edit Mode' : 'โหมดแก้ไข'}
@@ -751,7 +776,9 @@ async function endRunSendRequest() {
                   setIsEndRunConfirmed(false);
                   setIsEndRunOpen(true);
                 }}
-                className="flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15 min-[600px]:min-h-0"
+                disabled={dataFetched?.Permission.can_manage_permission === false}
+                hidden={dataFetched?.Permission.can_manage_permission === false}
+                className={`${dataFetched?.Permission.can_manage_permission === false?'cursor-not-allowed':''} flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-500/15 min-[600px]:min-h-0`}
               >
                 <X className="h-3.5 w-3.5" /> {language === 'EN' ? 'End Run' : 'จบกิจกรรม'}
               </button>
@@ -879,7 +906,9 @@ async function endRunSendRequest() {
                 const refreshedToken = await getAuth().currentUser?.getIdToken()||'';
                 if (!refreshedToken) return;
                 fetchSalesRunData(id, refreshedToken);
-              }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
+              }}
+              hidden = {dataFetched?.Permission.can_manage_permission === false}
+               className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-lg bg-[#FFB24C] px-1.5 py-1.5 text-[10px] font-bold text-[#0B0F4F] hover:bg-[#f5a733] sm:min-h-0">
                 <UserPlus className="h-3 w-3 shrink-0" /> + {language === 'EN' ? 'Invite Assistant' : 'เชิญผู้ช่วย'}
               </button>
               <button onClick={async () => {
@@ -888,7 +917,9 @@ async function endRunSendRequest() {
                 if (!refreshedToken) return;
                 fetchSalesRunData(id, refreshedToken);
 
-              }} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
+              }}
+              hidden = {dataFetched?.Permission.can_manage_permission === false}
+              className="mt-2 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-[#7C5CFF]/20 bg-[#7C5CFF]/5 px-2 py-2 text-[11px] font-bold text-[#7C5CFF] hover:bg-[#7C5CFF]/10 sm:min-h-0">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />{language === 'EN' ? 'Manage Permissions' : 'จัดการสิทธิ์'}
               </button>
             </div>
@@ -1083,7 +1114,7 @@ async function endRunSendRequest() {
 
     {/* 1. HOST PRODUCTS */}
    {products.map((supplier) => (
-   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} Name={supplier.name} Role={supplier.name === "My Products"? "host" : "Supplier"} id={supplier.id} language={language} />
+   <SaleSection key={supplier.id} products={supplier.products} handleSell={handleSell} permission={dataFetched?.Permission} Name={supplier.name} Role={supplier.name === "My Products"? "host" : "Supplier"} id={supplier.id} language={language} />
    ))}
 
   </div>
@@ -1122,7 +1153,7 @@ async function endRunSendRequest() {
 
 
       {/* 2. FAST LOG SHARED EXPENSE CARD */}
-      <div className="min-w-0 space-y-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-2xs sm:p-6">
+      <div hidden = {dataFetched?.Permission.can_record_expenses === false} className="min-w-0 space-y-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-2xs sm:p-6">
         {/* Section Title */}
         <div className="flex items-center space-x-2 text-slate-800 font-bold text-sm">
           <PlusCircle className="w-4 h-4 text-[#FFB24C]" />
@@ -2018,9 +2049,20 @@ function ProductGroupSection({ title, badgeText, badgeColor, countColor, itemCou
     </div>
   );
 }
-function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSell: (id: string) => void; language: 'EN' | 'TH' }) {
+function ProductCard({
+  item,
+  onSell,
+  language,
+  permission,
+}: {
+  item: InventoryProduct;
+  onSell: (id: string) => void;
+  language: 'EN' | 'TH';
+  permission?: dataFetch['Permission'];
+}) {
   const IconComponent = item.icon;
   const isOutOfStock = item.stock === 0;
+  const canSell = permission?.can_sell === true;
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   return (
@@ -2097,9 +2139,10 @@ function ProductCard({ item, onSell, language }: { item: InventoryProduct; onSel
       </div> */}
       <button
     onClick={() => onSell(item.id)}
-  disabled={isOutOfStock}
-  className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
-    isOutOfStock
+  disabled={isOutOfStock || !canSell}
+
+  className={` flex min-h-11 flex-1 items-center justify-center gap-1 rounded-xl px-5 text-sm font-bold text-white shadow-xs transition-all active:scale-95 sm:h-9 sm:min-h-0 sm:min-w-[112px] sm:flex-none ${
+    isOutOfStock || !canSell
       ? 'bg-gray-400 opacity-90 cursor-not-allowed'
       : 'bg-[#7C5CFF] hover:bg-[#6847e8] active:bg-[#5536d2]'
   }`}
@@ -2195,6 +2238,7 @@ function AssistantPermissionsModal({
     permissions.can_sell,
     permissions.can_view_log
   ].filter(Boolean).length;
+  const hasAssistant = Assistant_Name.length > 0;
 
   const handleSavePermissions = async (_value: AssistantPermissionValue) => {
     
@@ -2356,6 +2400,7 @@ function AssistantPermissionsModal({
                 title={language === 'EN' ? 'Sell Products / Cashier Mode' : 'ขายสินค้า / โหมดแคชเชียร์'}
                 description={language === 'EN' ? 'Sell products and register sales transactions in Sales Mode' : 'ขายสินค้าและบันทึกการทำธุรกรรมการขายในโหมดการขาย'}
                 enabled={permissions.can_sell}
+                disabled={!hasAssistant}
                 onToggle={() => togglePermission('can_sell')}
               />
 
@@ -2365,6 +2410,7 @@ function AssistantPermissionsModal({
                 title={language === 'EN' ? 'Add / Edit / Delete Products' : 'เพิ่ม / แก้ไข / ลบสินค้า'}
                 description={language === 'EN' ? 'Manage catalog items, quantities, and pricing' : 'จัดการรายการสินค้า, ปริมาณ, และราคา'}
                 enabled={permissions.can_manage_stock}
+                disabled={!hasAssistant}
                 onToggle={() => togglePermission('can_manage_stock')}
               />
 
@@ -2374,6 +2420,7 @@ function AssistantPermissionsModal({
                 title={language === 'EN' ? 'Record Booth Expenses' : 'บันทึกค่าใช้จ่ายของบูธ'}
                 description={language === 'EN' ? 'Record booth expenses and operational costs' : 'บันทึกค่าใช้จ่ายของบูธและค่าใช้จ่ายในการดำเนินงาน'}
                 enabled={permissions.can_record_expenses}
+                disabled={!hasAssistant}
                 onToggle={() => togglePermission('can_record_expenses')}
               />
 
@@ -2383,6 +2430,7 @@ function AssistantPermissionsModal({
                 title={language === 'EN' ? 'View Sales Log & Gross Stats' : 'ดูบันทึกการขายและสถิติทั้งหมด'}
                 description={language === 'EN' ? 'Access transaction history, undo sales, and total stats' : 'เข้าถึงประวัติการทำธุรกรรม, ยกเลิกการขาย, และสถิติทั้งหมด'}
                 enabled={permissions.can_view_log}
+                disabled={!hasAssistant}
                 onToggle={() => togglePermission('can_view_log')}
               />
 
@@ -2393,6 +2441,7 @@ function AssistantPermissionsModal({
                 badgeText="RESTRICTED"
                 description={language === 'EN' ? 'Assign roles and grant assistant permissions' : 'กำหนดบทบาทและให้สิทธิ์แก่ผู้ช่วย'}
                 enabled={permissions.can_manage_permission}
+                disabled={!hasAssistant}
                 onToggle={() => togglePermission('can_manage_permission')}
               />
 
@@ -2415,7 +2464,8 @@ function AssistantPermissionsModal({
               handleSavePermissions(permissions);
               onSave(permissions);
             }}
-            className="w-full sm:w-auto px-5 py-2.5 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
+            disabled={!hasAssistant}
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#6366F1] hover:bg-[#5558E8] text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#6366F1]"
           >
             <Check className="w-4 h-4 stroke-[3]" />
             <span> {language === 'EN' ? 'Save Permissions' : 'บันทึกสิทธิ์'}</span>
@@ -2434,6 +2484,7 @@ type PermissionToggleRowProps = {
   badgeText?: string;
   description: string;
   enabled: boolean;
+  disabled?: boolean;
   onToggle: () => void;
 };
 
@@ -2443,12 +2494,17 @@ function PermissionToggleRow({
   badgeText,
   description,
   enabled,
+  disabled = false,
   onToggle
 }: PermissionToggleRowProps) {
   return (
     <div
-      onClick={onToggle}
-      className={`flex items-center justify-between gap-3 rounded-xl border p-2.5 shadow-2xs transition-colors cursor-pointer ${
+      onClick={() => {
+        if (!disabled) onToggle();
+      }}
+      className={`flex items-center justify-between gap-3 rounded-xl border p-2.5 shadow-2xs transition-colors ${
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+      } ${
         enabled
           ? 'border-emerald-200 bg-emerald-50/70 hover:bg-emerald-50'
           : 'border-slate-100/90 bg-white hover:bg-slate-50/60'
@@ -2480,9 +2536,10 @@ function PermissionToggleRow({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          onToggle();
+          if (!disabled) onToggle();
         }}
-        className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none ${
+        disabled={disabled}
+        className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 ease-in-out shrink-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
           enabled ? 'bg-emerald-500' : 'bg-slate-200'
         }`}
       >
@@ -2710,6 +2767,7 @@ function FinalEndRunModal({
 function SaleSection({
   products,
   handleSell,
+  permission,
   Name,
   Role,
   id,
@@ -2717,6 +2775,7 @@ function SaleSection({
 }: {
   products: InventoryProduct[];
   handleSell: (id: string) => void;
+  permission?: dataFetch['Permission'];
   Name: string;
   Role: string;
   id: string;
@@ -2752,6 +2811,7 @@ function SaleSection({
           key={cardItem.id}
           item={cardItem}
           onSell={handleSell}
+          permission={permission}
           language={language}
         />
       ))}

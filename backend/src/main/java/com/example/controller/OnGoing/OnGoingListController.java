@@ -16,6 +16,9 @@ import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductFixDTO;
 import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductAddDTO;
 import com.example.dto.request.OnGoing.OngoingID.ProductEdit.ProductDeleteDTO;
 import com.example.service.OnGoing.OnGoingIDService;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.entity.ExpenseLogEntity;
@@ -54,9 +57,12 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
 }
 
     @GetMapping("/ongoing-list/{id}")
-    public ResponseEntity<OnGoingIDDTO> fetchOnGoingListById(@PathVariable("id") String id) throws Exception {
-                      
-        return ResponseEntity.ok(onGoingIDService.getOnGoingListBySalesId(id));
+    public ResponseEntity<OnGoingIDDTO> fetchOnGoingListById(@PathVariable("id") String id, Authentication authentication) throws Exception {
+        String uid = (String) authentication.getPrincipal();
+        
+        UserRecord user = FirebaseAuth.getInstance().getUser(uid);
+        String userId = user.getUid();
+        return ResponseEntity.ok(onGoingIDService.getOnGoingListBySalesId(id, userId));
     }
 
     @PostMapping("/confirm-sale")

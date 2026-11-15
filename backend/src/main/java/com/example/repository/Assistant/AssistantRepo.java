@@ -4,7 +4,7 @@ import com.example.dto.response.DashboardDTO;
 import com.example.dto.response.List_RunDTO;
 import com.example.entity.SaleRunEntity;
 import com.example.entity.UserEntity;
-
+import com.example.dto.response.Assistant.AssistantPermissionCheckDTO;
 import jakarta.transaction.Transactional;
 
 import com.example.entity.RunAssistanceEntity;
@@ -61,7 +61,11 @@ public interface AssistantRepo extends JpaRepository<RunAssistanceEntity, String
         SELECT sale_run_id FROM sale_run WHERE code_join = :code_join AND sale_run_status = 1
            """,nativeQuery = true)
     String findSaleRunIdByCodeJoin(@Param("code_join") String code_join);
-
+    
+    @Query (value = """
+        SELECT can_manage_stock, can_manage_permission, can_record_expenses, can_sell, can_view_log FROM run_assistance WHERE sales_run_id = :sale_run_id AND user_id = :user_id
+           """,nativeQuery = true)
+    AssistantPermissionCheckDTO findPermissionByUser_idAndSaleRun_id(@Param("user_id") String user_id, @Param("sale_run_id") String sale_run_id);
 
 }
 
