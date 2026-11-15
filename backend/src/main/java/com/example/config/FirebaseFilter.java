@@ -37,7 +37,11 @@ public class FirebaseFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
+// 
+System.out.println("===== FirebaseFilter =====");
+System.out.println("Authorization exists: " + (header != null));
 
+// 
         if (header == null || !header.startsWith("Bearer ")) {
             response.sendError(401, "Missing Bearer token");
             return;
@@ -45,9 +49,14 @@ public class FirebaseFilter extends OncePerRequestFilter {
 
         try {
             String token = header.substring(7);
-
+            
             FirebaseToken decodedToken =
                     FirebaseAuth.getInstance().verifyIdToken(token);
+
+// 
+            System.out.println("Firebase Token Verified");
+System.out.println("UID: " + decodedToken.getUid());
+// 
 
             String uid = decodedToken.getUid();
 
@@ -60,7 +69,9 @@ public class FirebaseFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
-
+                    // 
+System.out.println("Passing request to next filter");
+// 
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
