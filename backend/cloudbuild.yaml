@@ -5,14 +5,14 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp:$SHORT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp-backend:$SHORT_SHA'
       - '.'
 
   # 2. Push Image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp:$SHORT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp-backend:$SHORT_SHA'
 
   # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
@@ -20,9 +20,9 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'artapp'
+      - 'artapp-backend'
       - '--image'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp:$SHORT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp-backend:$SHORT_SHA'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -30,4 +30,4 @@ steps:
       - '--quiet'
 
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp:$SHORT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/artapp-repo/artapp-backend:$SHORT_SHA'
