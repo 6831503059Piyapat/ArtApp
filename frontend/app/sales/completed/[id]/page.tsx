@@ -32,7 +32,7 @@ type RunData = {
 
   }[];
 
-  List_Expenses_logs: {
+  List_Expense_Logs: {
     Amount: number;
     Categpory: string;
     Description: string;
@@ -43,7 +43,7 @@ type RunData = {
 
 }[];
 
-List_Sales_logs: {
+List_Sale_Logs: {
   Assistant_name: string;
   Price: number;
   Product_name: string;
@@ -507,7 +507,7 @@ const percentage = grossSales > 0
             }`}
           >
             <List size={16} /> {language === 'EN' ? 'Sales Log' : 'รายการขาย'}
-            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">88</span>
+            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_Sale_Logs?.length ?? 0}</span>
           </button>
           
           <button onClick={() => setActiveTab('expenses')}
@@ -516,7 +516,7 @@ const percentage = grossSales > 0
             }`}
           >
             <Receipt size={16} className={activeTab === 'expenses' ? '' : 'text-[#ED571B]'} /> {language === 'EN' ? 'Expenses Log' : 'รายการค่าใช้จ่าย'}
-            <span className="bg-[#FEF0EA] text-[#ED571B] text-xs px-1.5 py-0.5 rounded-md">1</span>
+            <span className="bg-[#FEF0EA] text-[#ED571B] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_Expense_Logs?.length ?? 0}</span>
           </button>
 
           <button onClick={() => setActiveTab('changes')}
@@ -525,7 +525,7 @@ const percentage = grossSales > 0
             }`}
           >
             <History size={16} className="text-[#F062C0]" /> {language === 'EN' ? 'Changes Made' : 'รายการเปลี่ยนแปลง'}
-            <span className={`${activeTab === 'changes' ? 'bg-[#F062C0]/15 text-[#F062C0]' : 'bg-[#F062C0]/10 text-[#F062C0]'} text-xs px-1.5 py-0.5 rounded-md`}>4</span>
+            <span className={`${activeTab === 'changes' ? 'bg-[#F062C0]/15 text-[#F062C0]' : 'bg-[#F062C0]/10 text-[#F062C0]'} text-xs px-1.5 py-0.5 rounded-md`}>{dataFetch?.List_Change_Made?.length ?? 0}</span>
           </button>
 
           <button onClick={() => setActiveTab('payouts')}
@@ -534,7 +534,7 @@ const percentage = grossSales > 0
             }`}
           >
             <Users size={16} /> {language === 'EN' ? 'Payout Summaries' : 'สรุปการจ่ายเงิน'}
-            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">3</span>
+            <span className="bg-[#7C5CFF]/15 text-[#7C5CFF] text-xs px-1.5 py-0.5 rounded-md">{dataFetch?.List_supplier?.length ?? 0}</span>
           </button>
         </div>
 
@@ -579,6 +579,8 @@ const percentage = grossSales > 0
                           >
                             {language === 'EN' ? 'All Suppliers' : 'ซัพพลายเออร์ทั้งหมด'}
                           </button>
+                          {/* วนลูปสร้างปุ่มตามรายชื่อ Supplier ที่ได้จาก API */}
+                          
                           <button 
                             onClick={() => { setSelectedSupplier('Host (Alex Chen)'); setIsSupplierDropdownOpen(false); }}
                             className="min-h-11 w-full px-3 py-2 text-left text-sm text-[#0B0F4F] hover:bg-blue-50 hover:text-blue-600"
