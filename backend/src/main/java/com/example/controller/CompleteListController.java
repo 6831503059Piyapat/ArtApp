@@ -32,9 +32,8 @@ public class CompleteListController {
  @GetMapping("/complete-list")
     public ResponseEntity<CompleteDTO> fetchCompleteList(Authentication authentication) throws Exception {
          String uid = (String) authentication.getPrincipal();
-         UserRecord user = FirebaseAuth.getInstance()
-                .getUser(uid);
-        return ResponseEntity.ok(completeListService.getCompleteListByUserId(user.getUid()));
+         
+        return ResponseEntity.ok(completeListService.getCompleteListByUserId(uid));
     }
 
     @GetMapping ("/complete-list/{id}")

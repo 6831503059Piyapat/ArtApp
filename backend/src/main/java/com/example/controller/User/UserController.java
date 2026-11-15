@@ -1,13 +1,16 @@
+
 package com.example.controller.User;
 
 import com.example.dto.request.Profile.UpdateProfileDTO;
-import com.example.service.UserService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserRecord;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.example.dto.request.Profile.CreateUserDTO;
+
+import com.example.service.UserService;
 import com.example.service.Users.UserRegisterService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,54 +21,111 @@ public class UserController {
     private final UserService userService;
     private final UserRegisterService userRegisterService;
 
-    public UserController(UserService userService, UserRegisterService userRegisterService) {
+    public UserController(
+            UserService userService,
+            UserRegisterService userRegisterService
+    ) {
         this.userService = userService;
         this.userRegisterService = userRegisterService;
     }
 
+    // Update current user's display name
     @PutMapping("/display-name")
-    public ResponseEntity<?> updateDisplayName(@RequestBody UpdateProfileDTO request) {
+    public ResponseEntity<?> updateDisplayName(
+            Authentication authentication,
+            @RequestBody UpdateProfileDTO request
+    ) {
+
+        String uid = (String) authentication.getPrincipal();
+
+        if (request.getDisplayName() == null
+                || request.getDisplayName().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Display name is required"));
+        }
+
         try {
-            userService.updateDisplayName(request.getUid(), request.getDisplayName());
-        
+
+            userService.updateDisplayName(
+                    uid,
+                    request.getDisplayName()
+            );
+
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("uid", request.getUid());
+            response.put("uid", uid);
             response.put("displayName", request.getDisplayName());
-            // Update the display name in the database
-            // userService.updateDisplayName(userRecord.getUid(), userRecord.getDisplayName());
+
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
+
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse);
+            errorResponse.put("error", "Unable to update display name");
+
+            return ResponseEntity.internalServerError()
+                    .body(errorResponse);
         }
     }
-    @PostMapping ("/register-profile")
-    public ResponseEntity<String> updateUserDatabase(@RequestBody CreateUserDTO request) {
-        
-        // try {
-            if(userRegisterService.userExists(request.getUid())) {
-            return ResponseEntity.badRequest().body("User already exists in the database.");
+
+    // Register current Firebase user in application database
+    @PostMapping("/register-profile")
+    public ResponseEntity<String> registerProfile(
+            Authentication authentication,
+            @RequestBody CreateUserDTO request
+    ) {
+
+        String uid = (String) authentication.getPrincipal();
+
+        if (request.getEmail() == null
+                || request.getEmail().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body("Email is required.");
         }
-        
-            userRegisterService.registerUser(request.getUid(), request.getEmail(), request.getDisplayName());
-            return ResponseEntity.ok("User profile updated successfully.");
-        // } catch (Exception e) {
-        //     return ResponseEntity.badRequest().body("Error updating user profile: " + e.getMessage());
-        // }
-        
+
+        if (userRegisterService.userExists(uid)) {
+            return ResponseEntity.badRequest()
+                    .body("User already exists in the database.");
+        }
+
+        userRegisterService.registerUser(
+                uid,
+                request.getEmail(),
+                request.getDisplayName()
+        );
+
+        return ResponseEntity.ok(
+                "User profile registered successfully."
+        );
     }
-    @GetMapping ("/profile/{uid}")
-    public ResponseEntity<?> getUserProfile(@PathVariable("uid") String uid) {
-        String displayName = userService.getDisplayName(uid);
+
+    // Get current user's profile only
+    @GetMapping("/profile/{uid}")
+    public ResponseEntity<?> getUserProfile(
+            @PathVariable("uid") String requestedUid,
+            Authentication authentication
+    ) {
+
+        String authenticatedUid =
+                (String) authentication.getPrincipal();
+
+        // Users can only access their own profile
+        if (!authenticatedUid.equals(requestedUid)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("error", "Access denied"));
+        }
+
+        String displayName =
+                userService.getDisplayName(authenticatedUid);
+
         if (displayName == null) {
             return ResponseEntity.notFound().build();
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("uid", uid);
+        response.put("uid", authenticatedUid);
         response.put("displayName", displayName);
+
         return ResponseEntity.ok(response);
     }
 }
