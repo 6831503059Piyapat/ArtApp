@@ -97,27 +97,41 @@ async function handleJoinRunSubmit(){
 }
 
 }
-async function fetchDashboardData(idToken:any) {
-  try{
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/dashboard', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}` // ส่ง token ของผู้ใช้ปัจจุบันไปยัง backend
+async function fetchDashboardData(idToken: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/backend/dashboard`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
       }
+    );
 
+    const responseBody = await response.text();
 
-    });
-    const data = await response.json();
+    console.log("Dashboard Status:", response.status);
+    console.log("Dashboard Body:", responseBody);
+
+    if (!response.ok) {
+      throw new Error(
+        `Dashboard API Error ${response.status}: ${responseBody}`
+      );
+    }
+
+    const data = responseBody
+      ? JSON.parse(responseBody)
+      : null;
+
     setDataFetch(data);
-    console.log("Response:", data);
-    setDataFetch(data);
 
-
-  }catch(err){
-    console.error("Error fetching dashboard data:", err);
+  } catch (err) {
+    console.error("Error fetching dashboard:", err);
   }
 }
+
 
 useEffect(() => {
   const auth = getAuth();
@@ -126,7 +140,7 @@ useEffect(() => {
     if(user){
     const emailName = user?.email?.split('@')[0];
     setDisplayName(user?.displayName?.trim() || emailName || '');
-    const idToken = await user?.getIdToken();
+    const idToken = await user?.getIdToken(true);
     setToken(idToken ?? null);
     fetchDashboardData(idToken);
     }
