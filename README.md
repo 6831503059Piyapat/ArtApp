@@ -98,7 +98,7 @@ Technologies used in this project:
 |:---:|:---:|
 | ![Homepage](./images/homepage.png) | ![Dashboard](image-1.png) |
 | <br> **⚙️ Main Features** <br> | 
-| ![Main Features](image-2.png) | ![Main Features](image-1.png)
+| ![Main Features](image-2.png) | (![Main Features](image-4.png))
 
 ---
 
