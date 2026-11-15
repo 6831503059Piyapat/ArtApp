@@ -70,9 +70,8 @@ public class SecurityConfig {
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/live-status/**").permitAll()
                 .requestMatchers(
-                    "/api/public/**",
-                    "/backend/users/register-profile"
-                ).permitAll()
+                    "/api/public/**").permitAll()
+                 .requestMatchers("/backend/users/register-profile").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
