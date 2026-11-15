@@ -75,6 +75,40 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
 | **Data Export** | Post-run sales summaries and local data exports via CSV, XLSX, and PDF formats. |
 
 ---
+<h2>🧑‍💼 Team Responsibilities</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Member</th>
+      <th align="left">Responsibilities</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Piyapat Koedsuk</strong></td>
+      <td>All backend code</td>
+    </tr>
+    <tr>
+      <td><strong>Sirinan Mahapibule</strong></td>
+      <td>UI/UX interface design, Frontend</td>
+    </tr>
+    <tr>
+      <td><strong>Natdaporn Thao-on</strong></td>
+      <td>Database system, Frontend</td>
+    </tr>
+    <tr>
+      <td><strong>Sutheemon Kawee</strong></td>
+      <td><em><!-- Add Sutheemon's role here --></em></td>
+    </tr>
+    <tr>
+      <td><strong>Kanyaphorn Saengwong</strong></td>
+      <td><code>README.md</code> & Documentation</td>
+    </tr>
+  </tbody>
+</table>
+
+---
 <a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
@@ -94,9 +128,9 @@ Technologies used in this project:
 <a id="screenshots"></a>
 ## 🖼️ The Gallery (Screenshots)
 
-| 🏠 Homepage | 📊 Dashboard |
+| 🏠 Landing Page | 📊 Dashboard |
 |:---:|:---:|
-| ![Homepage](./images/homepage.png) | ![Dashboard](image-1.png) |
+| ![Landingpage](Landing page.png) | ![Dashboard](image-1.png) |
 | <br> **⚙️ Main Features** <br> | 
 | ![Main Features](image-2.png) | ![Main Features](image-1.png)
 
