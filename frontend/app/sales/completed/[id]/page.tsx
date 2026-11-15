@@ -198,6 +198,50 @@ const percentage = grossSales > 0
   const totalPayout = dataFetch?.List_supplier?.reduce((sum, supplier) => sum + (supplier.net_payout || 0), 0) || 0;
 
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportCSV = async () => {
+    const user = getAuth().currentUser;
+
+    if (!user) {
+      console.error('Cannot export products: user is not authenticated');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+        const idToken = await user.getIdToken();
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + `/backend/export/products/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+            throw new Error(`Export failed: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = response.headers
+          .get("content-disposition")
+          ?.match(/filename="?([^"]+)"?/)?.[1] ?? "products.csv";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Could not export products:", error);
+    } finally {
+        setIsExporting(false);
+    }
+  };
   // 2. ฟังก์ชันกรองข้อมูล: ถ้าคำที่ค้นหาตรงกับชื่อสินค้า, คนขาย, หรือซัพพลายเออร์ ให้แสดงผล
  // 2. ฟังก์ชันกรองข้อมูลแบบใหม่ (รวม Search + Dropdown)
   const filteredSales = salesData.filter((item) => {
@@ -238,6 +282,19 @@ const percentage = grossSales > 0
 
 
   }
+  function formatCreatedDate(value?: string) {
+  if (!value) return '--/--/----';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--/--/----';
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Asia/Bangkok',
+  }).format(date);
+}
  useEffect(() => {
   const auth = getAuth();
    const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -281,7 +338,7 @@ const percentage = grossSales > 0
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-[#ED571B]" aria-hidden="true" />
-                  {language === 'EN' ? `Closed on ${dataFetch?.Date_complete}` : `ปิดการขายเมื่อ ${dataFetch?.Date_complete}`}
+                  {language === 'EN' ? `Closed on ${formatCreatedDate(dataFetch?.Date_complete)}` : `ปิดการขายเมื่อ ${formatCreatedDate(dataFetch?.Date_complete)}`}
                 </span>
                 <span className="flex items-center gap-1">
                   <User size={13} className="text-[#7C5CFF]" aria-hidden="true" />
@@ -296,8 +353,13 @@ const percentage = grossSales > 0
               </div>
             </div>
             <div className="relative grid w-full grid-cols-1 gap-2 sm:grid-cols-3 min-[900px]:flex min-[900px]:w-auto min-[900px]:shrink-0 min-[900px]:flex-wrap min-[900px]:items-center min-[900px]:min-w-0 min-[900px]:justify-end">
-              <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]">
-                <FileSpreadsheet size={13} className="text-blue-500" /> {language === 'EN' ? 'Download Excel (.xlsx)' : 'ดาวน์โหลด Excel (.xlsx)'}
+              <button
+                type="button"
+                onClick={exportCSV}
+                disabled={isExporting}
+                className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]"
+              >
+                <FileSpreadsheet size={13} className="text-blue-500" /> {isExporting ? (language === 'EN' ? 'Downloading...' : 'กำลังดาวน์โหลด...') : (language === 'EN' ? 'Download CSV' : 'ดาวน์โหลด CSV')}
               </button>
               <button className="flex min-h-11 w-full items-center justify-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs font-medium text-[#0B0F4F] shadow-sm transition hover:bg-gray-50 min-[900px]:min-h-0 min-[900px]:w-auto min-[900px]:whitespace-nowrap min-[900px]:text-[10px]">
                 <FileText size={13} className="text-[#F062C0]" /> {language === 'EN' ? 'PDF Statement' : 'เอกสารสรุป PDF'}

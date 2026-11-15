@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, String> {
    //Update display name
-   @Query(value = "UPDATE user SET display_name = :displayName WHERE uid = :uid", nativeQuery = true)
+   @Transactional 
+   @Modifying 
+   @Query(value = "UPDATE users SET display_name = :displayName WHERE user_id = :uid", nativeQuery = true)
    void updateDisplayName(@Param("uid") String uid, @Param("displayName") String displayName);
    @Modifying
    @Transactional 

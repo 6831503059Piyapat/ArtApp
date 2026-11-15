@@ -217,6 +217,7 @@ const getServerOrigin = () => "";
         console.error("QR code generation failed:", error);
       });
   }
+
   async function fetchSalesRunData(saleRunId: string, idToken: string) {
     // setProducts([]);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/ongoing-list/${saleRunId}`,{
