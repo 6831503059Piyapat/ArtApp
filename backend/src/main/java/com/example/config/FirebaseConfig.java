@@ -30,10 +30,6 @@ public class FirebaseConfig {
             // Google Cloud Run: ใช้ Application Default Credentials
             credentials = GoogleCredentials.getApplicationDefault();
 
-FirebaseOptions options = FirebaseOptions.builder()
-    .setCredentials(credentials)
-    .setProjectId("artappauth")
-    .build();
             System.out.println("Firebase: Using Cloud Run ADC");
 
         } else {
@@ -49,13 +45,15 @@ FirebaseOptions options = FirebaseOptions.builder()
             System.out.println("Firebase: Using local service account JSON");
         }
 
+        // ใช้ Firebase Project เดียวกันทั้ง Local และ Cloud
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(credentials)
-                .setProjectId("automated-lodge-483904-a5")
+                .setProjectId("artappauth")
                 .build();
 
         FirebaseApp.initializeApp(options);
 
         System.out.println("Firebase initialized successfully");
+        System.out.println("Firebase Project ID: artappauth");
     }
 }
