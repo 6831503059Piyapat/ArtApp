@@ -191,6 +191,7 @@ type AssistantPermissionAssistant = AssistantPermissionValue & {
 
 export default function SalesRunDetailContent() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [AssistantName, setAsistantName] = useState<string>('');
   const [expenses, setExpenses] = useState<ExpenseDTO[]>([]);
@@ -678,11 +679,17 @@ async function handleSaveChanges(){
     console.log("Adding expense:", await response.text());
   }
 async function endRunSendRequest() {
+  const user = getAuth().currentUser;
+  if (!user) {
+    console.error("Cannot end sales run: user is not authenticated");
+    return;
+  }
+  const idToken = await user.getIdToken();
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/backend/sale-runs/end`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
+      'Authorization': `Bearer `,
     },
     body: JSON.stringify({
       saleRunId: id,
@@ -694,6 +701,8 @@ async function endRunSendRequest() {
     console.error("Error ending sales run");
     return;
   }
+  
+  router.push(`/sales/completed/${id}`);
   console.log("Ending sales run:", await response.text());
 }
   return (
@@ -1643,6 +1652,7 @@ async function endRunSendRequest() {
             endRunSendRequest();
             setIsEndRunOpen(false);
             setIsEndRunConfirmed(false);
+            
           }}
           language={language}
         />
@@ -2669,6 +2679,7 @@ function EndSalesRunModal({
           <button
             onClick={() => {
               if (isReadyToSubmit) onConfirmEndRun();
+              
             }}
             disabled={!isReadyToSubmit}
             className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white shadow-xs transition-all ${
