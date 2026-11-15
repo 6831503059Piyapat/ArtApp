@@ -282,6 +282,19 @@ const percentage = grossSales > 0
 
 
   }
+  function formatCreatedDate(value?: string) {
+  if (!value) return '--/--/----';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--/--/----';
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Asia/Bangkok',
+  }).format(date);
+}
  useEffect(() => {
   const auth = getAuth();
    const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -325,7 +338,7 @@ const percentage = grossSales > 0
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-[#ED571B]" aria-hidden="true" />
-                  {language === 'EN' ? `Closed on ${dataFetch?.Date_complete}` : `ปิดการขายเมื่อ ${dataFetch?.Date_complete}`}
+                  {language === 'EN' ? `Closed on ${formatCreatedDate(dataFetch?.Date_complete)}` : `ปิดการขายเมื่อ ${formatCreatedDate(dataFetch?.Date_complete)}`}
                 </span>
                 <span className="flex items-center gap-1">
                   <User size={13} className="text-[#7C5CFF]" aria-hidden="true" />

@@ -46,6 +46,20 @@ const completedRuns = [
   { Sale_run_name: 'Artisan Weekend Pop-up', Date_closed: '10/09/2026', Gross_sale: '฿12,350' },
 ];
 
+function formatCreatedDate(value?: string) {
+  if (!value) return '--/--/----';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--/--/----';
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Asia/Bangkok',
+  }).format(date);
+}
+
 export default function DashboardPage() {
   const [sessionFilter, setSessionFilter] = useState<SessionFilter>('All Sessions');
   const showOngoing = sessionFilter !== 'Completed';
@@ -204,7 +218,7 @@ const handleJoinRun = (e: React.FormEvent<HTMLFormElement>) => {
               </div>
               <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] text-[#858ba0] sm:text-[11px]">
                 <span className="font-semibold text-[#0B0F4F]">{dataFetch?.List_Run.at(0)?.Total_Items_sold || 0} / {dataFetch?.List_Run.at(0)?.Total_stock || 0}  {language === 'EN' ? 'items cleared' : 'สินค้าเคลียร์แล้ว'}</span>
-                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} {dataFetch?.List_Run.at(0)?.Date_created}</span>
+                <span>{language === 'EN' ? 'Run created' : 'สร้างเมื่อ'} {formatCreatedDate(dataFetch?.List_Run.at(0)?.Date_created)}</span>
               </div>  
             </div>
             <div className="relative z-10 mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
