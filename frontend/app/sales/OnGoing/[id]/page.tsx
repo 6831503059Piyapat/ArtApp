@@ -689,7 +689,7 @@ async function endRunSendRequest() {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer `,
+      'Authorization': `Bearer ${await getAuth().currentUser?.getIdToken()}`,
     },
     body: JSON.stringify({
       saleRunId: id,
