@@ -1,5 +1,7 @@
+
 options:
   logging: CLOUD_LOGGING_ONLY
+
 steps:
   # 1. Build Frontend Docker Image
   - name: 'gcr.io/cloud-builders/docker'
@@ -38,6 +40,8 @@ steps:
       - 'us-central1'
       - '--platform'
       - 'managed'
+      - '--service-account'
+      - 'artapp-frontend@automated-lodge-483904-a5.iam.gserviceaccount.com'
       - '--quiet'
 
 images:
