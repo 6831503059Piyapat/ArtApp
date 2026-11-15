@@ -99,11 +99,11 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
     </tr>
     <tr>
       <td><strong>Sutheemon Kawee</strong></td>
-      <td><em><!-- Add Sutheemon's role here --></em></td>
+      <td><em>User Profile page</em></td>
     </tr>
     <tr>
       <td><strong>Kanyaphorn Saengwong</strong></td>
-      <td><code>README.md</code> & Documentation</td>
+      <td><code>README.md</code></td>
     </tr>
   </tbody>
 </table>
@@ -130,9 +130,9 @@ Technologies used in this project:
 
 | 🏠 Landing Page | 📊 Dashboard |
 |:---:|:---:|
-| ![Landingpage](Landing page.png) | ![Dashboard](image-1.png) |
+| ![Landingpage]() | ![Dashboard](image-1.png) |
 | <br> **⚙️ Main Features** <br> | 
-| ![Main Features](image-2.png) | (![Main Features](image-4.png))
+| ![Main Features](image-2.png) | ![Main Features](image-1.png)
 
 ---
 
@@ -266,5 +266,5 @@ We would like to thank our instructor and everyone who supported us throughout t
 **Developed with suffering by our team.**
 
 ⭐ If you find this project interesting, consider giving it a star!
-
+ 
 </div>
