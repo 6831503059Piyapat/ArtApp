@@ -3,7 +3,6 @@ package com.example.config;
 
 import java.util.List;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,12 +22,18 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-        config.setAllowedOrigins(
-            List.of(dotenv.get("HEADER_ORIGIN_ALLOWED"))
-        );
+        String allowedOrigin = System.getenv("HEADER_ORIGIN_ALLOWED");
+
+        if (allowedOrigin == null || allowedOrigin.isBlank()) {
+            throw new IllegalStateException(
+                "Missing environment variable: HEADER_ORIGIN_ALLOWED"
+            );
+        }
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(allowedOrigin));
 
         config.setAllowedMethods(
             List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -64,7 +69,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/live-status/**").permitAll()
-                .requestMatchers("/api/public/**", "/backend/users/register-profile").permitAll()
+                .requestMatchers(
+                    "/api/public/**",
+                    "/backend/users/register-profile"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
