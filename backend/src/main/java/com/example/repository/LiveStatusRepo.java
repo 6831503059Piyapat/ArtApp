@@ -80,7 +80,7 @@ WHERE s.sales_run_id = :sale_id;
 SELECT CASE
     WHEN EXISTS (
         SELECT 1
-        FROM Sale_Run
+        FROM sale_run
         WHERE sale_run_id = :sale_id
           AND sale_run_status = TRUE
     )

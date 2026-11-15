@@ -23,38 +23,38 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
 
     
     @Query (value = """
-       UPDATE Product SET current_stock = current_stock - :amount WHERE id = :Product_Id
+       UPDATE product SET current_stock = current_stock - :amount WHERE product_id = :Product_Id
     """,nativeQuery = true)
     void updateProductQuantity(@Param("Product_Id") String Product_Id, @Param ("amount") Integer amount);
 
     @Query (value = """
-       UPDATE Product SET current_stock = :Start_Stock WHERE id = :Product_Id
+       UPDATE product SET current_stock = :Start_Stock WHERE product_id = :Product_Id
     """,nativeQuery = true)
     void updateProductStartStock(@Param ("Product_Id") String Product_Id, @Param ("Start_Stock") Integer StartStock);
 @Modifying
 @Transactional
     @Query (value = """
-       UPDATE Product SET current_stock = start_stock - :current_stock WHERE product_id = :Product_Id
+       UPDATE product SET current_stock = start_stock - :current_stock WHERE product_id = :Product_Id
     """,nativeQuery = true)
     void updateProductCurrentStock(@Param ("Product_Id") String Product_Id, @Param ("current_stock") Integer current_stock);
 
     @Query (value = """
-        UPDATE Product SET image = :image WHERE id = :Product_Id
+        UPDATE product SET image = :image WHERE product_id = :Product_Id
         """,nativeQuery = true)
     void updateProductImage(@Param ("Product_Id") String Product_Id, @Param ("image") String image);
 
     @Query (value = """
-        UPDATE Product SET name = :name WHERE id = :Product_Id
+        UPDATE product SET name = :name WHERE product_id = :Product_Id
         """,nativeQuery = true)
     void updateProductName(@Param ("Product_Id") String Product_Id, @Param ("name") String name);
 
     @Query (value = """
-        UPDATE Product SET Product_Unit_Price = :price WHERE id = :Product_Id
+        UPDATE product SET product_unit_price = :price WHERE product_id = :Product_Id
         """,nativeQuery = true)
     void updateProductPrice(@Param ("Product_Id") String Product_Id, @Param ("price") Double price);
 
     @Query(value = """
-        DELETE FROM Product WHERE id = :Product_Id
+        DELETE FROM product WHERE product_id = :Product_Id
         """, nativeQuery = true)
     void deleteProduct(@Param ("Product_Id") String Product_Id);
 
@@ -64,7 +64,7 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
     //ADD Product
     @Query (
         value = """
-        INSERT INTO Product(Product_Id, Supplier_Id, Product_Name, Product_Unit_Price, Image_url, Start_Stock, Current_Stock) VALUES (:Product_Id,:Supplier_Id,:Product_Name,:Product_Unit_Price,:Image_url,:Start_Stock,:Current_Stock)
+        INSERT INTO product(product_id, supplier_id, product_name, product_unit_price, image_url, start_stock, current_stock) VALUES (:Product_Id,:Supplier_Id,:Product_Name,:Product_Unit_Price,:Image_url,:Start_Stock,:Current_Stock)
         """,nativeQuery = true)
         void addProduct(@Param ("Product_Id") String Product_Id, @Param ("Supplier_Id") String Supplier_Id, @Param ("Product_Name") String Product_Name, @Param ("Product_Unit_Price") Double Product_Unit_Price, @Param ("Image_url") String Image_url, @Param ("Start_Stock") Integer Start_Stock, @Param ("Current_Stock") Integer Current_Stock);
     // Sell Product
@@ -78,7 +78,7 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
     @Transactional
     @Query(
         value = """
-        UPDATE Product SET product_name = :name, product_unit_price = :price,current_stock = :current_stock, start_stock = :start_stock WHERE product_id = :id
+        UPDATE product SET product_name = :name, product_unit_price = :price,current_stock = :current_stock, start_stock = :start_stock WHERE product_id = :id
         """,
         nativeQuery = true
     )
@@ -88,7 +88,7 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
     @Transactional 
     @Query(
         value = """
-        DELETE FROM Product WHERE product_id = :id
+        DELETE FROM product WHERE product_id = :id
         """,nativeQuery = true
     )
     void deleteProductById(@Param("id") String id);

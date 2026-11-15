@@ -46,22 +46,22 @@ SELECT
         MAX(run_summary.Total_Revenue), 0
     ) AS Best_revenue
 
-FROM Sale_Run sr
+FROM sale_run sr
 
 LEFT JOIN (
     SELECT
-        Sale_run_id,
+        sale_run_id,
 
         SUM(quantity_sold) AS Total_item_sold,
 
         SUM(quantity_sold * product_unit_price)
             AS Total_Revenue
 
-    FROM Sale_logs
-    GROUP BY Sale_run_id
+    FROM sale_logs
+    GROUP BY sale_run_id
 
 ) run_summary
-    ON sr.Sale_run_id = run_summary.Sale_run_id
+    ON sr.sale_run_id = run_summary.sale_run_id
 
 WHERE sr.host_user_id =
     :uid;
@@ -81,33 +81,33 @@ WHERE sr.host_user_id =
 // }[];
     @Query(value = """
     SELECT 
-        CAST(sr.Sale_run_id AS CHAR) AS Id,
+        CAST(sr.sale_run_id AS CHAR) AS Id,
         sr.sale_run_name AS Sale_run_name,
         COALESCE(stock_summary.Total_stock, 0) AS Total_stock,
         COALESCE(sales_summary.Total_Items_sold, 0) AS Total_Items_sold,
-        CAST(sr.Date_created AS DATETIME) AS Date_created,
-        CAST(COALESCE(sr.Date_closed, sr.Date_created) AS DATETIME) AS Date_closed,
+        CAST(sr.date_created AS DATETIME) AS Date_created,
+        CAST(COALESCE(sr.date_closed, sr.date_created) AS DATETIME) AS Date_closed,
         sr.sale_run_status AS isActive,
         CAST(COALESCE(sales_summary.Gross_sale, 0) AS DOUBLE) AS Gross_sale
-    FROM Sale_Run sr
+    FROM sale_run sr
     LEFT JOIN (
         SELECT 
-            sup.Sales_run_id,
+            sup.sales_run_id,
             SUM(p.Start_stock) AS Total_stock
-        FROM Supplier sup
-        JOIN Product p ON sup.Supplier_id = p.Supplier_id
-        GROUP BY sup.Sales_run_id
-    ) stock_summary ON sr.Sale_run_id = stock_summary.Sales_run_id
+        FROM supplier sup
+        JOIN product p ON sup.supplier_id = p.supplier_id
+        GROUP BY sup.sales_run_id
+    ) stock_summary ON sr.sale_run_id = stock_summary.sales_run_id
     LEFT JOIN (
         SELECT 
-            sl.Sale_run_id,
+            sl.sale_run_id,
             SUM(sl.quantity_sold) AS Total_Items_sold,
             SUM(sl.quantity_sold * sl.product_unit_price) AS Gross_sale
-        FROM Sale_logs sl
-        GROUP BY sl.Sale_run_id
-    ) sales_summary ON sr.Sale_run_id = sales_summary.Sale_run_id
+        FROM sale_logs sl
+        GROUP BY sl.sale_run_id
+    ) sales_summary ON sr.sale_run_id = sales_summary.sale_run_id
     WHERE sr.host_user_id = :uid
-    ORDER BY sr.Date_created DESC;
+    ORDER BY sr.date_created DESC;
     """, nativeQuery = true)
 List<List_RunDTO> findDashboardListByUserId(@Param("uid") String uid);
     

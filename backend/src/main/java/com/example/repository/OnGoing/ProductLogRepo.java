@@ -16,7 +16,7 @@ public interface ProductLogRepo extends JpaRepository<ProductEntity, String> {
 
     
     @Query (value = """
-        INSERT INTO SaleLogs (Sale_Logs_Id, Supplier_name,Product_Name,Run_Assistance_Name,Sale_run_Id,Product_Unit_Price,Quantity_Sold,Total_Price,Time_Stamp) VALUES (:Sale_Logs_Id, :Supplier_name, :Product_Name, :Run_Assistance_Name, :Sale_run_Id, :Product_Unit_Price, :Quantity_Sold, :Total_Price, :Time_Stamp)
+        INSERT INTO sale_logs (sale_logs_Id, supplier_name,product_Name,run_assistance_name,sale_run_id,product_unit_price,quantity_sold,total_price,time_stamp) VALUES (:Sale_Logs_Id, :Supplier_name, :Product_Name, :Run_Assistance_Name, :Sale_run_Id, :Product_Unit_Price, :Quantity_Sold, :Total_Price, :Time_Stamp)
     """,nativeQuery = true)
     void insertProductToLog(
                             @Param("Sale_Logs_Id") String Sale_Logs_Id, 
