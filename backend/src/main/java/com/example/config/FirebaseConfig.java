@@ -32,7 +32,7 @@ public class FirebaseConfig {
 
 FirebaseOptions options = FirebaseOptions.builder()
     .setCredentials(credentials)
-    .setProjectId("automated-lodge-483904-a5")
+    .setProjectId("artappauth")
     .build();
             System.out.println("Firebase: Using Cloud Run ADC");
 
