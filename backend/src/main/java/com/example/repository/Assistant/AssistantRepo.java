@@ -4,7 +4,7 @@ import com.example.dto.response.DashboardDTO;
 import com.example.dto.response.List_RunDTO;
 import com.example.entity.SaleRunEntity;
 import com.example.entity.UserEntity;
-
+import com.example.dto.response.Assistant.AssistantPermissionCheckDTO;
 import jakarta.transaction.Transactional;
 
 import com.example.entity.RunAssistanceEntity;
@@ -51,4 +51,21 @@ public interface AssistantRepo extends JpaRepository<RunAssistanceEntity, String
                             @Param ("can_record_expenses") Boolean can_record_expenses,
                             @Param ("can_sell") Boolean can_sell,
                             @Param ("can_view_log") Boolean can_view_log);
+   @Query(
+        value= """
+        SELECT EXISTS(SELECT 1 FROM run_assistance WHERE user_id = :user_id AND sales_run_id = :sale_run_id) AS is_exist
+        """, nativeQuery = true)
+    Long checkAssistant(@Param("user_id") String user_id, @Param("sale_run_id") String sale_run_id);
+
+    @Query (value = """
+        SELECT sale_run_id FROM sale_run WHERE code_join = :code_join AND sale_run_status = 1
+           """,nativeQuery = true)
+    String findSaleRunIdByCodeJoin(@Param("code_join") String code_join);
+    
+    @Query (value = """
+        SELECT can_manage_stock, can_manage_permission, can_record_expenses, can_sell, can_view_log FROM run_assistance WHERE sales_run_id = :sale_run_id AND user_id = :user_id
+           """,nativeQuery = true)
+    AssistantPermissionCheckDTO findPermissionByUser_idAndSaleRun_id(@Param("user_id") String user_id, @Param("sale_run_id") String sale_run_id);
+
 }
+

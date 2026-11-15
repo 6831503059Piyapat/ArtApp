@@ -50,8 +50,7 @@ export default function ProfilePage() {
         'Authorization': `Bearer ${token}`},
         body: JSON.stringify({
           uid: user.uid,
-          displayName: username,
-          stallAlias
+          displayName: stallAlias,
         })
       });
       console.log('Profile updated:', response);

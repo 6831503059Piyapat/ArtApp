@@ -39,6 +39,7 @@ import com.example.repository.ExpensesLogRepo;
 import com.example.repository.ChangeHistoryRepo;
 import org.springframework.web.server.ResponseStatusException;
 import com.example.dto.request.OnGoing.OngoingID.Supplier.AddSupplierDTO;
+import com.example.dto.response.Assistant.AssistantPermissionCheckDTO;
 
 @Service
 public class OnGoingIDService {
@@ -64,7 +65,7 @@ public class OnGoingIDService {
     }
 
     @Transactional(readOnly = true)
-    public OnGoingIDDTO getOnGoingListBySalesId(String Sale_run_Id) {
+    public OnGoingIDDTO getOnGoingListBySalesId(String Sale_run_Id, String userId) {
     if (Sale_run_Id == null || Sale_run_Id.isBlank()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sale run ID is required");
     }
@@ -78,8 +79,11 @@ public class OnGoingIDService {
             onGoingIDProductDTO.add(new OnGoingIDProductDTO(Supplier_id, supplier.getSupplier_Name(), null, null, products));
 
         }
+
         List<AssistantDTO> assistanceNames = assistantRepository.findListAssistantBySalesId(Sale_run_Id);
- 
+        
+        AssistantPermissionCheckDTO permission = assistantRepository.findPermissionByUser_idAndSaleRun_id(userId, Sale_run_Id);
+
         OnGoingSaleDTO onGoingSaleDTO = onGoingIDRepository.findOnGoingIDListBySalesId(Sale_run_Id);
         if (onGoingSaleDTO == null) {
             throw new ResponseStatusException(
@@ -94,6 +98,7 @@ public class OnGoingIDService {
         onGoingIDDTO.setTotal_Stock(onGoingSaleDTO.getTotal_Stock());
         onGoingIDDTO.setTotal_Sale(onGoingSaleDTO.getTotal_Sale());
         onGoingIDDTO.setJoin_code(onGoingSaleDTO.getCode_join());
+        onGoingIDDTO.setPermission(permission);
         List<String> supplierNames = new ArrayList<>();
         for (SupplierOnGoingDTO supplier : supplierDTO) {
             supplierNames.add(supplier.getSupplier_Name());

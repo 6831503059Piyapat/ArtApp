@@ -126,7 +126,6 @@ export default function CreateSalesRun() {
   const [runName, setRunName] = useState<string>("");
   const [runDate, setRunDate] = useState<string>(getTodayDate()); // Default to today's date
   const [runLocation, setRunLocation] = useState<string>("");
-  const [ownerProducts, setOwnerProducts] = useState<Product[]>();
   //State for manage blank and error form
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -140,7 +139,28 @@ export default function CreateSalesRun() {
   const [newSupplierName, setNewSupplierName] = useState("");
   const [supplierFormOpen, setSupplierFormOpen] = useState(false);
   const [newExpense, setNewExpense] = useState({ name: "", category: "Booth Fee", amount: "" });
+  const [formResetKey, setFormResetKey] = useState(0);
   const [launched, setLaunched] = useState(false);
+
+  const resetForm = () => {
+    setRunDate(getTodayDate());
+    setRunLocation("");
+    setRunName("");
+    setSections(initialSections);
+    setExpenses(initialExpenses);
+    setSubmitStatus(null);
+    setError("");
+    setSuccess("");
+    setLoading(false);
+    setRunNameError(false);
+    setRunDateError(false);
+    setRunLocationError(false);
+    setNewSupplierName("");
+    setSupplierFormOpen(false);
+    setNewExpense({ name: "", category: "Booth Fee", amount: "" });
+    setFormResetKey((current) => current + 1);
+    setLaunched(false);
+  };
 
   const updateSection = (sectionId: string, update: (section: SupplierSection) => SupplierSection) => {
     setSections((current) => current.map((section) => section.id === sectionId ? update(section) : section));
@@ -275,18 +295,19 @@ export default function CreateSalesRun() {
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
 
   useEffect(() => {
-    console.log(getLocalDateTime());
+    resetForm();
+    
     const auth = getAuth();
   setLanguage(localStorage.getItem('language') === 'EN' ? 'EN' : 'TH');
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
     if(user){
-    const emailName = user?.email?.split('@')[0];
     const idToken = await user?.getIdToken();
     setToken(idToken ?? null);
     }
     
   })
-  return unsubscribe;
+  return () => unsubscribe();
+    
 },[]);
   return (
     <div className="min-h-screen bg-[#f7f8fc] pb-32 font-sans text-[#111747] sm:pb-20">
@@ -374,7 +395,7 @@ export default function CreateSalesRun() {
                      {language === 'EN' ? 'Run Name' : 'ชื่อรายการขาย'} <span className="text-[#f15a24]">*</span>
                     <span className="relative mt-1 block">
                       <Store className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runNameError ? 'text-[#f15a24]':' text-[#7957ff]'}`} />
-                      <input required placeholder={language === 'EN' ? 'Enter run name Ex: MFU Outside Night Market (MON14)' : 'ป้อนชื่อรายการขาย Ex: MFU Outside Night Market (MON14)'} onChange={(e) => setRunName(e.target.value)} className={`${inputClass} ${runNameError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6 font-semibold`} />
+                      <input required value={runName} autoComplete="off" placeholder={language === 'EN' ? 'Enter run name Ex: MFU Outside Night Market (MON14)' : 'ป้อนชื่อรายการขาย Ex: MFU Outside Night Market (MON14)'} onChange={(e) => setRunName(e.target.value)} className={`${inputClass} ${runNameError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6 font-semibold`} />
                     </span>
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -389,7 +410,7 @@ export default function CreateSalesRun() {
                        {language === 'EN' ? 'Booth Location' : 'สถานที่'}
                       <span className="relative mt-1 block">
                         <MapPin className={`absolute left-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 ${runLocationError ? 'text-[#f15a24]' : 'text-[#858ba0]'}`} />
-                        <input placeholder={language === 'EN' ? 'Mae Fah Luang University' : 'มหาวิทยาลัยแม่ฟ้าหลวง'} onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} ${runLocationError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
+                        <input value={runLocation} autoComplete="off" placeholder={language === 'EN' ? 'Mae Fah Luang University' : 'มหาวิทยาลัยแม่ฟ้าหลวง'} onChange={(e) => setRunLocation(e.target.value)} className={`${inputClass} ${runLocationError ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : `${inputClass2}`} w-full pl-6`} />
                       </span>
                     </label>
                   </div>
@@ -399,7 +420,7 @@ export default function CreateSalesRun() {
 
             {sections.map((section, index) => (
               <ProductSection
-                key={section.id}
+                key={`${section.id}-${formResetKey}`}
                 section={section}
                 index={index + 1}
                 onAdd={(product) => updateSection(section.id, (current) => ({
@@ -517,15 +538,11 @@ export default function CreateSalesRun() {
             <button
               type="button"
               onClick={() => {
-                setSubmitStatus(null);
                 if (submitStatus.type === "success") {
-                  setSections(initialSections);
-                  setExpenses(initialExpenses);
-                  setRunName("");
-                  setRunDate(getTodayDate());
-                  setRunLocation("");
+                  resetForm();
                   router.push("/sales/OnGoing");
-
+                } else {
+                  setSubmitStatus(null);
                 }
               }}
               className="mt-4 inline-flex min-h-10 items-center justify-center gap-1 rounded-lg bg-[#7957ff] px-5 py-2 text-sm font-bold text-white hover:bg-[#6642ed]"
