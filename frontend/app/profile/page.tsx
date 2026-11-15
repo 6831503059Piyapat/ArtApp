@@ -3,7 +3,7 @@ import Navbar from '@/app/components/navbar';
 import Image from 'next/image';
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { Store, User, CheckCircle2, Info, Save, SlidersHorizontal, LogOut } from 'lucide-react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
@@ -60,6 +60,33 @@ export default function ProfilePage() {
    
   }
 
+  async function saveDisplayName() {
+    const user = auth.currentUser;
+    const displayName = stallAlias.trim();
+
+    if (!user || !displayName) {
+      throw new Error('Display name is required');
+    }
+
+    const token = await user.getIdToken();
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/backend/users/display-name', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ uid: user.uid, displayName }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update display name: ${response.status}`);
+    }
+
+    await updateProfile(user, { displayName });
+    setStallAlias(displayName);
+    setUsername(displayName);
+  }
+
   function handleLanguageChange(lang: 'EN' | 'TH') {
     localStorage.setItem('language', lang);
     window.dispatchEvent(new Event('languagechange'));
@@ -73,12 +100,18 @@ export default function ProfilePage() {
     localStorage.setItem('Currency', currency.toString());
   };
 
-  const handleSave = () => {
-    setToastMessage(language === 'EN' ? 'Changes saved successfully!' : 'บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!');
-    setIsInfoToast(false);
+  const handleSave = async () => {
+    try {
+      await saveDisplayName();
+      setToastMessage(language === 'EN' ? 'Changes saved successfully!' : 'บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!');
+      setIsInfoToast(false);
+    } catch (error) {
+      console.error('Error updating display name:', error);
+      setToastMessage(language === 'EN' ? 'Could not save display name.' : 'ไม่สามารถบันทึกชื่อที่แสดงได้');
+      setIsInfoToast(true);
+    }
     setShowToast(true);
-    handleChange();
-    setTimeout(() => setShowToast(false), 3000);
+    window.setTimeout(() => setShowToast(false), 3000);
   };
 
   const notifyFieldCannotChange = () => {
@@ -96,16 +129,41 @@ export default function ProfilePage() {
       console.error('Logout failed:', error);
     }
   };
+  async function fetchUserDisplayName(uid: string,token:string) {
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/backend/users/profile/${uid}`,{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch display name: ${response.status}`);
+      }
+
+      const data: { displayName?: string } = await response.json();
+      return data.displayName;
+    }catch(err){
+      console.error('Error fetching display name:', err);
+    }
+  }
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setUsername(user.displayName || '');
-        setStallAlias(user.email?.split('@')[0] || '');
+        const idToken = await user.getIdToken();
+        const backendDisplayName = await fetchUserDisplayName(user.uid, idToken);
+        const displayName = backendDisplayName || user.displayName || user.email?.split('@')[0] || '';
+        setUsername(displayName);
+        setStallAlias(displayName);
         setEmail(user.email || '');
         setProfileImage(user.photoURL || null);
       }
     });
+
+    return unsubscribe;
   }, []);
 
   return (

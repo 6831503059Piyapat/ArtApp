@@ -26,15 +26,13 @@ public class UserController {
     @PutMapping("/display-name")
     public ResponseEntity<?> updateDisplayName(@RequestBody UpdateProfileDTO request) {
         try {
-            UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(request.getUid())
-                    .setDisplayName(request.getDisplayName());
-
-            UserRecord userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
-
+            System.out.println("Received request to update display name for UID: " + request.getUid() + " to: " + request.getDisplayName());
+            userService.updateDisplayName(request.getUid(), request.getDisplayName());
+        
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("uid", userRecord.getUid());
-            response.put("displayName", userRecord.getDisplayName());
+            response.put("uid", request.getUid());
+            response.put("displayName", request.getDisplayName());
             // Update the display name in the database
             // userService.updateDisplayName(userRecord.getUid(), userRecord.getDisplayName());
             return ResponseEntity.ok(response);
@@ -58,5 +56,17 @@ public class UserController {
         //     return ResponseEntity.badRequest().body("Error updating user profile: " + e.getMessage());
         // }
         
+    }
+    @GetMapping ("/profile/{uid}")
+    public ResponseEntity<?> getUserProfile(@PathVariable("uid") String uid) {
+        String displayName = userService.getDisplayName(uid);
+        if (displayName == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("uid", uid);
+        response.put("displayName", displayName);
+        return ResponseEntity.ok(response);
     }
 }

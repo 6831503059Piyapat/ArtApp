@@ -1,41 +1,54 @@
 
 package com.example.config;
-
-import java.io.IOException;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.annotation.Configuration;
+import jakarta.annotation.PostConstruct;
+import java.io.InputStream;
+import java.io.IOException;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Bean
-    public FirebaseApp firebaseApp() throws IOException {
+    @PostConstruct
+    public void initialize() throws IOException {
 
-        // ใช้ Default App ที่มีอยู่แล้ว หาก Initialize ไปก่อนหน้านี้
-        for (FirebaseApp app : FirebaseApp.getApps()) {
-            if (FirebaseApp.DEFAULT_APP_NAME.equals(app.getName())) {
-                return app;
+        if (!FirebaseApp.getApps().isEmpty()) {
+            return;
+        }
+
+        GoogleCredentials credentials;
+
+        String environment =
+            System.getenv("APP_ENV");
+
+        if ("cloud".equalsIgnoreCase(environment)) {
+
+            // Google Cloud Run: ใช้ ADC
+            credentials =
+                GoogleCredentials.getApplicationDefault();
+
+        } else {
+
+            // Local: ใช้ไฟล์ JSON
+            ClassPathResource resource =
+                new ClassPathResource("serviceAccountKey.json");
+
+            try (InputStream input =
+                     resource.getInputStream()) {
+
+                credentials =
+                    GoogleCredentials.fromStream(input);
             }
         }
 
-        // โหลด Firebase Service Account จาก resources
-        try (var serviceAccount =
-                 new ClassPathResource("serviceAccountKey.json")
-                     .getInputStream()) {
-
-            FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(
-                    GoogleCredentials.fromStream(serviceAccount)
-                )
+        FirebaseOptions options =
+            FirebaseOptions.builder()
+                .setCredentials(credentials)
                 .build();
 
-            return FirebaseApp.initializeApp(options);
-        }
+        FirebaseApp.initializeApp(options);
     }
 }

@@ -18,6 +18,11 @@ public class UserService {
     public void updateDisplayName(String userId, String displayName) {
         userRepository.updateDisplayName(userId, displayName);
     }
+    public String getDisplayName(String userId) {
+        return userRepository.findById(userId)
+                .map(user -> user.getDisplayName())
+                .orElse(null);
+    }
     
 }
 
