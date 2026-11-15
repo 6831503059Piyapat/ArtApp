@@ -34,15 +34,12 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(allowedOrigin));
-
         config.setAllowedMethods(
             List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
         );
-
         config.setAllowedHeaders(
             List.of("Authorization", "Content-Type")
         );
-
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
@@ -66,12 +63,19 @@ public class SecurityConfig {
                 )
             )
             .authorizeHttpRequests(auth -> auth
+
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/live-status/**").permitAll()
+
+                .requestMatchers("/api/public/**").permitAll()
+
                 .requestMatchers(
-                    "/api/public/**").permitAll()
-                 .requestMatchers("/backend/users/register-profile").permitAll()
+                    HttpMethod.POST,
+                    "/backend/users/register-profile"
+                ).permitAll()
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

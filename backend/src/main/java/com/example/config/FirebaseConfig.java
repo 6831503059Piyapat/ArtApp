@@ -30,6 +30,10 @@ public class FirebaseConfig {
             // Google Cloud Run: ใช้ Application Default Credentials
             credentials = GoogleCredentials.getApplicationDefault();
 
+FirebaseOptions options = FirebaseOptions.builder()
+    .setCredentials(credentials)
+    .setProjectId("automated-lodge-483904-a5")
+    .build();
             System.out.println("Firebase: Using Cloud Run ADC");
 
         } else {

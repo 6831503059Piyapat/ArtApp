@@ -1,3 +1,4 @@
+
 package com.example.config;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -6,65 +7,70 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-
 import java.io.IOException;
 import java.util.List;
 
-// *** ห้ามใส่ @Component หรือ @Service บนหัวคลาสนี้เด็ดขาด ***
 public class FirebaseFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-                String path = request.getServletPath();
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
-        // 1. กำหนด Path ของ WebSocket ที่ต้องการยกเว้น
-        if (path.startsWith("/ws")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (path.startsWith("/live-status")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        // หากเป็น OPTIONS Request ให้ถือว่าผ่านและตอบ SC_OK กลับไปทันที
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (path.startsWith("/backend/users/register-profile")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String path = request.getServletPath();
+
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || path.startsWith("/ws")
+                || path.startsWith("/live-status")
+                || path.equals("/backend/users/register-profile")
+                || path.startsWith("/api/public/");
+    }
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing Bearer token");
+            response.sendError(401, "Missing Bearer token");
             return;
         }
 
-        String token = header.substring(7);
         try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            String token = header.substring(7);
+
+            FirebaseToken decodedToken =
+                    FirebaseAuth.getInstance().verifyIdToken(token);
+
             String uid = decodedToken.getUid();
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(uid, null,
-                            List.of(() -> "ROLE_USER"));
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            uid,
+                            null,
+                            List.of(() -> "ROLE_USER")
+                    );
+
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
+
+            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            SecurityContextHolder.clearContext();
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
-            return;
-        }
 
-        filterChain.doFilter(request, response);
+            System.err.println("Firebase verification failed: "
+                    + e.getClass().getName() + ": " + e.getMessage());
+
+            SecurityContextHolder.clearContext();
+
+            response.sendError(401, "Invalid Firebase token");
+        }
     }
 }
