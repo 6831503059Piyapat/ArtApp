@@ -35,25 +35,33 @@ public class Dashboard {
         this.joinsaleService = joinsaleService;
     }
 
-    @GetMapping("/dashboard")
-    public ResponseEntity<DashboardDTO> getTotalSaleRun(Authentication authentication) throws Exception {
-        String uid = (String) authentication.getPrincipal();
-    
-        UserRecord user = FirebaseAuth.getInstance()
-                .getUser(uid);
-        DashboardTotalDTO dashboardData = dashboardService.getDashboardByUserId(user.getUid());
-        List<List_RunDTO> dashboardList = dashboardService.getDashboardListByUserId(user.getUid());
+   
+@GetMapping("/dashboard")
+public ResponseEntity<DashboardDTO> getTotalSaleRun(
+        Authentication authentication) throws Exception {
 
-        DashboardDTO finalDashboardData = new DashboardDTO(
+    // UID ได้รับการตรวจสอบแล้วจาก FirebaseFilter
+    String uid = (String) authentication.getPrincipal();
+
+    // ใช้ UID เรียกข้อมูลจาก Database โดยตรง
+    DashboardTotalDTO dashboardData =
+            dashboardService.getDashboardByUserId(uid);
+
+    List<List_RunDTO> dashboardList =
+            dashboardService.getDashboardListByUserId(uid);
+
+    DashboardDTO finalDashboardData = new DashboardDTO(
             dashboardData.Total_create(),
             dashboardData.Total_complete(),
             dashboardData.Total_active(),
             dashboardData.Total_item_sold(),
             dashboardData.Best_revenue(),
             dashboardList
-        );
-        return ResponseEntity.ok(finalDashboardData);
-    }
+    );
+
+    return ResponseEntity.ok(finalDashboardData);
+}
+
     @PostMapping("/join-sale")
     public ResponseEntity<String> joinSale(Authentication authentication, @RequestBody JoinSaleDTO joinSaleDTO) throws FirebaseAuthException {
         // Handle the join sale request
