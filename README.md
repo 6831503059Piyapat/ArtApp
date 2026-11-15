@@ -99,7 +99,7 @@ ConsignDesk is here to rescue shared booth management from the chaos of manual r
     </tr>
     <tr>
       <td><strong>Sutheemon Kawee</strong></td>
-      <td><em><!-- Add Sutheemon's role here --></em></td>
+      <td>SRS document, Frontend</td>
     </tr>
     <tr>
       <td><strong>Kanyaphorn Saengwong</strong></td>
