@@ -10,12 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.dto.response.OnGoingDTO;
 import com.example.dto.response.OnGoingID.OnGoingIDProductDTO;
 import org.springframework.data.repository.query.Param;
+import com.example.dto.System.ProductCSVDTO;
 import org.springframework.stereotype.Repository;
 import com.example.dto.response.OnGoingID.OnGoingIDDTO;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.dto.response.OnGoingID.ProductDTO;
 import com.example.entity.ProductEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -58,7 +60,10 @@ public interface ProductRepo extends JpaRepository<ProductEntity, String> {
         """, nativeQuery = true)
     void deleteProduct(@Param ("Product_Id") String Product_Id);
 
-
+    @Query(value = """
+        SELECT product_name,product_unit_price,run_assistant_name,payment_method,quantity_sold,total_price,time_stamp AS time_stamp FROM sale_logs WHERE sale_run_id = :sale_run_id
+        """, nativeQuery = true)
+    List<ProductCSVDTO> findProductTOCSVById(@Param("sale_run_id") String sale_run_id);
 
 
     //ADD Product

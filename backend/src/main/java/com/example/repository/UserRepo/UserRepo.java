@@ -16,7 +16,7 @@ public interface UserRepo extends JpaRepository<UserEntity, String> {
    //Update display name
    @Transactional 
    @Modifying 
-   @Query(value = "UPDATE users SET display_name = :displayName WHERE uid = :uid", nativeQuery = true)
+   @Query(value = "UPDATE users SET display_name = :displayName WHERE user_id = :uid", nativeQuery = true)
    void updateDisplayName(@Param("uid") String uid, @Param("displayName") String displayName);
    @Modifying
    @Transactional 

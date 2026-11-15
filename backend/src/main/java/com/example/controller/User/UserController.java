@@ -26,7 +26,6 @@ public class UserController {
     @PutMapping("/display-name")
     public ResponseEntity<?> updateDisplayName(@RequestBody UpdateProfileDTO request) {
         try {
-            System.out.println("Received request to update display name for UID: " + request.getUid() + " to: " + request.getDisplayName());
             userService.updateDisplayName(request.getUid(), request.getDisplayName());
         
             Map<String, Object> response = new HashMap<>();
