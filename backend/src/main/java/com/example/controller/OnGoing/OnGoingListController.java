@@ -60,9 +60,9 @@ public ResponseEntity<List<OnGoingDTO>> getOnGoingList(Authentication authentica
     public ResponseEntity<OnGoingIDDTO> fetchOnGoingListById(@PathVariable("id") String id, Authentication authentication) throws Exception {
         String uid = (String) authentication.getPrincipal();
         
-        UserRecord user = FirebaseAuth.getInstance().getUser(uid);
-        String userId = user.getUid();
-        return ResponseEntity.ok(onGoingIDService.getOnGoingListBySalesId(id, userId));
+        
+       
+        return ResponseEntity.ok(onGoingIDService.getOnGoingListBySalesId(id, uid));
     }
 
     @PostMapping("/confirm-sale")

@@ -55,6 +55,9 @@ console.log('Backend response body:', await response.text());
 if(response.ok){
   router.replace('/dashboard');
 }
+if(response.status == 400){
+  router.replace('/dashboard');
+}
   } catch (error) {
     console.error('Google Login Error:', error);
     setFormMessage(
